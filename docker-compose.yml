@@ -1,0 +1,38 @@
+version: '3.7'
+
+services:    
+  api:
+    build: .
+    ports:
+      - 8000:8000
+    environment:
+      DB_URL: mongodb://root:example@db:27017/
+
+  cronjob:
+    build: .
+    environment:
+      - DB_URL=mongodb://root:example@db:27017/
+      - PYTHONUNBUFFERED=0
+    entrypoint: ["python", "-u", "/app/src/apps/cronjobs/__init__.py"]
+
+    volumes:
+      - ".:/app"
+
+  db:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - 27017:27017
+
+  cache:
+    image: memcached
+    restart: always
+    ports:
+      - 11211:11211
+
+
+
+

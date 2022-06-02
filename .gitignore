@@ -1,0 +1,9 @@
+mysql_data/
+.env
+.vscode/
+log/
+.Docker.swp
+**/__pycache__/
+.python-version
+venv/
+contracts.local.json

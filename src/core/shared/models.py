@@ -1,0 +1,371 @@
+from dataclasses import dataclass
+from datetime import datetime
+from typing import List
+
+from beanie import PydanticObjectId
+from pydantic import BaseModel
+
+from src.core.shared.static.game_data.Common import BuildableItemBaseType, CommonKeys, BuildableItemLevelInfo
+from src.core.shared.static.game_data.PlanetData import PlanetData
+from src.core.shared.static.game_data.ResourceData import ResourceData as RD, ResourceData
+from src.core.shared.static.game_data.InstallationData import InstallationData as ID
+from src.core.shared.static.game_data.ResearchData import ResearchData as RE
+from src.core.shared.static.game_data.DefenseData import DefenseData as DD
+from src.core.shared.static.game_data.StakingData import StakingData as SD
+from src.core.shared.service.tier_benefit import tier_benefit_service
+
+
+class AppBaseException(Exception):
+    msg: str
+    code = 400
+
+
+class ShadyActivityException(AppBaseException):
+    msg = "This looks suspicios to me, what are you trying boi?"
+
+
+class UserNotFoundException(AppBaseException):
+    msg = "Provided user was not found"
+    code = 401
+
+
+class PlanetNameMissingException(AppBaseException):
+    msg = "Please choose a name for your planet"
+
+
+class PlanetIdAlreadyExistsException(AppBaseException):
+    msg = "Provided planet id already exists"
+
+
+class NotMyPlanetException(AppBaseException):
+    msg = "This planet belongs to other user..."
+
+
+class NoPlanetFoundException(AppBaseException):
+    msg = "No planet with this id found..."
+    code = 404
+
+
+class QueueIsFullException(AppBaseException):
+    msg = "Can't upgrade, queue is full..."
+
+
+@dataclass
+class User:
+    id: str = None
+    wallet: str = None
+    username: str = None
+
+    def exists(self):
+        return self.id is not None
+
+
+
+
+class PlanetTier(BaseModel):
+    tier_code: str = SD.TIER_0
+    tier_name: str = SD.TIER_NAMES[SD.TIER_0]
+    token_amount: float = 0
+    time_release: datetime | None = None
+    staked: bool = False
+
+
+class LevelUpRewardClaims(BaseModel):
+    id: PydanticObjectId = None
+    level: int = None
+    completed: bool = False
+
+
+class BuildableItem(BaseModel):
+    label: str
+    type: str
+    current_level: int = 0
+    building: bool = False
+    finish: float = None
+
+    repairing: bool = False
+    health: int = -1
+
+    quantity: int = -1
+    quantity_building: int = -1
+
+
+class Resources(BaseModel):
+    metal: float = None
+    crystal: float = None
+    petrol: float = None
+    energy: float = None
+
+    metal_last_updated: float = None
+    crystal_last_updated: float = None
+    petrol_last_updated: float = None
+
+    energy_usage: float = None
+    energy_max_deposit: float = None
+
+
+class Reserves(BaseModel):
+    # Total resources reserve left
+    total_metal: float = 0
+    total_crystal: float = 0
+    total_petrol: float = 0
+
+    # Current visible resource reserve
+    metal: float = 0
+    crystal: float = 0
+    petrol: float = 0
+
+
+class EnergyDeposit(BaseModel):
+    id: str = None
+    created_time: float = None
+    token_amount: float = None
+    usd_value: float = None
+    planet_id: str
+    was_recovered = False
+
+# @TODO: Add emails
+class Planet(BaseModel):
+    id: str = None
+    created_at: datetime = None
+    name: str = None
+    rarity: str = None
+    image: str = None
+    image_url: str = None
+    level: int = None
+    experience: int = None
+    diameter: int = None
+    slots: int = None  # = Diameter/1000
+    slots_used: int = None
+    min_temperature: int = None
+    max_temperature: int = None
+
+    reserves: Reserves = None
+
+    # Original resources reserve
+    original_total_metal_amount: float = None
+    original_total_crystal_amount: float = None
+    original_total_petrol_amount: float = None
+
+    galaxy: int = None
+    solar_system: int = None
+    position: int = None
+    user: str = None
+
+    claimable: int = None  # timestamp
+    claimed: bool = None
+
+    tier: PlanetTier = None
+    resources: Resources = Resources()
+
+    price_paid: int = None
+    free_tokens: float = None
+
+    resources_level: List[BuildableItem] = []
+    installation_level: List[BuildableItem] = []
+    research_level: List[BuildableItem] = []
+    defense_items: List[BuildableItem] = []
+    pending_levelup_reward: List[LevelUpRewardClaims] = []
+
+    energy_deposits: List[EnergyDeposit] = []
+    def building_queue(self) -> list[BuildableItem]:
+        buildable_item: list[
+            BuildableItem] = self.resources_level + self.research_level + self.installation_level + self.defense_items
+
+        return list(filter(lambda b: b.building or b.repairing, buildable_item))
+
+
+    def is_free(self):
+        return self.price_paid == 0
+
+    def set_image_url(self, url: str):
+        self.image_url = f"{url}/{self.image}.png"
+
+    # @TODO: Pydantic bug dont serialize properties
+    # @SEE: https://github.com/samuelcolvin/pydantic/pull/2625
+    # @property
+    def calculate_energy_usage_per_min(self) -> float:
+        mines: List[BuildableItem] = self.resources_level
+        energy_usage = 0
+        mine: BuildableItem
+
+        for mine in mines:
+            mine_info: BuildableItemBaseType = RD.get_item(mine.label)
+
+            if mine_info.category is not RD.MINE_CATEGORY:
+                continue
+
+            current_level = mine.current_level
+            if current_level == 0:
+                continue
+
+            level_info = mine_info.get_level_info(current_level)
+            health_percentage = mine.health / level_info.health
+            energy_usage += level_info.energy_usage
+            if health_percentage < 1:
+                energy_health_factor = health_percentage * 1.5
+                if energy_health_factor > 1:
+                    energy_health_factor = 1
+
+                energy_usage *= energy_health_factor
+
+        self.resources.energy_usage = energy_usage
+
+        # @TODO: Should be a property on resources just like this method once PR is merged
+        self.resources.energy_max_deposit = PlanetData.DATA[self.rarity][CommonKeys.ENERGY_DEPOSIT_MAX_ONCE]
+
+        return self.resources.energy_usage
+
+    def get_planet_resource_data(self):
+        re = {}
+        resources_level = self.resources_level
+
+        resource_level: BuildableItem
+        for resource_level in resources_level:
+            label = resource_level.label
+            upgrading = resource_level.building
+            repairing = resource_level.repairing
+            current_level = resource_level.current_level
+
+            current_level_info: BuildableItemLevelInfo = ResourceData.get_item(label).get_level_info(current_level)
+
+            tmp = {'building': upgrading, 'repairing': repairing}
+
+            if upgrading or repairing:
+                tmp['finish'] = resource_level.finish
+
+            tmp['level'] = current_level
+            tmp['type'] = RD.TYPE
+
+            resources_data: BuildableItemBaseType = RD.get_item(label)
+            tmp['name'] = resources_data.name
+            tmp['label'] = resources_data.label
+            tmp['description'] = resources_data.description
+            tmp['health'] = resource_level.health
+            tmp['upgrades'] = {}
+
+            if resources_data.category == RD.MINE_CATEGORY:
+                tmp['production'] = current_level_info.production
+
+            if resources_data.category == RD.WAREHOUSE_CATEGORY:
+                tmp['capacity'] = current_level_info.capacity
+
+            for upgrade in resources_data.builds:
+                upgrade_data: BuildableItemLevelInfo = resources_data.builds[upgrade]
+                # upgrade_data = resources_data.builds[upgrade]
+                tmp['upgrades'][upgrade_data.level] = tier_benefit_service(self.tier.tier_code, upgrade_data)
+
+            re[label] = tmp
+
+        return re
+
+    def get_planet_research_data(self):
+        re = {}
+
+        research_levels = self.research_level
+        research_level: BuildableItem
+        for research_level in research_levels:
+            label = research_level.label
+            upgrading = research_level.building
+            current_level = research_level.current_level
+
+            research_data: BuildableItemBaseType = RE.get_item(label)
+
+            tmp = {'building': upgrading}
+
+            if upgrading:
+                tmp['finish'] = research_level.finish
+
+            tmp['level'] = current_level
+            tmp['type'] = RE.TYPE
+            tmp['name'] = research_data.name
+            tmp['label'] = research_data.label
+            tmp['description'] = research_data.description
+
+            tmp['upgrades'] = {}
+            for upgrade in research_data.builds:
+                upgrade_data: BuildableItemLevelInfo = research_data.builds[upgrade]
+                tmp['upgrades'][upgrade_data.level] = tier_benefit_service(self.tier.tier_code, upgrade_data)
+
+            re[label] = tmp
+
+        return re
+
+    def get_planet_installation_data(self):
+        re = {}
+        installations_level = self.installation_level
+
+        installation_level: BuildableItem
+        for installation_level in installations_level:
+            label = installation_level.label
+            upgrading = installation_level.building
+            current_level = installation_level.current_level
+
+            installation_data: BuildableItemBaseType = ID.get_item(label)
+
+            tmp = {'building': upgrading}
+
+            if upgrading:
+                tmp['finish'] = installation_level.finish
+
+            tmp['level'] = current_level
+            tmp['type'] = ID.TYPE
+            tmp['name'] = installation_data.name
+            tmp['label'] = installation_data.label
+            tmp['description'] = installation_data.description
+
+            tmp['upgrades'] = {}
+            for upgrade in installation_data.builds:
+                upgrade_data: BuildableItemLevelInfo = installation_data.builds[upgrade]
+                tmp['upgrades'][upgrade_data.level] = tier_benefit_service(self.tier.tier_code, upgrade_data)
+
+            re[label] = tmp
+
+        return re
+
+    def get_planet_defense_data(self):
+        re = {}
+
+        defense_items: list[BuildableItem] = self.defense_items
+        defense_item: BuildableItem
+        for defense_item in defense_items:
+            label = defense_item.label
+            defense_data: BuildableItemBaseType = DD.get_item(label)
+
+            tmp = {}
+            tmp['type'] = DD.TYPE
+            tmp['name'] = defense_data.name
+            tmp['label'] = label
+            tmp['description'] = defense_data.description
+            tmp['available'] = defense_item.quantity
+            tmp['data'] = tier_benefit_service(self.tier.tier_code, defense_data.get_level_info())
+
+            tmp['building'] = False
+            tmp['finish'] = False
+
+            if defense_item.building:
+                tmp['building'] = defense_item.building
+                tmp['quantity_building'] = defense_item.quantity_building
+                tmp['finish'] = defense_item.finish
+
+            re[label] = tmp
+
+        return re
+
+    def get_emails(self):
+        # @TODO: Add emails
+        emails = self
+
+        re = []
+        for email in emails:
+            re.append({
+                'id': email.id,
+                'sender': email.sender,
+                'title': email.title,
+                'subTitle': email.sub_title,
+                'template': email.template,
+                'body': email.body,
+                'read': email.read,
+            })
+
+        return re
