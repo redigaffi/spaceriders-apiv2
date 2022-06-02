@@ -1,5 +1,5 @@
-from src.core.shared.static.game_data.Common import BuildableItemLevelInfo
-from src.core.shared.static.game_data.StakingData import StakingData as SD, StakingBenefits
+from core.shared.static.game_data.Common import BuildableItemLevelInfo
+from core.shared.static.game_data.StakingData import StakingData as SD, StakingBenefits
 import copy
 
 

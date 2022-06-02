@@ -1,4 +1,4 @@
-from src.core.shared.ports import LoggingPort
+from core.shared.ports import LoggingPort
 from logging import Logger
 import logging
 import sys

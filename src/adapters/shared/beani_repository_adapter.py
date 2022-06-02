@@ -4,8 +4,8 @@ from beanie import Document, Indexed, Link, PydanticObjectId, WriteRules
 
 from adapters.shared.beanie_models_adapter import EnergyDepositDocument, PlanetDocument, UserDocument, to_planet, \
     from_planet
-from src.core.shared.ports import UserRepositoryPort, PlanetRepositoryPort, EnergyDepositRepositoryPort
-from src.core.shared.models import User, PlanetTier, Resources, Planet, Reserves, BuildableItem, UserNotFoundException, \
+from core.shared.ports import UserRepositoryPort, PlanetRepositoryPort, EnergyDepositRepositoryPort
+from core.shared.models import User, PlanetTier, Resources, Planet, Reserves, BuildableItem, UserNotFoundException, \
     LevelUpRewardClaims, EnergyDeposit
 
 from datetime import datetime, timezone
@@ -69,57 +69,58 @@ class BeaniUserRepositoryAdapter(UserRepositoryPort):
 class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
 
     async def all_claimed_planets(self) -> list[Planet]:
-        PlanetDocument.update_forward_refs()
+
         planets = await PlanetDocument.find(PlanetDocument.claimed == True, fetch_links=True).to_list()
-        return [to_planet(planet) for planet in planets]
+        return [await to_planet(planet) for planet in planets]
 
     async def all_user_planets(self, user_id: str) -> list[Planet]:
-        PlanetDocument.update_forward_refs()
+
         planets = await PlanetDocument.find(PlanetDocument.user == user_id, fetch_links=True).to_list()
 
-        return [to_planet(planet) for planet in planets]
+        return [await to_planet(planet) for planet in planets]
 
     async def update(self, planet: Planet) -> Planet:
-        PlanetDocument.update_forward_refs()
+
         old: PlanetDocument = await PlanetDocument.get(PydanticObjectId(planet.id), fetch_links=True)
         old = from_planet(planet)
-        await old.replace()
-        return to_planet(old)
+        await old.save()
+        fresh: PlanetDocument = await PlanetDocument.get(PydanticObjectId(planet.id), fetch_links=True)
+        return await to_planet(fresh)
 
     async def get_my_planet(self, user_id: str, planet_id: str) -> Planet | None:
-        PlanetDocument.update_forward_refs()
+
         planet = await PlanetDocument.find_one(
             PlanetDocument.id == PydanticObjectId(planet_id),
             PlanetDocument.user == user_id, fetch_links=True
         )
 
         if planet is not None:
-            return to_planet(planet)
+            return await to_planet(planet)
 
     async def get(self, planet_id: str) -> Planet | None:
-        PlanetDocument.update_forward_refs()
+
         planet = await PlanetDocument.get(PydanticObjectId(planet_id))
         if planet is not None:
-            return to_planet(planet)
+            return await to_planet(planet)
 
     async def has_free_planet(self, user_id: str) -> bool:
-        PlanetDocument.update_forward_refs()
+
         free_planet = await PlanetDocument.find(PlanetDocument.user == user_id,
                                                 PlanetDocument.price_paid == 0, fetch_links=True).limit(1).to_list()
 
         return len(free_planet) > 0
 
     async def last_created_planet(self) -> Planet | bool:
-        PlanetDocument.update_forward_refs()
+
         last_planet = await PlanetDocument.all(fetch_links=True).sort(-PlanetDocument.created_at).limit(1).to_list()
 
         if not last_planet:
             return False
 
-        return to_planet(last_planet[0])
+        return await to_planet(last_planet[0])
 
     async def create_planet(self, planet_data: Planet) -> Planet:
-        PlanetDocument.update_forward_refs()
+
         user = await UserDocument.find_one(UserDocument.wallet==planet_data.user, fetch_links=True)
 
         planet_tier = PlanetTier()
@@ -157,10 +158,11 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
             research_level=planet_data.research_level,
             defense_items=planet_data.defense_items,
             pending_levelup_reward=[],
+            energy_deposits=[]
         )
 
         await new_planet.save(link_rule=WriteRules.WRITE)
         user.planets.append(new_planet)
         await user.save(link_rule=WriteRules.WRITE)
 
-        return to_planet(new_planet)
+        return await to_planet(new_planet)

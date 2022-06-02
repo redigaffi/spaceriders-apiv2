@@ -3,9 +3,9 @@ from decouple import config
 from datetime import datetime, timezone
 import jwt
 from fastapi import HTTPException, Request, Depends
-from src.adapters.shared.beani_repository_adapter import BeaniUserRepositoryAdapter
-from src.core.shared.models import User, UserNotFoundException
-from src.core.shared.ports import UserRepositoryPort
+from adapters.shared.beani_repository_adapter import BeaniUserRepositoryAdapter
+from core.shared.models import User, UserNotFoundException
+from core.shared.ports import UserRepositoryPort
 
 
 class JWTBearer(HTTPBearer):

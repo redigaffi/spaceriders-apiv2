@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 
-from src.core.shared.static.game_data.Common import BuildableItemBaseType
+from core.shared.static.game_data.Common import BuildableItemBaseType
 
 
 class GameData(ABC):

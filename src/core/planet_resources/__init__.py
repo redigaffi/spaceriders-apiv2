@@ -2,11 +2,11 @@ import math
 
 from pydantic import BaseModel
 from dataclasses import dataclass
-from src.core.shared.models import Planet, BuildableItem
-from src.core.shared.ports import PlanetRepositoryPort, ResponsePort
-from src.core.shared.static.game_data.Common import BuildableItemLevelInfo, CommonKeys
-from src.core.shared.static.game_data.PlanetData import PlanetData
-from src.core.shared.static.game_data.ResourceData import ResourceData as RD
+from core.shared.models import Planet, BuildableItem
+from core.shared.ports import PlanetRepositoryPort, ResponsePort
+from core.shared.static.game_data.Common import BuildableItemLevelInfo, CommonKeys
+from core.shared.static.game_data.PlanetData import PlanetData
+from core.shared.static.game_data.ResourceData import ResourceData as RD
 import datetime
 
 

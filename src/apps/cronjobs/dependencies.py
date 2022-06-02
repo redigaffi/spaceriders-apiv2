@@ -1,17 +1,17 @@
-from src.adapters.cronjobs import BlackHoleResponsePort
-from src.adapters.shared.beani_repository_adapter import BeaniUserRepositoryAdapter, BeaniPlanetRepositoryAdapter, \
+from adapters.cronjobs import BlackHoleResponsePort
+from adapters.shared.beani_repository_adapter import BeaniUserRepositoryAdapter, BeaniPlanetRepositoryAdapter, \
     EnergyDepositRepositoryAdapter
-from src.adapters.shared.cache_adapter import MemCacheCacheServiceAdapter
-from src.adapters.shared.evm_adapter import EvmChainServiceAdapter, TokenPriceAdapter
-from src.adapters.shared.logging_adapter import LoggingAdapter
-from src.apps.cronjobs.settings import get_logger
-from src.controllers.cronjobs import CronjobController
-from src.core.planet_energy import PlanetEnergy
+from adapters.shared.cache_adapter import MemCacheCacheServiceAdapter
+from adapters.shared.evm_adapter import EvmChainServiceAdapter, TokenPriceAdapter
+from adapters.shared.logging_adapter import LoggingAdapter
+from apps.cronjobs.settings import get_logger
+from controllers.cronjobs import CronjobController
+from core.planet_energy import PlanetEnergy
 from decouple import config
 import emcache
 import json
 from pathlib import Path
-from src.core.shared.ports import CacheServicePort, ChainServicePort, TokenPricePort
+from core.shared.ports import CacheServicePort, ChainServicePort, TokenPricePort
 
 response_adapter = BlackHoleResponsePort()
 logging_adapter = LoggingAdapter(get_logger("cronjobs_app"))

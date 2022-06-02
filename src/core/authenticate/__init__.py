@@ -4,8 +4,8 @@ from web3.auto import w3
 from eth_account.messages import encode_defunct
 from dataclasses import dataclass
 
-from src.core.shared.models import AppBaseException
-from src.core.shared.ports import UserRepositoryPort, ResponsePort, ChainServicePort
+from core.shared.models import AppBaseException
+from core.shared.ports import UserRepositoryPort, ResponsePort, ChainServicePort
 from pydantic import BaseModel
 import jwt
 from datetime import datetime, timezone

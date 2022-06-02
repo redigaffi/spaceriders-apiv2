@@ -3,21 +3,21 @@ from decouple import config
 from adapters.shared.beani_repository_adapter import EnergyDepositRepositoryAdapter
 from adapters.shared.logging_adapter import LoggingAdapter, get_logger
 from core.planet_energy import PlanetEnergy
-from src.core.authenticate import Authenticate
-from src.adapters.shared.beani_repository_adapter import BeaniUserRepositoryAdapter, BeaniPlanetRepositoryAdapter
-from src.core.buildable_items import BuildableItems
-from src.core.fetch_chain_data import FetchChainData
-from src.core.get_planets import GetPlanets
-from src.core.mint_planet import MintPlanet
-from src.adapters.http import HttpResponsePort
-from src.adapters.shared.cache_adapter import MemCacheCacheServiceAdapter
-from src.adapters.shared.evm_adapter import EvmChainServiceAdapter, TokenPriceAdapter
+from core.authenticate import Authenticate
+from adapters.shared.beani_repository_adapter import BeaniUserRepositoryAdapter, BeaniPlanetRepositoryAdapter
+from core.buildable_items import BuildableItems
+from core.fetch_chain_data import FetchChainData
+from core.get_planets import GetPlanets
+from core.mint_planet import MintPlanet
+from adapters.http import HttpResponsePort
+from adapters.shared.cache_adapter import MemCacheCacheServiceAdapter
+from adapters.shared.evm_adapter import EvmChainServiceAdapter, TokenPriceAdapter
 import emcache
 import json
 from pathlib import Path
-from src.controllers.http import HttpController
-from src.core.planet_resources import PlanetResources
-from src.core.shared.ports import ChainServicePort, CacheServicePort, TokenPricePort, UserRepositoryPort, \
+from controllers.http import HttpController
+from core.planet_resources import PlanetResources
+from core.shared.ports import ChainServicePort, CacheServicePort, TokenPricePort, UserRepositoryPort, \
     PlanetRepositoryPort
 
 http_response_port = HttpResponsePort()

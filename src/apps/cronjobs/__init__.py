@@ -6,10 +6,10 @@ import motor.motor_asyncio
 import asyncio
 import aioschedule as schedule
 import dependencies
-from src.adapters.shared.beani_repository_adapter import UserDocument, PlanetDocument, EnergyDepositDocument
-from src.controllers.cronjobs import CronjobController
-from src.core.planet_energy import PlanetEnergyRecoverEnergyDepositsRequest
-from src.core.shared.models import Planet
+from adapters.shared.beani_repository_adapter import UserDocument, PlanetDocument, EnergyDepositDocument
+from controllers.cronjobs import CronjobController
+from core.planet_energy import PlanetEnergyRecoverEnergyDepositsRequest
+from core.shared.models import Planet
 
 
 async def energy_deposit_recover_cronjob(controller: CronjobController):

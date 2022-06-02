@@ -1,5 +1,5 @@
-from src.core.shared.models import Planet, BuildableItem
-from src.core.shared.static.game_data.StakingData import StakingData
+from core.shared.models import Planet, BuildableItem
+from core.shared.static.game_data.StakingData import StakingData
 
 
 def is_queue_full(planet: Planet) -> bool:

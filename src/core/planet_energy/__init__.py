@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 
-from src.core.shared.models import AppBaseException, ShadyActivityException
-from src.core.shared.models import EnergyDeposit
-from src.core.shared.ports import ResponsePort, PlanetRepositoryPort, LoggingPort, ChainServicePort, \
+from core.shared.models import AppBaseException, ShadyActivityException
+from core.shared.models import EnergyDeposit
+from core.shared.ports import ResponsePort, PlanetRepositoryPort, LoggingPort, ChainServicePort, \
     EnergyDepositRepositoryPort, TokenPricePort
 from dataclasses import dataclass
 import datetime

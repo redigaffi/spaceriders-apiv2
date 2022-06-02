@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pydantic import BaseModel
-from src.core.shared.ports import TokenPricePort, ChainServicePort, ResponsePort
+from core.shared.ports import TokenPricePort, ChainServicePort, ResponsePort
 
 
 class FetchChainDataResponse(BaseModel):

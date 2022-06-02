@@ -4,23 +4,23 @@ from starlette.background import BackgroundTask
 # Info, seems like this need to be at the top, also some have src before and others not (maybe due to relationship?)
 from adapters.shared.beanie_models_adapter import UserDocument, EnergyDepositDocument, PlanetDocument
 from apps.http.dependencies import get_middleware
-from src.controllers.http import HttpController
+from controllers.http import HttpController
 import uvicorn
 from decouple import config
 from beanie import init_beanie
 import motor.motor_asyncio
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-import src.apps.http.dependencies as dependencies
-import src.apps.http.settings
+import apps.http.dependencies as dependencies
+import apps.http.settings
 import logging as log
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
 import asyncio
-from src.core.buildable_items import BuildableItems, FinishBuildRequest
-from src.core.planet_resources import PlanetResourcesUpdateRequest
-from src.core.shared.models import AppBaseException
-from src.apps.http.urls import register_fastapi_routes
+from core.buildable_items import BuildableItems, FinishBuildRequest
+from core.planet_resources import PlanetResourcesUpdateRequest
+from core.shared.models import AppBaseException
+from apps.http.urls import register_fastapi_routes
 import time
 import logging
 

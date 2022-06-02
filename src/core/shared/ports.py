@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from src.core.shared.models import User, Planet, EnergyDeposit
+from core.shared.models import User, Planet, EnergyDeposit
 
 
 class LoggingPort(ABC):

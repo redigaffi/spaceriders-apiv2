@@ -2,17 +2,17 @@ from dataclasses import dataclass
 
 from core.planet_energy import PlanetEnergy, EnergyDepositRequest
 from core.shared.models import EnergyDeposit
-from src.adapters.http.security import jwt_bearer
-from src.core.authenticate import Authenticate
-from src.core.buildable_items import BuildableItems, BuildableRequest
-from src.core.fetch_chain_data import FetchChainData
-from src.core.get_planets import GetPlanets
-from src.core.mint_planet import FreePlanetRequest, MintPlanet, MintPaidPlanetRequest, FetchPlanetCostResponse, \
+from adapters.http.security import jwt_bearer
+from core.authenticate import Authenticate
+from core.buildable_items import BuildableItems, BuildableRequest
+from core.fetch_chain_data import FetchChainData
+from core.get_planets import GetPlanets
+from core.mint_planet import FreePlanetRequest, MintPlanet, MintPaidPlanetRequest, FetchPlanetCostResponse, \
     FetchPlanetCostDataRequest, ClaimPlanetRequest
-from src.core.authenticate import AuthenticationDetailsRequest
+from core.authenticate import AuthenticationDetailsRequest
 from fastapi import Depends
 from fastapi.encoders import jsonable_encoder
-from src.core.shared.models import Planet
+from core.shared.models import Planet
 
 
 @dataclass

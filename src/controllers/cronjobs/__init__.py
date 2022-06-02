@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from src.core.planet_energy import PlanetEnergy, PlanetEnergyRecoverEnergyDepositsRequest
+from core.planet_energy import PlanetEnergy, PlanetEnergyRecoverEnergyDepositsRequest
 
 @dataclass
 class CronjobController:

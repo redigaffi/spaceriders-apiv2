@@ -1,4 +1,4 @@
-from src.core.shared.ports import ChainServicePort, CacheServicePort, TokenPricePort
+from core.shared.ports import ChainServicePort, CacheServicePort, TokenPricePort
 from dataclasses import dataclass
 from web3 import Web3
 import time

@@ -1,4 +1,4 @@
-from src.core.shared.ports import ResponsePort
+from core.shared.ports import ResponsePort
 
 
 class HttpResponsePort(ResponsePort):

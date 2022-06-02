@@ -1,10 +1,10 @@
-from src.controllers.http import HttpController
-from src.core.authenticate import JwtResponse
-from src.core.buildable_items import BuildableResponse
-from src.core.fetch_chain_data import FetchChainDataResponse, FetchChainTokenPriceResponse
-from src.core.get_planets import FetchByPlanetIdResponse
-from src.core.mint_planet import FetchPlanetCostResponse, FetchPlanetCostDataResponse
-from src.core.shared.models import Planet, BuildableItem, EnergyDeposit
+from controllers.http import HttpController
+from core.authenticate import JwtResponse
+from core.buildable_items import BuildableResponse
+from core.fetch_chain_data import FetchChainDataResponse, FetchChainTokenPriceResponse
+from core.get_planets import FetchByPlanetIdResponse
+from core.mint_planet import FetchPlanetCostResponse, FetchPlanetCostDataResponse
+from core.shared.models import Planet, BuildableItem, EnergyDeposit
 
 
 async def register_fastapi_routes(http_controller: HttpController) -> list:

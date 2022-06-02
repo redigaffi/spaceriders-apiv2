@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from src.core.shared.models import NoPlanetFoundException, Planet
-from src.core.shared.ports import PlanetRepositoryPort, ResponsePort
+from core.shared.models import NoPlanetFoundException, Planet
+from core.shared.ports import PlanetRepositoryPort, ResponsePort
 from pydantic import BaseModel
 
 

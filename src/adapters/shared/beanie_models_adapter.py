@@ -3,13 +3,13 @@ from typing import Optional, List
 from beanie import Document, Indexed, Link
 
 from core.shared.models import EnergyDeposit
-from src.core.shared.models import User, PlanetTier, Resources, Planet, Reserves, BuildableItem, UserNotFoundException, \
+from core.shared.models import User, PlanetTier, Resources, Planet, Reserves, BuildableItem, UserNotFoundException, \
     LevelUpRewardClaims
 from datetime import datetime, timezone
 
 
-def to_planet(planet_document: PlanetDocument) -> Planet:
-    PlanetDocument.update_forward_refs()
+async def to_planet(planet_document: PlanetDocument) -> Planet:
+
 
     planet = Planet()
     planet.id = planet_document.id
@@ -43,7 +43,7 @@ def to_planet(planet_document: PlanetDocument) -> Planet:
     planet.research_level = planet_document.research_level
     planet.defense_items = planet_document.defense_items
     planet.pending_levelup_reward = planet_document.pending_levelup_reward
-    # planet.energy_deposits = [x.to_energy_deposit() for x in planet_document.energy_deposits]
+    planet.energy_deposits = [(await x.fetch()).to_energy_deposit() for x in planet_document.energy_deposits if x is not None]
     # @TODO: DONT REMOVE THIS LINE YET!!! Workaround until they fix PR, see method
     planet.calculate_energy_usage_per_min()
 

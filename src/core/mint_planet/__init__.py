@@ -1,12 +1,12 @@
 from dataclasses import dataclass
-from src.core.shared.models import Planet, PlanetIdAlreadyExistsException, AppBaseException, NotMyPlanetException, \
+from core.shared.models import Planet, PlanetIdAlreadyExistsException, AppBaseException, NotMyPlanetException, \
     PlanetNameMissingException
-from src.core.shared.ports import ResponsePort, ChainServicePort, TokenPricePort, PlanetRepositoryPort
+from core.shared.ports import ResponsePort, ChainServicePort, TokenPricePort, PlanetRepositoryPort
 from pydantic import BaseModel
 import logging as log
-from src.core.shared.static.game_data.PlanetData import PlanetData
+from core.shared.static.game_data.PlanetData import PlanetData
 import math
-from src.core.shared.service.planet import get_new_planet
+from core.shared.service.planet import get_new_planet
 
 import datetime as dt
 

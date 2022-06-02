@@ -1,13 +1,13 @@
 import bson
 
-from src.core.shared.models import Planet, Reserves, BuildableItem, LevelUpRewardClaims
-from src.core.shared.static.game_data.Common import BuildableItemBaseType, CommonKeys, BuildableItemLevelInfo
-from src.core.shared.static.game_data.PlanetLevelData import PlanetLevelData
-from src.core.shared.static.game_data.ResourceData import ResourceData as RD, ResourceData
-from src.core.shared.static.game_data.InstallationData import InstallationData as ID
-from src.core.shared.static.game_data.ResearchData import ResearchData as RE
-from src.core.shared.static.game_data.DefenseData import DefenseData as DD
-from src.core.shared.static.game_data.PlanetData import PlanetData
+from core.shared.models import Planet, Reserves, BuildableItem, LevelUpRewardClaims
+from core.shared.static.game_data.Common import BuildableItemBaseType, CommonKeys, BuildableItemLevelInfo
+from core.shared.static.game_data.PlanetLevelData import PlanetLevelData
+from core.shared.static.game_data.ResourceData import ResourceData as RD, ResourceData
+from core.shared.static.game_data.InstallationData import InstallationData as ID
+from core.shared.static.game_data.ResearchData import ResearchData as RE
+from core.shared.static.game_data.DefenseData import DefenseData as DD
+from core.shared.static.game_data.PlanetData import PlanetData
 import random
 import math
 

@@ -1,4 +1,4 @@
-from src.core.shared.ports import CacheServicePort
+from core.shared.ports import CacheServicePort
 from dataclasses import dataclass
 from emcache import Client
 import time
