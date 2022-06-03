@@ -23,7 +23,6 @@ class EnergyDepositRepositoryAdapter(EnergyDepositRepositoryPort):
         if energy_deposit is not None:
             return energy_deposit.to_energy_deposit()
 
-
     async def create_energy_deposit(self, energy_deposit: EnergyDeposit) -> EnergyDeposit:
         energy_document = EnergyDepositDocument(planet_id=energy_deposit.planet_id,
                                                 was_recovered=energy_deposit.was_recovered,
@@ -34,7 +33,7 @@ class EnergyDepositRepositoryAdapter(EnergyDepositRepositoryPort):
         if energy_deposit.id is not None:
             energy_document.id = PydanticObjectId(energy_deposit.id)
 
-        await energy_document.save(link_rule=WriteRules.WRITE)
+        await energy_document.save()
 
         # planet: PlanetDocument = await PlanetDocument.get(PydanticObjectId(energy_deposit.planet_id), fetch_links=True)
         # planet.energy_deposits.append(energy_document)
@@ -88,10 +87,10 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
         return await to_planet(fresh)
 
     async def get_my_planet(self, user_id: str, planet_id: str) -> Planet | None:
-
+        # if fetch_links provided energy_deposits comes null?
         planet = await PlanetDocument.find_one(
             PlanetDocument.id == PydanticObjectId(planet_id),
-            PlanetDocument.user == user_id, fetch_links=True
+            PlanetDocument.user == user_id
         )
 
         if planet is not None:
@@ -106,13 +105,13 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
     async def has_free_planet(self, user_id: str) -> bool:
 
         free_planet = await PlanetDocument.find(PlanetDocument.user == user_id,
-                                                PlanetDocument.price_paid == 0, fetch_links=True).limit(1).to_list()
+                                                PlanetDocument.price_paid == 0).limit(1).to_list()
 
         return len(free_planet) > 0
 
     async def last_created_planet(self) -> Planet | bool:
 
-        last_planet = await PlanetDocument.all(fetch_links=True).sort(-PlanetDocument.created_at).limit(1).to_list()
+        last_planet = await PlanetDocument.all().sort(-PlanetDocument.created_at).limit(1).to_list()
 
         if not last_planet:
             return False
@@ -121,15 +120,14 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
 
     async def create_planet(self, planet_data: Planet) -> Planet:
 
-        user = await UserDocument.find_one(UserDocument.wallet==planet_data.user, fetch_links=True)
+        user = await UserDocument.find_one(UserDocument.wallet==planet_data.user)
 
         planet_tier = PlanetTier()
-
 
         # id = bson.objectid.ObjectId()
         new_planet = PlanetDocument(
             name=planet_data.name,
-            created_at=datetime.now(tz=timezone.utc),
+            created_at=datetime.timestamp(datetime.now()),
             rarity=planet_data.rarity,
             image=planet_data.image,
             diameter=planet_data.diameter,

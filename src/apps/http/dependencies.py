@@ -2,6 +2,7 @@ from decouple import config
 
 from adapters.shared.beani_repository_adapter import EnergyDepositRepositoryAdapter
 from adapters.shared.logging_adapter import LoggingAdapter, get_logger
+from core.nft_data import NftData
 from core.planet_energy import PlanetEnergy
 from core.authenticate import Authenticate
 from adapters.shared.beani_repository_adapter import BeaniUserRepositoryAdapter, BeaniPlanetRepositoryAdapter
@@ -34,10 +35,9 @@ async def cache_dependency():
     return MemCacheCacheServiceAdapter(client)
 
 
-async def contract_dependency(cache: CacheServicePort):
+async def contract_dependency(cache: CacheServicePort, rpc_urls: str):
     root = Path(__file__).parent.parent.parent
     env = config('ENV')
-    rpc_urls = config('RPCS_URL')
 
     path = str(root) + f"/static/contract_addresses/contracts.{env}.json"
     with open(path, "r") as f:
@@ -64,13 +64,15 @@ async def contract_dependency(cache: CacheServicePort):
     with open(f"{abi_base_path}/PancakeRouter.json", "r") as f:
         router_abi = json.loads(f.read())
 
-    return EvmChainServiceAdapter(cache, rpc_urls, config('PRIVATE_KEY'), spaceriders_token_address, spaceriders_game_address, spaceriders_nft_address,
+    return EvmChainServiceAdapter(cache, rpc_urls, config('PRIVATE_KEY'), spaceriders_token_address,
+                                  spaceriders_game_address, spaceriders_nft_address,
                                   spaceriders_ticket_nft_address, spaceriders_token_abi, spaceriders_game_abi,
                                   spaceriders_nft_abi, spaceriders_ticket_nft_abi, router_abi)
 
 
 async def token_price_dependency(cache: CacheServicePort, contract: ChainServicePort):
     return TokenPriceAdapter(cache, contract)
+
 
 # Use cases
 
@@ -79,8 +81,10 @@ async def authenticate_use_case(user_repo: UserRepositoryPort):
     return Authenticate(config('SECRET_KEY'), config('ENV'), user_repo, http_response_port)
 
 
-async def buy_planet_use_case(token_price: TokenPricePort, contract: ChainServicePort, planet_repository: PlanetRepositoryPort):
-    return MintPlanet(token_price, contract, config('API_ENDPOINT'), config('PLANET_IMAGES_BUCKET_PATH'), planet_repository, http_response_port)
+async def buy_planet_use_case(token_price: TokenPricePort, contract: ChainServicePort,
+                              planet_repository: PlanetRepositoryPort):
+    return MintPlanet(token_price, contract, config('API_ENDPOINT'), config('PLANET_IMAGES_BUCKET_PATH'),
+                      planet_repository, http_response_port)
 
 
 async def fetch_chain_data_use_case(token_price: TokenPricePort, contract: ChainServicePort):
@@ -99,8 +103,18 @@ async def get_planet_resources_use_case(planet_repository: PlanetRepositoryPort)
     return PlanetResources(planet_repository, http_response_port)
 
 
-async def get_planet_energy_use_case(token_price_adapter: TokenPricePort, energy_repository: EnergyDepositRepositoryAdapter, planet_repository: PlanetRepositoryPort, logging_adapter: LoggingAdapter, contract: ChainServicePort):
-    return PlanetEnergy(token_price_adapter, energy_repository, planet_repository, logging_adapter, contract, http_response_port)
+async def get_planet_energy_use_case(token_price_adapter: TokenPricePort,
+                                     energy_repository: EnergyDepositRepositoryAdapter,
+                                     planet_repository: PlanetRepositoryPort, logging_adapter: LoggingAdapter,
+                                     contract: ChainServicePort):
+    return PlanetEnergy(token_price_adapter, energy_repository, planet_repository, logging_adapter, contract,
+                        http_response_port)
+
+
+async def nft_data_use_case(api_endpoint: str, planet_images_base_url: str, testnet_ticket_images_base_url: str,
+                            planet_repository_port: PlanetRepositoryPort, contract_testnet: ChainServicePort,
+                            contract_mainnet: ChainServicePort):
+    return NftData(api_endpoint, planet_images_base_url, testnet_ticket_images_base_url, planet_repository_port, contract_testnet, contract_mainnet)
 
 
 # Controllers
@@ -118,13 +132,19 @@ async def http_controller():
     energy_repository = EnergyDepositRepositoryAdapter()
 
     cache = await cache_dependency()
-    contract_service = await contract_dependency(cache)
+    contract_service = await contract_dependency(cache, config('RPCS_URL'))
+    contract_mainnet_service = await contract_dependency(cache, config('RPCS_URL_MAINNET'))
+
     token_price = await token_price_dependency(cache, contract_service)
 
     a = await authenticate_use_case(user_repository)
     b = await buy_planet_use_case(token_price, contract_service, planet_repository)
-    d = await fetch_chain_data_use_case(token_price, contract_service)
-    e = await get_planets_use_case(planet_repository)
-    f = await get_buildable_items_use_case(planet_repository)
-    g = await get_planet_energy_use_case(token_price, energy_repository, planet_repository, logging_adapter, contract_service)
-    return HttpController(a, b, d, e, f, g)
+    c = await fetch_chain_data_use_case(token_price, contract_service)
+    d = await get_planets_use_case(planet_repository)
+    e = await get_buildable_items_use_case(planet_repository)
+    f = await get_planet_energy_use_case(token_price, energy_repository, planet_repository, logging_adapter,
+                                         contract_service)
+
+    g = await nft_data_use_case(config('API_ENDPOINT'), config('PLANET_IMAGES_BUCKET_PATH'), config('TESTNET_TICKET_IMAGES_BUCKET_PATH'),
+                                planet_repository, contract_service, contract_mainnet_service)
+    return HttpController(a, b, c, d, e, f, g)

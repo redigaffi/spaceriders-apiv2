@@ -84,6 +84,7 @@ def from_planet(planet: Planet):
         planet_document.energy_deposits = [EnergyDepositDocument.from_energy_deposit(x) for x in planet.energy_deposits]
         return planet_document
 
+
 # INFO: Seems like order matters, if I put this below planet it wont create DBRef in db (no reference)
 class EnergyDepositDocument(Document):
     created_time: float | None = 0
@@ -113,7 +114,7 @@ class EnergyDepositDocument(Document):
 
 
 class PlanetDocument(Document):
-    created_at: datetime = None
+    created_at: float = None
 
     name: str = "Planet"
     rarity: str = "Common"
@@ -137,7 +138,7 @@ class PlanetDocument(Document):
 
     user: str
 
-    claimable: int = None  # timestamp
+    claimable: float = None  # timestamp
     claimed: bool = False
 
     tier: PlanetTier = None

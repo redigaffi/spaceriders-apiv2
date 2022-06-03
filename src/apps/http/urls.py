@@ -39,5 +39,8 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
              endpoint=http_controller.build, methods=["post"]),
 
         dict(path=r"/planet/energy", response_model=EnergyDeposit,
-             endpoint=http_controller.energy_deposit, methods=["post"])
+             endpoint=http_controller.energy_deposit, methods=["post"]),
+
+        dict(path=r"/nft/{planet_id}",
+             endpoint=http_controller.fetch_planet_nft_data, methods=["get"])
     ]
