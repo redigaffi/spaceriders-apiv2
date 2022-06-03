@@ -5,10 +5,6 @@ from pydantic import BaseModel
 from core.shared.ports import PlanetRepositoryPort, ChainServicePort, ResponsePort
 
 
-class FreePlanetRequest(BaseModel):
-    name: str
-
-
 class OpenseaAttributeStandardResponse(BaseModel):
     display_type: str = None
     trait_type: str = None

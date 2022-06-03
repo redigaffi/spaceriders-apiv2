@@ -3,12 +3,22 @@ from typing import Optional, List
 from beanie import Document, Indexed, Link, PydanticObjectId, WriteRules
 
 from adapters.shared.beanie_models_adapter import EnergyDepositDocument, PlanetDocument, UserDocument, to_planet, \
-    from_planet
-from core.shared.ports import UserRepositoryPort, PlanetRepositoryPort, EnergyDepositRepositoryPort
+    from_planet, EmailDocument
+from core.shared.ports import UserRepositoryPort, PlanetRepositoryPort, EnergyDepositRepositoryPort, EmailRepositoryPort
 from core.shared.models import User, PlanetTier, Resources, Planet, Reserves, BuildableItem, UserNotFoundException, \
-    LevelUpRewardClaims, EnergyDeposit
+    LevelUpRewardClaims, EnergyDeposit, Email
 
 from datetime import datetime, timezone
+
+
+class EmailRepositoryAdapter(EmailRepositoryPort):
+    async def create(self, email: Email) -> Email:
+        email_document = EmailDocument(title=email.title, sub_title=email.sub_title,template=email.template,
+                                       body=email.body, sender=email.sender, read=email.read, planet=email.planet)
+
+        await email_document.save()
+
+        return email_document.to_email()
 
 
 class EnergyDepositRepositoryAdapter(EnergyDepositRepositoryPort):
@@ -74,23 +84,26 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
 
     async def all_user_planets(self, user_id: str) -> list[Planet]:
 
-        planets = await PlanetDocument.find(PlanetDocument.user == user_id, fetch_links=True).to_list()
+        planets = await PlanetDocument.find(PlanetDocument.user == user_id).to_list()
 
         return [await to_planet(planet) for planet in planets]
 
     async def update(self, planet: Planet) -> Planet:
 
-        old: PlanetDocument = await PlanetDocument.get(PydanticObjectId(planet.id), fetch_links=True)
+        old: PlanetDocument = await PlanetDocument.get(PydanticObjectId(planet.id))
         old = from_planet(planet)
         await old.save()
-        fresh: PlanetDocument = await PlanetDocument.get(PydanticObjectId(planet.id), fetch_links=True)
+        fresh: PlanetDocument = await PlanetDocument.get(PydanticObjectId(planet.id))
         return await to_planet(fresh)
 
     async def get_my_planet(self, user_id: str, planet_id: str) -> Planet | None:
         # if fetch_links provided energy_deposits comes null?
+        # @README: seems like fetch_link works with emails but not with energy_deposits, only difference is that
+        # on energy deposit we set our own id.
         planet = await PlanetDocument.find_one(
             PlanetDocument.id == PydanticObjectId(planet_id),
-            PlanetDocument.user == user_id
+            PlanetDocument.user == user_id,
+            #fetch_links=True
         )
 
         if planet is not None:

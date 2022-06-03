@@ -60,8 +60,6 @@ class User:
         return self.id is not None
 
 
-
-
 class PlanetTier(BaseModel):
     tier_code: str = SD.TIER_0
     tier_name: str = SD.TIER_NAMES[SD.TIER_0]
@@ -124,6 +122,18 @@ class EnergyDeposit(BaseModel):
     planet_id: str
     was_recovered = False
 
+
+class Email(BaseModel):
+    id: str = None
+    title: str = None
+    sub_title: str = None
+    template: str = None
+    body: str = None
+    sender: str = None
+    read: bool = False
+    planet: str
+
+
 # @TODO: Add emails
 class Planet(BaseModel):
     id: str = None
@@ -166,8 +176,9 @@ class Planet(BaseModel):
     research_level: List[BuildableItem] = []
     defense_items: List[BuildableItem] = []
     pending_levelup_reward: List[LevelUpRewardClaims] = []
-
     energy_deposits: List[EnergyDeposit] = []
+    emails: List[Email] = []
+
     def building_queue(self) -> list[BuildableItem]:
         buildable_item: list[
             BuildableItem] = self.resources_level + self.research_level + self.installation_level + self.defense_items

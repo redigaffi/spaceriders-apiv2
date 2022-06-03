@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, Query
 from starlette.background import BackgroundTask
 
 # Info, seems like this need to be at the top, also some have src before and others not (maybe due to relationship?)
-from adapters.shared.beanie_models_adapter import UserDocument, EnergyDepositDocument, PlanetDocument
+from adapters.shared.beanie_models_adapter import UserDocument, EnergyDepositDocument, PlanetDocument, EmailDocument
 from apps.http.dependencies import get_middleware
 from controllers.http import HttpController
 import uvicorn
@@ -93,24 +93,24 @@ async def middleware(request: Request, call_next):
 
 
 async def init_db():
-    client = motor.motor_asyncio.AsyncIOMotorClient(config("DB_URL"), )
-    db = client[config('DB_NAME')]
+
 
     client.get_io_loop = asyncio.get_event_loop
     # await UserDocument.init_model(db, False)
     # await EnergyDepositDocument.init_model(db, False)
     # await PlanetDocument.init_model(db, False)
     # await TrollDocument.init_model(db, False)
-    await init_beanie(database=db,
-                      document_models=[UserDocument, EnergyDepositDocument, PlanetDocument]
-                      )
+
 
 @app.on_event("startup")
 async def app_init():
     await dependencies.logging_adapter.info("Http App started")
-    await init_db()
 
-
+    client = motor.motor_asyncio.AsyncIOMotorClient(config("DB_URL"), )
+    db = client[config('DB_NAME')]
+    await init_beanie(database=db,
+                      document_models=[UserDocument, EnergyDepositDocument, PlanetDocument, EmailDocument]
+    )
 
     http_controller = await dependencies.http_controller()
     urls = await register_fastapi_routes(http_controller)

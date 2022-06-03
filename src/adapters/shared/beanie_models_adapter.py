@@ -1,8 +1,8 @@
 from __future__ import annotations
 from typing import Optional, List
-from beanie import Document, Indexed, Link
+from beanie import Document, Indexed, Link, PydanticObjectId
 
-from core.shared.models import EnergyDeposit
+from core.shared.models import EnergyDeposit, Email
 from core.shared.models import User, PlanetTier, Resources, Planet, Reserves, BuildableItem, UserNotFoundException, \
     LevelUpRewardClaims
 from datetime import datetime, timezone
@@ -42,6 +42,7 @@ async def to_planet(planet_document: PlanetDocument) -> Planet:
     planet.defense_items = planet_document.defense_items
     planet.pending_levelup_reward = planet_document.pending_levelup_reward
     planet.energy_deposits = [(await x.fetch()).to_energy_deposit() for x in planet_document.energy_deposits if x is not None]
+    planet.emails = [(await x.fetch()).to_email() for x in planet_document.emails if x is not None]
     # @TODO: DONT REMOVE THIS LINE YET!!! Workaround until they fix PR, see method
     planet.calculate_energy_usage_per_min()
 
@@ -80,8 +81,32 @@ def from_planet(planet: Planet):
         planet_document.defense_items = planet.defense_items
         planet_document.pending_levelup_reward = planet.pending_levelup_reward
         planet_document.energy_deposits = [EnergyDepositDocument.from_energy_deposit(x) for x in planet.energy_deposits]
+        planet_document.emails = [EmailDocument.from_email(x) for x in planet.emails]
         return planet_document
 
+
+class EmailDocument(Document):
+    title: str = None
+    sub_title: str = None
+    template: str = None
+    body: str = None
+    sender: str = None
+    read: bool = False
+    planet: str
+
+    def to_email(self) -> Email:
+        return Email(id=str(self.id), title=self.title, sub_title=self.sub_title, template=self.template,
+                                       body=self.body, sender=self.sender, read=self.read, planet=self.planet)
+
+    @staticmethod
+    def from_email(email: Email):
+        return EmailDocument(id=PydanticObjectId(email.id), title=email.title, sub_title=email.sub_title, template=email.template,
+                     body=email.body, sender=email.sender, read=email.read, planet=email.planet)
+
+    class Settings:
+        name = "emails"
+        # use_cache = True
+        # cache_expiration_time = timedelta(seconds=60)
 
 # INFO: Seems like order matters, if I put this below planet it wont create DBRef in db (no reference)
 class EnergyDepositDocument(Document):
@@ -148,8 +173,8 @@ class PlanetDocument(Document):
     research_level: List[BuildableItem] = None
     defense_items: List[BuildableItem] = None
     pending_levelup_reward: List[LevelUpRewardClaims] = None
-
     energy_deposits: List[Link[EnergyDepositDocument]] = []
+    emails: List[Link[EmailDocument]] = []
 
     price_paid: int = 0
     free_tokens: float | None = 0

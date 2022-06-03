@@ -1,8 +1,9 @@
 from decouple import config
 
-from adapters.shared.beani_repository_adapter import EnergyDepositRepositoryAdapter
+from adapters.shared.beani_repository_adapter import EnergyDepositRepositoryAdapter, EmailRepositoryAdapter
 from adapters.shared.logging_adapter import LoggingAdapter, get_logger
 from core.nft_metadata import NftData
+from core.planet_emails import PlanetEmails
 from core.planet_energy import PlanetEnergy
 from core.authenticate import Authenticate
 from adapters.shared.beani_repository_adapter import BeaniUserRepositoryAdapter, BeaniPlanetRepositoryAdapter
@@ -19,7 +20,7 @@ from pathlib import Path
 from controllers.http import HttpController
 from core.planet_resources import PlanetResources
 from core.shared.ports import ChainServicePort, CacheServicePort, TokenPricePort, UserRepositoryPort, \
-    PlanetRepositoryPort
+    PlanetRepositoryPort, EmailRepositoryPort
 
 http_response_port = HttpResponsePort()
 logging_adapter = LoggingAdapter(get_logger("http_app"))
@@ -116,6 +117,9 @@ async def nft_data_use_case(api_endpoint: str, planet_images_base_url: str, test
     return NftData(api_endpoint, planet_images_base_url, testnet_ticket_images_base_url, planet_repository_port, contract_testnet, http_response_port)
 
 
+async def get_email_use_case(planet_repository_port: PlanetRepositoryPort, email_repository_port: EmailRepositoryPort):
+    return PlanetEmails(planet_repository_port, email_repository_port, http_response_port)
+
 # Controllers
 
 async def get_middleware():
@@ -129,6 +133,7 @@ async def http_controller():
     user_repository = BeaniUserRepositoryAdapter()
     planet_repository = BeaniPlanetRepositoryAdapter()
     energy_repository = EnergyDepositRepositoryAdapter()
+    email_repository = EmailRepositoryAdapter()
 
     cache = await cache_dependency()
     contract_service = await contract_dependency(cache, config('RPCS_URL'))
@@ -150,4 +155,6 @@ async def http_controller():
 
     g = await nft_data_use_case(config('API_ENDPOINT'), config('PLANET_IMAGES_BUCKET_PATH'), config('TESTNET_TICKET_IMAGES_BUCKET_PATH'),
                                 planet_repository, nft_contract_service)
-    return HttpController(a, b, c, d, e, f, g)
+
+    h = await get_email_use_case(planet_repository, email_repository)
+    return HttpController(a, b, c, d, e, f, g, h)

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from core.shared.models import User, Planet, EnergyDeposit
+from core.shared.models import User, Planet, EnergyDeposit, Email
 
 
 class LoggingPort(ABC):
@@ -9,6 +9,12 @@ class LoggingPort(ABC):
 
     @abstractmethod
     async def error(self, msg, extra=None):
+        pass
+
+
+class EmailRepositoryPort(ABC):
+    @abstractmethod
+    async def create(self, email: Email) -> Email:
         pass
 
 
