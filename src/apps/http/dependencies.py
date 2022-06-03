@@ -129,10 +129,16 @@ async def get_staking_use_case(planet_repository_port: PlanetRepositoryPort, tok
 # Controllers
 
 async def get_middleware():
+    cache = await cache_dependency()
+    contract_service = await contract_dependency(cache, config('RPCS_URL'))
     planet_repository = BeaniPlanetRepositoryAdapter()
+    token_price = await token_price_dependency(cache, contract_service)
+
     items_use_case = await get_buildable_items_use_case(planet_repository)
     planet_resources = await get_planet_resources_use_case(planet_repository)
-    return items_use_case, planet_resources
+    planet_staking = await get_staking_use_case(planet_repository, token_price, contract_service)
+
+    return items_use_case, planet_resources, planet_staking
 
 
 async def http_controller():

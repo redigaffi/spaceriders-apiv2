@@ -210,3 +210,14 @@ class Staking:
         planet = await self.planet_repository_port.update(planet)
 
         return await self.response_port.publish_response(planet)
+
+    async def tier_expired_reset(self, planet_id: str):
+        planet = await self.planet_repository_port.get(planet_id)
+
+        now = int(datetime.timestamp(datetime.now()))
+        if planet.tier.staked and planet.tier.time_release < now:
+            planet.tier.tier_code = StakingData.TIER_0
+            planet.tier.tier_name = StakingData.TIER_NAMES[StakingData.TIER_0]
+            planet = await self.planet_repository_port.update(planet)
+
+        return await self.response_port.publish_response(planet.tier)

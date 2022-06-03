@@ -83,23 +83,19 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 @app.middleware("http")
 async def middleware(request: Request, call_next):
-    items_use_case, planet_resources_use_case = await get_middleware()
+    if request.method == 'OPTIONS':
+        return await call_next(request)
+
+    items_use_case, planet_resources_use_case, planet_staking = await get_middleware()
+
     active_planet = request.headers.get("x-active-planet")
+
     if active_planet is not None:
+        await planet_staking.tier_expired_reset(planet_id=active_planet)
         await items_use_case.finish_build(FinishBuildRequest(planet_id=active_planet))
         await planet_resources_use_case(PlanetResourcesUpdateRequest(planet_id=active_planet))
 
     return await call_next(request)
-
-
-async def init_db():
-
-
-    client.get_io_loop = asyncio.get_event_loop
-    # await UserDocument.init_model(db, False)
-    # await EnergyDepositDocument.init_model(db, False)
-    # await PlanetDocument.init_model(db, False)
-    # await TrollDocument.init_model(db, False)
 
 
 @app.on_event("startup")
