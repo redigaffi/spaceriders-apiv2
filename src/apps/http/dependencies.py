@@ -2,7 +2,7 @@ from decouple import config
 
 from adapters.shared.beani_repository_adapter import EnergyDepositRepositoryAdapter
 from adapters.shared.logging_adapter import LoggingAdapter, get_logger
-from core.nft_data import NftData
+from core.nft_metadata import NftData
 from core.planet_energy import PlanetEnergy
 from core.authenticate import Authenticate
 from adapters.shared.beani_repository_adapter import BeaniUserRepositoryAdapter, BeaniPlanetRepositoryAdapter
@@ -112,9 +112,8 @@ async def get_planet_energy_use_case(token_price_adapter: TokenPricePort,
 
 
 async def nft_data_use_case(api_endpoint: str, planet_images_base_url: str, testnet_ticket_images_base_url: str,
-                            planet_repository_port: PlanetRepositoryPort, contract_testnet: ChainServicePort,
-                            contract_mainnet: ChainServicePort):
-    return NftData(api_endpoint, planet_images_base_url, testnet_ticket_images_base_url, planet_repository_port, contract_testnet, contract_mainnet)
+                            planet_repository_port: PlanetRepositoryPort, contract_testnet: ChainServicePort):
+    return NftData(api_endpoint, planet_images_base_url, testnet_ticket_images_base_url, planet_repository_port, contract_testnet, http_response_port)
 
 
 # Controllers
@@ -145,6 +144,10 @@ async def http_controller():
     f = await get_planet_energy_use_case(token_price, energy_repository, planet_repository, logging_adapter,
                                          contract_service)
 
+    nft_contract_service = contract_service
+    if config('ENV') == "testnet":
+        nft_contract_service = contract_mainnet_service
+
     g = await nft_data_use_case(config('API_ENDPOINT'), config('PLANET_IMAGES_BUCKET_PATH'), config('TESTNET_TICKET_IMAGES_BUCKET_PATH'),
-                                planet_repository, contract_service, contract_mainnet_service)
+                                planet_repository, nft_contract_service)
     return HttpController(a, b, c, d, e, f, g)

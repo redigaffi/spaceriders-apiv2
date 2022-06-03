@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from core.nft_data import NftData
+from core.nft_metadata import NftData
 from core.planet_energy import PlanetEnergy, EnergyDepositRequest
 from core.shared.models import EnergyDeposit
 from adapters.http.security import jwt_bearer
@@ -75,6 +75,10 @@ class HttpController:
 
     async def fetch_planet_nft_data(self, planet_id: str):
         re = await self.nft_data.planet_nft_view(planet_id)
+        return jsonable_encoder(re)
+
+    async def fetch_ticket_nft_data(self, token_id: int):
+        re = await self.nft_data.testnet_ticket_nft(token_id)
         return jsonable_encoder(re)
 
 
