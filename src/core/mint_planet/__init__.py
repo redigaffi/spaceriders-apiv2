@@ -90,7 +90,7 @@ class MintPlanet:
         signed_msg = await self.contract_service.sign_message(['string', 'address', 'uint256'],
                                                               [request.planet_id, user, token_amount_cost_wei])
 
-        url = f"{self.api_base_path}/nft/{request.planet_id}"
+        url = f"{self.api_base_path}/nft/planet/{request.planet_id}"
         response = FetchPlanetCostDataResponse(planet_id=request.planet_id, price=token_amount_cost_wei, token_uri=url,
                                                v=signed_msg['v'], r=signed_msg['r'], s=signed_msg['s'])
 
