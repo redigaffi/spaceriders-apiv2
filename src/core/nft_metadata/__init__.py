@@ -102,4 +102,3 @@ class NftData:
         )
 
         return await self.response_port.publish_response(re)
-

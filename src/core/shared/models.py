@@ -364,11 +364,8 @@ class Planet(BaseModel):
         return re
 
     def get_emails(self):
-        # @TODO: Add emails
-        emails = self
-
         re = []
-        for email in emails:
+        for email in self.emails:
             re.append({
                 'id': email.id,
                 'sender': email.sender,
@@ -378,5 +375,4 @@ class Planet(BaseModel):
                 'body': email.body,
                 'read': email.read,
             })
-
         return re

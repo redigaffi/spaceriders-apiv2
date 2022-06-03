@@ -46,5 +46,11 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
              endpoint=http_controller.fetch_planet_nft_data, methods=["get"]),
 
         dict(path=r"/nft/ticket/{token_id}", response_model=OpenseaMetadataNftResponse,
-             endpoint=http_controller.fetch_ticket_nft_data, methods=["get"])
+             endpoint=http_controller.fetch_ticket_nft_data, methods=["get"]),
+
+        dict(path=r"/planet/email/{email_id}/read", response_model={},
+             endpoint=http_controller.email_mark_as_read, methods=["post"]),
+
+        dict(path=r"/planet/email/{email_id}/delete", response_model={},
+             endpoint=http_controller.email_delete, methods=["post"]),
     ]

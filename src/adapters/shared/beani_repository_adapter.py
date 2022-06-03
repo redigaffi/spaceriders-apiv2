@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Optional, List
-from beanie import Document, Indexed, Link, PydanticObjectId, WriteRules
+from beanie import Document, Indexed, Link, PydanticObjectId, WriteRules, DeleteRules
 
 from adapters.shared.beanie_models_adapter import EnergyDepositDocument, PlanetDocument, UserDocument, to_planet, \
     from_planet, EmailDocument
@@ -17,8 +17,32 @@ class EmailRepositoryAdapter(EmailRepositoryPort):
                                        body=email.body, sender=email.sender, read=email.read, planet=email.planet)
 
         await email_document.save()
-
         return email_document.to_email()
+
+    async def update(self, email: Email) -> Email:
+        email_document = EmailDocument.from_email(email)
+        await email_document.save()
+        fresh: EmailDocument = await EmailDocument.get(PydanticObjectId(email.id))
+        return fresh.to_email()
+
+    async def delete(self, email: Email):
+        email_document: EmailDocument = await EmailDocument.get(PydanticObjectId(email.id))
+        planet = await PlanetDocument.get(PydanticObjectId(email.planet))
+        await planet.fetch_link(PlanetDocument.emails)
+        planet.emails = [x.to_email() for x in planet.emails if str(x.id) != email.id]
+        planet_document = from_planet(planet)
+        await planet_document.save()
+        await email_document.delete(link_rule=DeleteRules.DELETE_LINKS)
+
+    async def get(self, email_id) -> Email:
+        email = None
+        try:
+            email = await EmailDocument.get(PydanticObjectId(email_id))
+        except:
+            pass
+
+        if email is not None:
+            return email.to_email()
 
 
 class EnergyDepositRepositoryAdapter(EnergyDepositRepositoryPort):
@@ -83,9 +107,7 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
         return [await to_planet(planet) for planet in planets]
 
     async def all_user_planets(self, user_id: str) -> list[Planet]:
-
         planets = await PlanetDocument.find(PlanetDocument.user == user_id).to_list()
-
         return [await to_planet(planet) for planet in planets]
 
     async def update(self, planet: Planet) -> Planet:

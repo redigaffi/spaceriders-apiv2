@@ -11,6 +11,7 @@ class FetchByPlanetIdResponse(BaseModel):
     research: dict
     installation: dict
     defense: dict
+    emails: list
 
 
 @dataclass
@@ -29,6 +30,7 @@ class GetPlanets:
         re = planet.get_planet_research_data()
         ii = planet.get_planet_installation_data()
         di = planet.get_planet_defense_data()
+        em = planet.get_emails()
 
         planet.set_image_url(self.planet_images_bucket_path)
 
@@ -37,7 +39,8 @@ class GetPlanets:
             resources=ri,
             research=re,
             installation=ii,
-            defense=di
+            defense=di,
+            emails=em
         )
 
         return await self.response_port.publish_response(response)

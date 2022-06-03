@@ -77,7 +77,8 @@ class HttpController:
         return jsonable_encoder(re)
 
     async def fetch_planet_nft_data(self, planet_id: str):
-        await self.planet_emails.asd(planet_id)
+        await self.planet_emails.create("629a3819ea41650638836fb7")
+
         re = await self.nft_data.planet_nft_view(planet_id)
         return jsonable_encoder(re)
 
@@ -85,4 +86,10 @@ class HttpController:
         re = await self.nft_data.testnet_ticket_nft(token_id)
         return jsonable_encoder(re)
 
+    async def email_mark_as_read(self, email_id: str):
+        re = await self.planet_emails.mark_as_read(email_id)
+        return jsonable_encoder(re)
 
+    async def email_delete(self, email_id: str):
+        re = await self.planet_emails.delete(email_id)
+        return jsonable_encoder(re)

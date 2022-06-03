@@ -17,6 +17,18 @@ class EmailRepositoryPort(ABC):
     async def create(self, email: Email) -> Email:
         pass
 
+    @abstractmethod
+    async def update(self, email: Email) -> Email:
+        pass
+
+    @abstractmethod
+    async def delete(self, email: Email):
+        pass
+
+    @abstractmethod
+    async def get(self, email_id) -> Email:
+        pass
+
 
 class EnergyDepositRepositoryPort(ABC):
     @abstractmethod
