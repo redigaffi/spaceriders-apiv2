@@ -19,6 +19,7 @@ import json
 from pathlib import Path
 from controllers.http import HttpController
 from core.planet_resources import PlanetResources
+from core.planet_staking import Staking
 from core.shared.ports import ChainServicePort, CacheServicePort, TokenPricePort, UserRepositoryPort, \
     PlanetRepositoryPort, EmailRepositoryPort
 
@@ -120,6 +121,11 @@ async def nft_data_use_case(api_endpoint: str, planet_images_base_url: str, test
 async def get_email_use_case(planet_repository_port: PlanetRepositoryPort, email_repository_port: EmailRepositoryPort):
     return PlanetEmails(planet_repository_port, email_repository_port, http_response_port)
 
+
+async def get_staking_use_case(planet_repository_port: PlanetRepositoryPort, token_price: TokenPricePort, chain_service_adapter: ChainServicePort):
+    return Staking(planet_repository_port, token_price, chain_service_adapter, http_response_port)
+
+
 # Controllers
 
 async def get_middleware():
@@ -157,4 +163,7 @@ async def http_controller():
                                 planet_repository, nft_contract_service)
 
     h = await get_email_use_case(planet_repository, email_repository)
-    return HttpController(a, b, c, d, e, f, g, h)
+
+    j = await get_staking_use_case(planet_repository, token_price, contract_service)
+
+    return HttpController(a, b, c, d, e, f, g, h, j)

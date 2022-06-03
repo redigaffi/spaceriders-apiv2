@@ -100,18 +100,25 @@ tests = ["mypy", "PyHamcrest (>=2.0.2)", "pytest (>=4.6)", "pytest-benchmark", "
 
 [[package]]
 name = "beanie"
-version = "1.11.0"
+version = "1.11.1"
 description = "Asynchronous Python ODM for MongoDB"
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
+develop = false
 
 [package.dependencies]
 click = ">=7"
-motor = ">=2.5,<3.0"
+motor = "^2.5"
 pydantic = ">=1.9.0"
 toml = "*"
 yarl = ">=1.6"
+
+[package.source]
+type = "git"
+url = "https://github.com/roman-right/beanie.git"
+reference = "1.11.1"
+resolved_reference = "76f201b17bf911a5b77edc72fe652882838bdcf2"
 
 [[package]]
 name = "bitarray"
@@ -425,7 +432,7 @@ requests = ">=2.11"
 
 [[package]]
 name = "jsonschema"
-version = "4.5.1"
+version = "4.6.0"
 description = "An implementation of JSON Schema validation for Python"
 category = "main"
 optional = false
@@ -437,7 +444,7 @@ pyrsistent = ">=0.14.0,<0.17.0 || >0.17.0,<0.17.1 || >0.17.1,<0.17.2 || >0.17.2"
 
 [package.extras]
 format = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validator", "rfc3987", "uri-template", "webcolors (>=1.11)"]
-format_nongpl = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validator", "rfc3986-validator (>0.1.0)", "uri-template", "webcolors (>=1.11)"]
+format-nongpl = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validator", "rfc3986-validator (>0.1.0)", "uri-template", "webcolors (>=1.11)"]
 
 [[package]]
 name = "lru-dict"
@@ -745,7 +752,7 @@ python-versions = "*"
 
 [[package]]
 name = "web3"
-version = "5.29.1"
+version = "5.29.2"
 description = "Web3.py"
 category = "main"
 optional = false
@@ -796,7 +803,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "6d9299e0f3e2bcf941ea78f5c7393596396685970251e6d84c5f266f0b146548"
+content-hash = "933aa2fc1725c215ccbba07e9eadf052a78e32a9b5b20cc2646e1d1fd5f053f7"
 
 [metadata.files]
 aiohttp = [
@@ -900,10 +907,7 @@ base58 = [
     {file = "base58-2.1.1-py3-none-any.whl", hash = "sha256:11a36f4d3ce51dfc1043f3218591ac4eb1ceb172919cebe05b52a5bcc8d245c2"},
     {file = "base58-2.1.1.tar.gz", hash = "sha256:c5d0cb3f5b6e81e8e35da5754388ddcc6d0d14b6c6a132cb93d69ed580a7278c"},
 ]
-beanie = [
-    {file = "beanie-1.11.0-py3-none-any.whl", hash = "sha256:60102e1803bf87f6a96ce06601f6de7770f9825c37b7144717d10254f52cc4e7"},
-    {file = "beanie-1.11.0.tar.gz", hash = "sha256:634a1d0d49bc567340481a13703e8a305cd3f28a475185e1447073e1d42122c3"},
-]
+beanie = []
 bitarray = [
     {file = "bitarray-1.2.2.tar.gz", hash = "sha256:27a69ffcee3b868abab3ce8b17c69e02b63e722d4d64ffd91d659f81e9984954"},
 ]
@@ -1057,8 +1061,8 @@ ipfshttpclient = [
     {file = "ipfshttpclient-0.8.0a2.tar.gz", hash = "sha256:0d80e95ee60b02c7d414e79bf81a36fc3c8fbab74265475c52f70b2620812135"},
 ]
 jsonschema = [
-    {file = "jsonschema-4.5.1-py3-none-any.whl", hash = "sha256:71b5e39324422543546572954ce71c67728922c104902cb7ce252e522235b33f"},
-    {file = "jsonschema-4.5.1.tar.gz", hash = "sha256:7c6d882619340c3347a1bf7315e147e6d3dae439033ae6383d6acb908c101dfc"},
+    {file = "jsonschema-4.6.0-py3-none-any.whl", hash = "sha256:1c92d2db1900b668201f1797887d66453ab1fbfea51df8e4b46236689c427baf"},
+    {file = "jsonschema-4.6.0.tar.gz", hash = "sha256:9d6397ba4a6c0bf0300736057f649e3e12ecbc07d3e81a0dacb72de4e9801957"},
 ]
 lru-dict = [
     {file = "lru-dict-1.1.7.tar.gz", hash = "sha256:45b81f67d75341d4433abade799a47e9c42a9e22a118531dcb5e549864032d7c"},
@@ -1466,8 +1470,8 @@ varint = [
     {file = "varint-1.0.2.tar.gz", hash = "sha256:a6ecc02377ac5ee9d65a6a8ad45c9ff1dac8ccee19400a5950fb51d594214ca5"},
 ]
 web3 = [
-    {file = "web3-5.29.1-py3-none-any.whl", hash = "sha256:41930f4c48dc730d74c9d8b2d7c0701bce9598dc9e970dc1ce7a9b3fbd21546a"},
-    {file = "web3-5.29.1.tar.gz", hash = "sha256:14d0c4ef5d693b6cc9a36ad4ff31201add8ef1f4c1cdb920f7ce07f81841e6bc"},
+    {file = "web3-5.29.2-py3-none-any.whl", hash = "sha256:57d64f3bfe1eced1fc48629916bd6679844d26d9186f7cfb140e9c5e75864147"},
+    {file = "web3-5.29.2.tar.gz", hash = "sha256:f37b01f3dc32010b176cef01c2107bc25b7cf94b63c3269d4ec52d7e5ded9a36"},
 ]
 websockets = [
     {file = "websockets-9.1-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:d144b350045c53c8ff09aa1cfa955012dd32f00c7e0862c199edcabb1a8b32da"},

@@ -64,7 +64,7 @@ class PlanetTier(BaseModel):
     tier_code: str = SD.TIER_0
     tier_name: str = SD.TIER_NAMES[SD.TIER_0]
     token_amount: float = 0
-    time_release: datetime | None = None
+    time_release: float | None = None
     staked: bool = False
 
 
@@ -137,6 +137,7 @@ class Email(BaseModel):
 # @TODO: Add emails
 class Planet(BaseModel):
     id: str = None
+    # @TODO: Change to float
     created_at: datetime = None
     name: str = None
     rarity: str = None

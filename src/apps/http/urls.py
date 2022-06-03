@@ -5,7 +5,8 @@ from core.fetch_chain_data import FetchChainDataResponse, FetchChainTokenPriceRe
 from core.get_planets import FetchByPlanetIdResponse
 from core.mint_planet import FetchPlanetCostResponse, FetchPlanetCostDataResponse
 from core.nft_metadata import OpenseaMetadataNftResponse
-from core.shared.models import Planet, BuildableItem, EnergyDeposit
+from core.planet_staking import TierInfoResponse, CreateStakingResponse
+from core.shared.models import Planet, BuildableItem, EnergyDeposit, PlanetTier
 
 
 async def register_fastapi_routes(http_controller: HttpController) -> list:
@@ -51,6 +52,21 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
         dict(path=r"/planet/email/{email_id}/read", response_model={},
              endpoint=http_controller.email_mark_as_read, methods=["post"]),
 
-        dict(path=r"/planet/email/{email_id}/delete", response_model={},
+        dict(path=r"/planet/email/{email_id}/delete",
              endpoint=http_controller.email_delete, methods=["post"]),
+
+        dict(path=r"/planet/staking/info", response_model=dict[str, TierInfoResponse],
+             endpoint=http_controller.staking_info, methods=["get"]),
+
+        dict(path=r"/planet/staking/create", response_model=CreateStakingResponse,
+             endpoint=http_controller.staking_create, methods=["post"]),
+
+        dict(path=r"/planet/staking/confirm", response_model=PlanetTier,
+             endpoint=http_controller.staking_confirm, methods=["post"]),
+
+        dict(path=r"/planet/staking/unstake", response_model=PlanetTier,
+             endpoint=http_controller.unstake, methods=["post"]),
+
+        dict(path=r"/health",
+             endpoint=http_controller.health, methods=["get"]),
     ]

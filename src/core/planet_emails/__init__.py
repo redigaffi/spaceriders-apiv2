@@ -6,12 +6,6 @@ from core.shared.models import Email, AppBaseException
 from core.shared.ports import ResponsePort, EmailRepositoryPort, PlanetRepositoryPort
 
 
-class OpenseaAttributeStandardResponse(BaseModel):
-    display_type: str = None
-    trait_type: str = None
-    value: str = None
-
-
 class EmailNotFoundException(AppBaseException):
     msg = "Email not found"
 

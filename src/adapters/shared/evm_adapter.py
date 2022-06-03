@@ -1,4 +1,4 @@
-from core.shared.ports import ChainServicePort, CacheServicePort, TokenPricePort
+from core.shared.ports import ChainServicePort, CacheServicePort, TokenPricePort, SignedMessageDict
 from dataclasses import dataclass
 from web3 import Web3
 import time
@@ -91,10 +91,11 @@ class EvmChainServiceAdapter(ChainServicePort):
 
         return multi_call_result['re']
 
+
     def __to_32byte_hex(self, val):
         return Web3.toHex(Web3.toBytes(val).rjust(32, b'\0'))
 
-    async def sign_message(self, types: list, values: list) -> dict:
+    async def sign_message(self, types: list, values: list) -> SignedMessageDict:
         rpc_url = self.rpc_urls.split(',')[0]
         w3 = Web3(Web3.HTTPProvider(rpc_url))
 

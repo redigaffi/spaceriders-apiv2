@@ -4,6 +4,7 @@ from core import planet_emails
 from core.nft_metadata import NftData
 from core.planet_emails import PlanetEmails
 from core.planet_energy import PlanetEnergy, EnergyDepositRequest
+from core.planet_staking import Staking, CreateStakingRequest, ConfirmStakingRequest, UnStakeRequest
 from core.shared.models import EnergyDeposit
 from adapters.http.security import jwt_bearer
 from core.authenticate import Authenticate
@@ -28,6 +29,7 @@ class HttpController:
     planet_energy: PlanetEnergy
     nft_data: NftData
     planet_emails: PlanetEmails
+    staking: Staking
 
     async def jwt(self, req: AuthenticationDetailsRequest):
         return await self.authenticate_use_case(req)
@@ -77,8 +79,6 @@ class HttpController:
         return jsonable_encoder(re)
 
     async def fetch_planet_nft_data(self, planet_id: str):
-        await self.planet_emails.create("629a3819ea41650638836fb7")
-
         re = await self.nft_data.planet_nft_view(planet_id)
         return jsonable_encoder(re)
 
@@ -86,10 +86,29 @@ class HttpController:
         re = await self.nft_data.testnet_ticket_nft(token_id)
         return jsonable_encoder(re)
 
-    async def email_mark_as_read(self, email_id: str):
+    async def email_mark_as_read(self, email_id: str, user=Depends(jwt_bearer)):
         re = await self.planet_emails.mark_as_read(email_id)
         return jsonable_encoder(re)
 
-    async def email_delete(self, email_id: str):
+    async def email_delete(self, email_id: str, user=Depends(jwt_bearer)):
         re = await self.planet_emails.delete(email_id)
         return jsonable_encoder(re)
+
+    async def staking_info(self):
+        re = await self.staking.tier_info()
+        return jsonable_encoder(re)
+
+    async def staking_create(self, request: CreateStakingRequest, user=Depends(jwt_bearer)):
+        re = await self.staking.create_staking(request, user)
+        return jsonable_encoder(re)
+
+    async def staking_confirm(self, request: ConfirmStakingRequest, user=Depends(jwt_bearer)):
+        re = await self.staking.confirm_staking(request, user)
+        return jsonable_encoder(re)
+
+    async def unstake(self, request: UnStakeRequest, user=Depends(jwt_bearer)):
+        re = await self.staking.unstake(request, user)
+        return jsonable_encoder(re)
+
+    async def health(self):
+        return jsonable_encoder({})

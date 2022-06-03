@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from core.shared.models import User, Planet, EnergyDeposit, Email
+from typing import TypedDict
 
 
 class LoggingPort(ABC):
@@ -106,6 +107,12 @@ class CacheServicePort(ABC):
         pass
 
 
+class SignedMessageDict(TypedDict):
+    v: int
+    r: str
+    s: str
+
+
 class ChainServicePort(ABC):
     SPACERIDERS_TOKEN_CONTRACT = "SPACERIDERS_TOKEN_CONTRACT"
     SPACERIDERS_GAME_CONTRACT = "SPACERIDERS_GAME_CONTRACT"
@@ -121,7 +128,7 @@ class ChainServicePort(ABC):
         pass
 
     @abstractmethod
-    async def sign_message(self, types: list, values: list) -> dict:
+    async def sign_message(self, types: list, values: list) -> SignedMessageDict:
         pass
 
     @abstractmethod
