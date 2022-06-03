@@ -9,8 +9,6 @@ from datetime import datetime, timezone
 
 
 async def to_planet(planet_document: PlanetDocument) -> Planet:
-
-
     planet = Planet()
     planet.id = planet_document.id
     planet.created_at = planet_document.created_at
@@ -51,7 +49,7 @@ async def to_planet(planet_document: PlanetDocument) -> Planet:
 
 
 def from_planet(planet: Planet):
-        planet_document = PlanetDocument(user=planet.user)
+        planet_document = PlanetDocument(user=planet.user, created_at=planet.created_at)
         planet_document.id = planet.id
         planet_document.name = planet.name
         planet_document.rarity = planet.rarity
@@ -114,7 +112,7 @@ class EnergyDepositDocument(Document):
 
 
 class PlanetDocument(Document):
-    created_at: float = None
+    created_at: float
 
     name: str = "Planet"
     rarity: str = "Common"

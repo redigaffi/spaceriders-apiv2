@@ -37,11 +37,11 @@ class HttpController:
         re: Planet = await self.buy_planet_use_case.claim_planet(user, req)
         return jsonable_encoder(re)
 
-    async def fetch_planet_cost(self):
+    async def planet_cost(self):
         re: FetchPlanetCostResponse = await self.buy_planet_use_case.fetch_planet_cost()
         return jsonable_encoder(re)
 
-    async def fetch_planet_cost_data(self, request: FetchPlanetCostDataRequest, user=Depends(jwt_bearer)):
+    async def planet_sign_cost_data(self, request: FetchPlanetCostDataRequest, user=Depends(jwt_bearer)):
         re = await self.buy_planet_use_case.fetch_planet_cost_data(user, request)
         return jsonable_encoder(re)
 

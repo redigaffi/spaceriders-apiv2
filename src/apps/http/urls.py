@@ -17,11 +17,11 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
 
         dict(path="/planet/free", response_model=Planet, endpoint=http_controller.mint_free_planet, methods=["post"]),
 
-        dict(path="/planet/fetch_cost", response_model=FetchPlanetCostResponse,
-             endpoint=http_controller.fetch_planet_cost, methods=["get"]),
+        dict(path="/planet/cost", response_model=FetchPlanetCostResponse,
+             endpoint=http_controller.planet_cost, methods=["get"]),
 
-        dict(path="/planet/fetch_cost_data", response_model=FetchPlanetCostDataResponse,
-             endpoint=http_controller.fetch_planet_cost_data, methods=["post"]),
+        dict(path="/planet/cost/sign", response_model=FetchPlanetCostDataResponse,
+             endpoint=http_controller.planet_sign_cost_data, methods=["post"]),
 
         dict(path="/chain", response_model=FetchChainDataResponse, endpoint=http_controller.get_chain_data,
              methods=["get"]),
