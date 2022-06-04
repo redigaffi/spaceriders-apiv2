@@ -1,13 +1,20 @@
 from dataclasses import dataclass
-
-from pydantic import BaseModel
-
 from core.shared.models import Email, AppBaseException
 from core.shared.ports import ResponsePort, EmailRepositoryPort, PlanetRepositoryPort
+from pydantic import BaseModel
 
 
 class EmailNotFoundException(AppBaseException):
     msg = "Email not found"
+
+
+class PlanetSendEmailRequest(BaseModel):
+    planet_id_receiver: str
+    title: str
+    sub_title: str
+    template: str
+    body: str
+    sender: str = "Universe"
 
 
 @dataclass
@@ -16,9 +23,16 @@ class PlanetEmails:
     email_repository_port: EmailRepositoryPort
     response_port: ResponsePort
 
-    async def create(self, planet_id: str):
-        planet = await self.planet_repository_port.get(planet_id)
-        email = Email(title="asd",sub_title="asd",template="asd",body="asd",sender="as",read=False,planet=planet_id)
+    async def create(self, email_request: PlanetSendEmailRequest):
+        planet = await self.planet_repository_port.get(email_request.planet_id_receiver)
+        email = Email(title=email_request.title,
+                      sub_title=email_request.sub_title,
+                      template=email_request.template,
+                      body=email_request.body,
+                      sender=email_request.sender,
+                      read=False,
+                      planet=email_request.planet_id_receiver)
+
         email = await self.email_repository_port.create(email)
         planet.emails.append(email)
         await self.planet_repository_port.update(planet)

@@ -47,30 +47,6 @@ def resource_reserve_als(label: str, planet: Planet, next_level_info: BuildableI
     return planet
 
 
-
-def give_planet_experience(planet: Planet, experience_amount: float) -> Planet:
-    try:
-        next_level_info = PlanetLevelData.LEVEL[planet.level + 1]
-    except:
-        return planet
-
-    current_xp = planet.experience
-    if current_xp + experience_amount >= next_level_info[CommonKeys.EXPERIENCE]:
-        difference = (current_xp + experience_amount) - next_level_info[CommonKeys.EXPERIENCE]
-        planet.level += 1
-        planet.experience = difference
-
-        if not planet.is_free():
-            lvl_up_id = bson.objectid.ObjectId()
-            lvl_claim: LevelUpRewardClaims = LevelUpRewardClaims(id=lvl_up_id, level=planet.level)
-            planet.pending_levelup_reward.append(lvl_claim)
-
-        return planet
-
-    planet.experience += experience_amount
-    return planet
-
-
 def get_new_planet(user: str, name: str, last_planet: Planet, price_paid: int, planet_images_bucket_path: str,
                    claimed: bool, claimable: int = None) -> Planet:
     galaxy, solar_system, position = get_new_planet_position(last_planet)

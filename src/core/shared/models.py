@@ -1,10 +1,6 @@
 from dataclasses import dataclass
-from datetime import datetime
 from typing import List
-
-from beanie import PydanticObjectId
 from pydantic import BaseModel
-
 from core.shared.static.game_data.Common import BuildableItemBaseType, CommonKeys, BuildableItemLevelInfo
 from core.shared.static.game_data.PlanetData import PlanetData
 from core.shared.static.game_data.ResourceData import ResourceData as RD, ResourceData
@@ -21,7 +17,7 @@ class AppBaseException(Exception):
 
 
 class ShadyActivityException(AppBaseException):
-    msg = "This looks suspicios to me, what are you trying boi?"
+    msg = "This looks suspicious to me, what are you trying boi?"
 
 
 class UserNotFoundException(AppBaseException):
@@ -69,9 +65,10 @@ class PlanetTier(BaseModel):
 
 
 class LevelUpRewardClaims(BaseModel):
-    id: PydanticObjectId = None
+    id: str = None
     level: int = None
     completed: bool = False
+    planet_id: str
 
 
 class BuildableItem(BaseModel):
@@ -138,7 +135,7 @@ class Email(BaseModel):
 class Planet(BaseModel):
     id: str = None
     # @TODO: Change to float
-    created_at: datetime = None
+    created_at: float = None
     name: str = None
     rarity: str = None
     image: str = None

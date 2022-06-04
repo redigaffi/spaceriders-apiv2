@@ -24,6 +24,7 @@ class CreateStakingRequest(BaseModel):
 class ConfirmStakingRequest(BaseModel):
     planet_id: str
 
+
 class UnStakeRequest(BaseModel):
     planet_id: str
 
@@ -212,6 +213,11 @@ class Staking:
         return await self.response_port.publish_response(planet)
 
     async def tier_expired_reset(self, planet_id: str):
+        """
+        Resets user tier in case it has finished but user has not withdrawn yet.
+        :param planet_id:
+        :return:
+        """
         planet = await self.planet_repository_port.get(planet_id)
 
         now = int(datetime.timestamp(datetime.now()))
@@ -219,5 +225,34 @@ class Staking:
             planet.tier.tier_code = StakingData.TIER_0
             planet.tier.tier_name = StakingData.TIER_NAMES[StakingData.TIER_0]
             planet = await self.planet_repository_port.update(planet)
+
+        return await self.response_port.publish_response(planet.tier)
+
+    async def tier_recover(self, planet_id: str):
+        """
+        Recover tier in case tx got submitted but API is not up-to-date.
+        :return:
+        """
+        planet = await self.planet_repository_port.get(planet_id)
+        staking_data = await self.chain_service_port.spaceriders_game_call("userStaking", planet_id)
+
+        owner = staking_data[0]
+        planet_id = staking_data[1]
+        amount = staking_data[2]
+        tier_code_sm = staking_data[3]
+        time = staking_data[4]
+        time_release = staking_data[5]
+        staked = staking_data[6]
+
+        if not staked:
+            return await self.response_port.publish_response(planet.tier)
+
+        if not planet.tier.staked or tier_code_sm != planet.tier.tier_code:
+            planet.tier.staked = True
+            planet.tier.tier_code = tier_code_sm
+            planet.tier.tier_name = StakingData.TIER_NAMES[tier_code_sm]
+            planet.tier.time_release = time_release
+            planet.tier.token_amount = amount / 10 ** 18
+            await self.planet_repository_port.update(planet)
 
         return await self.response_port.publish_response(planet.tier)

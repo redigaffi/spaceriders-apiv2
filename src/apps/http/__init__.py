@@ -2,7 +2,8 @@ from fastapi import FastAPI, Request, Query
 from starlette.background import BackgroundTask
 
 # Info, seems like this need to be at the top, also some have src before and others not (maybe due to relationship?)
-from adapters.shared.beanie_models_adapter import UserDocument, EnergyDepositDocument, PlanetDocument, EmailDocument
+from adapters.shared.beanie_models_adapter import UserDocument, EnergyDepositDocument, PlanetDocument, EmailDocument, \
+    LevelUpRewardClaimsDocument
 from apps.http.dependencies import get_middleware
 from controllers.http import HttpController
 import uvicorn
@@ -105,7 +106,7 @@ async def app_init():
     client = motor.motor_asyncio.AsyncIOMotorClient(config("DB_URL"), )
     db = client[config('DB_NAME')]
     await init_beanie(database=db,
-                      document_models=[UserDocument, EnergyDepositDocument, PlanetDocument, EmailDocument]
+                      document_models=[UserDocument, EnergyDepositDocument, PlanetDocument, EmailDocument, LevelUpRewardClaimsDocument]
     )
 
     http_controller = await dependencies.http_controller()

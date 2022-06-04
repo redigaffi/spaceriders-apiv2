@@ -43,6 +43,7 @@ async def to_planet(planet_document: PlanetDocument) -> Planet:
     planet.pending_levelup_reward = planet_document.pending_levelup_reward
     planet.energy_deposits = [(await x.fetch()).to_energy_deposit() for x in planet_document.energy_deposits if x is not None]
     planet.emails = [(await x.fetch()).to_email() for x in planet_document.emails if x is not None]
+    planet.pending_levelup_reward = [(await x.fetch()).to_lvl_up() for x in planet_document.pending_levelup_reward if x is not None]
     # @TODO: DONT REMOVE THIS LINE YET!!! Workaround until they fix PR, see method
     planet.calculate_energy_usage_per_min()
 
@@ -82,8 +83,26 @@ def from_planet(planet: Planet):
         planet_document.pending_levelup_reward = planet.pending_levelup_reward
         planet_document.energy_deposits = [EnergyDepositDocument.from_energy_deposit(x) for x in planet.energy_deposits]
         planet_document.emails = [EmailDocument.from_email(x) for x in planet.emails]
+        planet_document.pending_levelup_reward = [LevelUpRewardClaimsDocument.from_lvl_up(x) for x in planet.pending_levelup_reward]
         return planet_document
 
+
+class LevelUpRewardClaimsDocument(Document):
+    level: int = None
+    completed: bool = False
+    planet_id: str
+
+    def to_lvl_up(self) -> LevelUpRewardClaims:
+        return LevelUpRewardClaims(id=str(self.id), level=self.level, completed=self.completed, planet_id=self.planet_id)
+
+    @staticmethod
+    def from_lvl_up(lvl_up: LevelUpRewardClaims):
+        return LevelUpRewardClaimsDocument(id=PydanticObjectId(lvl_up.id), level=lvl_up.level, completed=lvl_up.completed, planet_id=lvl_up.planet_id)
+
+    class Settings:
+        name = "level_up_reward_claims"
+        # use_cache = True
+        # cache_expiration_time = timedelta(seconds=60)
 
 class EmailDocument(Document):
     title: str = None
@@ -107,6 +126,7 @@ class EmailDocument(Document):
         name = "emails"
         # use_cache = True
         # cache_expiration_time = timedelta(seconds=60)
+
 
 # INFO: Seems like order matters, if I put this below planet it wont create DBRef in db (no reference)
 class EnergyDepositDocument(Document):
@@ -172,7 +192,8 @@ class PlanetDocument(Document):
     installation_level: List[BuildableItem] = None
     research_level: List[BuildableItem] = None
     defense_items: List[BuildableItem] = None
-    pending_levelup_reward: List[LevelUpRewardClaims] = None
+
+    pending_levelup_reward: List[Link[LevelUpRewardClaimsDocument]] = []
     energy_deposits: List[Link[EnergyDepositDocument]] = []
     emails: List[Link[EmailDocument]] = []
 

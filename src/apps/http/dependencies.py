@@ -1,6 +1,7 @@
 from decouple import config
 
-from adapters.shared.beani_repository_adapter import EnergyDepositRepositoryAdapter, EmailRepositoryAdapter
+from adapters.shared.beani_repository_adapter import EnergyDepositRepositoryAdapter, EmailRepositoryAdapter, \
+    LevelUpRewardClaimsRepositoryAdapter
 from adapters.shared.logging_adapter import LoggingAdapter, get_logger
 from core.nft_metadata import NftData
 from core.planet_emails import PlanetEmails
@@ -18,10 +19,11 @@ import emcache
 import json
 from pathlib import Path
 from controllers.http import HttpController
+from core.planet_level import PlanetLevel
 from core.planet_resources import PlanetResources
 from core.planet_staking import Staking
 from core.shared.ports import ChainServicePort, CacheServicePort, TokenPricePort, UserRepositoryPort, \
-    PlanetRepositoryPort, EmailRepositoryPort
+    PlanetRepositoryPort, EmailRepositoryPort, LevelUpRewardClaimsRepositoryPort
 
 http_response_port = HttpResponsePort()
 logging_adapter = LoggingAdapter(get_logger("http_app"))
@@ -99,8 +101,8 @@ async def get_planets_use_case(planet_repository: PlanetRepositoryPort):
     return GetPlanets(planet_repository, config('PLANET_IMAGES_BUCKET_PATH'), http_response_port)
 
 
-async def get_buildable_items_use_case(planet_repository: PlanetRepositoryPort):
-    return BuildableItems(planet_repository, http_response_port)
+async def get_buildable_items_use_case(planet_repository: PlanetRepositoryPort, lvl_up_use_case: PlanetLevel):
+    return BuildableItems(planet_repository, lvl_up_use_case, http_response_port)
 
 
 async def get_planet_resources_use_case(planet_repository: PlanetRepositoryPort):
@@ -128,15 +130,25 @@ async def get_staking_use_case(planet_repository_port: PlanetRepositoryPort, tok
     return Staking(planet_repository_port, token_price, chain_service_adapter, http_response_port)
 
 
+async def get_planet_level_use_case(planet_repository_port: PlanetRepositoryPort, lvl_up_repo: LevelUpRewardClaimsRepositoryPort, email_use_case: PlanetEmails):
+    return PlanetLevel(planet_repository_port, lvl_up_repo, email_use_case, http_response_port)
+
+
 # Controllers
 
 async def get_middleware():
     cache = await cache_dependency()
     contract_service = await contract_dependency(cache, config('RPCS_URL'))
     planet_repository = BeaniPlanetRepositoryAdapter()
-    token_price = await token_price_dependency(cache, contract_service)
+    lvl_up_repository = LevelUpRewardClaimsRepositoryAdapter()
+    email_repository = EmailRepositoryAdapter()
 
-    items_use_case = await get_buildable_items_use_case(planet_repository)
+    token_price = await token_price_dependency(cache, contract_service)
+    email_use_case = await get_email_use_case(planet_repository, email_repository)
+
+    lvl_up_use_case = await get_planet_level_use_case(planet_repository, lvl_up_repository, email_use_case)
+
+    items_use_case = await get_buildable_items_use_case(planet_repository, lvl_up_use_case)
     planet_resources = await get_planet_resources_use_case(planet_repository)
     planet_staking = await get_staking_use_case(planet_repository, token_price, contract_service)
 
@@ -148,6 +160,7 @@ async def http_controller():
     planet_repository = BeaniPlanetRepositoryAdapter()
     energy_repository = EnergyDepositRepositoryAdapter()
     email_repository = EmailRepositoryAdapter()
+    lvl_up_repository = LevelUpRewardClaimsRepositoryAdapter()
 
     cache = await cache_dependency()
     contract_service = await contract_dependency(cache, config('RPCS_URL'))
@@ -155,11 +168,14 @@ async def http_controller():
 
     token_price = await token_price_dependency(cache, contract_service)
 
+    h = await get_email_use_case(planet_repository, email_repository)
+    k = await get_planet_level_use_case(planet_repository, lvl_up_repository, h)
+
     a = await authenticate_use_case(user_repository)
     b = await buy_planet_use_case(token_price, contract_service, planet_repository)
     c = await fetch_chain_data_use_case(token_price, contract_service)
     d = await get_planets_use_case(planet_repository)
-    e = await get_buildable_items_use_case(planet_repository)
+    e = await get_buildable_items_use_case(planet_repository, k)
     f = await get_planet_energy_use_case(token_price, energy_repository, planet_repository, logging_adapter,
                                          contract_service)
 
@@ -170,7 +186,7 @@ async def http_controller():
     g = await nft_data_use_case(config('API_ENDPOINT'), config('PLANET_IMAGES_BUCKET_PATH'), config('TESTNET_TICKET_IMAGES_BUCKET_PATH'),
                                 planet_repository, nft_contract_service)
 
-    h = await get_email_use_case(planet_repository, email_repository)
+
 
     j = await get_staking_use_case(planet_repository, token_price, contract_service)
 

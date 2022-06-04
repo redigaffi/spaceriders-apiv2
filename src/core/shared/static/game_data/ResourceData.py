@@ -37,7 +37,7 @@ class ResourceData(GameData):
         METAL_MINE: BuildableItemBaseType("Metal Mine", METAL_MINE, TYPE, MINE_CATEGORY, "Metal mine to extract metal",
                                           {
                                               0: BuildableItemLevelInfo(0, 100, 0, 60, 0, 0, 0, 60, 10, 0, 0, [], 0),
-                                              1: BuildableItemLevelInfo(1, 100, 0, 60, 0.01, 5, 0, 10, 500, 0, 20, [], 1),
+                                              1: BuildableItemLevelInfo(1, 100, 0, 60, 0.01, 5, 0, 10, 500, 0, 500, [], 1),
                                               2: BuildableItemLevelInfo(2, 100, 0, 60, 1, 5, 0, 1200, 500, 0, 0, [], 1),
                                           }
                                           ),

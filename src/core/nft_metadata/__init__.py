@@ -1,6 +1,4 @@
 from dataclasses import dataclass
-
-from ethpm.tools.builder import description
 from pydantic import BaseModel
 from core.shared.ports import PlanetRepositoryPort, ChainServicePort, ResponsePort
 

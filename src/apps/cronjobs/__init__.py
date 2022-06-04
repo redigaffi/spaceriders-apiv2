@@ -10,14 +10,15 @@ from adapters.shared.beani_repository_adapter import UserDocument, PlanetDocumen
 from controllers.cronjobs import CronjobController
 from core.planet_energy import PlanetEnergyRecoverEnergyDepositsRequest
 from core.shared.models import Planet
+import settings
 
 
-async def energy_deposit_recover_cronjob(controller: CronjobController):
+async def smart_contract_recover_cronjob(controller: CronjobController):
     all_claimed: list[Planet] = await dependencies.planet_repository.all_claimed_planets()
     for planet in all_claimed:
         request = PlanetEnergyRecoverEnergyDepositsRequest(planet_id=str(planet.id))
         await controller.recover_deposits(request)
-
+        await controller.recover_staking(str(planet.id))
 
 
 async def main():
@@ -28,8 +29,10 @@ async def main():
     await init_beanie(database=db, document_models=[UserDocument, EnergyDepositDocument, PlanetDocument])
 
     controller = await dependencies.cronjob_controller()
-    # If this is not here in main function it wont work
-    schedule.every(3).seconds.do(energy_deposit_recover_cronjob, controller)
+
+    # If this is not here in main function it won't work
+
+    schedule.every(3).seconds.do(smart_contract_recover_cronjob, controller)
 
     while True:
         await schedule.run_pending()

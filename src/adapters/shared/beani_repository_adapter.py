@@ -1,14 +1,31 @@
 from __future__ import annotations
-from typing import Optional, List
-from beanie import Document, Indexed, Link, PydanticObjectId, WriteRules, DeleteRules
+from beanie import PydanticObjectId, WriteRules, DeleteRules
 
 from adapters.shared.beanie_models_adapter import EnergyDepositDocument, PlanetDocument, UserDocument, to_planet, \
-    from_planet, EmailDocument
-from core.shared.ports import UserRepositoryPort, PlanetRepositoryPort, EnergyDepositRepositoryPort, EmailRepositoryPort
-from core.shared.models import User, PlanetTier, Resources, Planet, Reserves, BuildableItem, UserNotFoundException, \
+    from_planet, EmailDocument, LevelUpRewardClaimsDocument
+from core.shared.ports import UserRepositoryPort, PlanetRepositoryPort, EnergyDepositRepositoryPort, \
+    EmailRepositoryPort, LevelUpRewardClaimsRepositoryPort
+from core.shared.models import User, PlanetTier, Planet, UserNotFoundException, \
     LevelUpRewardClaims, EnergyDeposit, Email
 
 from datetime import datetime, timezone
+
+
+class LevelUpRewardClaimsRepositoryAdapter(LevelUpRewardClaimsRepositoryPort):
+    async def create(self, lvl_up: LevelUpRewardClaims) -> LevelUpRewardClaims:
+        lvl_up_document = LevelUpRewardClaimsDocument(level=lvl_up.level, completed=lvl_up.completed, planet_id=lvl_up.level)
+        await lvl_up_document.save()
+        return lvl_up_document.to_lvl_up()
+
+    async def get(self, lvl_up_id: str) -> LevelUpRewardClaims|None:
+        lvl_up = None
+        try:
+            lvl_up = await LevelUpRewardClaimsDocument.get(PydanticObjectId(lvl_up_id))
+        except:
+            pass
+
+        if lvl_up is not None:
+            return lvl_up.to_lvl_up()
 
 
 class EmailRepositoryAdapter(EmailRepositoryPort):
@@ -69,10 +86,6 @@ class EnergyDepositRepositoryAdapter(EnergyDepositRepositoryPort):
 
         await energy_document.save()
 
-        # planet: PlanetDocument = await PlanetDocument.get(PydanticObjectId(energy_deposit.planet_id), fetch_links=True)
-        # planet.energy_deposits.append(energy_document)
-        # await planet.save(link_rule=WriteRules.WRITE)
-
         return energy_document.to_energy_deposit()
 
 
@@ -103,7 +116,7 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
 
     async def all_claimed_planets(self) -> list[Planet]:
 
-        planets = await PlanetDocument.find(PlanetDocument.claimed == True, fetch_links=True).to_list()
+        planets = await PlanetDocument.find(PlanetDocument.claimed == True).to_list()
         return [await to_planet(planet) for planet in planets]
 
     async def all_user_planets(self, user_id: str) -> list[Planet]:

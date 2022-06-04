@@ -1,10 +1,12 @@
 import datetime
 from dataclasses import dataclass
 from pydantic import BaseModel
+
+from core.planet_level import PlanetLevel, GivePlanetExperienceRequest
 from core.shared.models import AppBaseException, Planet, NoPlanetFoundException, QueueIsFullException, BuildableItem
 from core.shared.ports import PlanetRepositoryPort, ResponsePort
 from core.shared.service.buildable_items import is_queue_full
-from core.shared.service.planet import give_planet_experience, resource_reserve_als
+from core.shared.service.planet import resource_reserve_als
 from core.shared.service.tier_benefit import tier_benefit_service
 from core.shared.static.game_data.Common import BuildableItemBaseType, BuildableItemLevelInfo
 from core.shared.static.game_data.GameData import GameData
@@ -60,9 +62,14 @@ class NotEnoughFundsForBuildException(AppBaseException):
     msg = "Can't build, not enough funds to cover building costs..."
 
 
+class CantUpgradeIfHealthIsNotFullException(AppBaseException):
+    msg = "Cant upgrade if health is not 100%, please repair before."
+
+
 @dataclass
 class BuildableItems:
     planet_repository_port: PlanetRepositoryPort
+    planet_level_use_case: PlanetLevel
     response_port: ResponsePort
 
     async def finish_build(self, finish_request: FinishBuildRequest) -> Planet:
@@ -168,12 +175,13 @@ class BuildableItems:
         if buildable.building or buildable.repairing:
             raise CantBuildOrRepairException()
 
-        # @TODO: Add exception: cant repair if health < 100%
-
         game_data: GameData = game_data_factory[request.type]
         label_info: BuildableItemBaseType = game_data.get_item(request.label)
         next_lvl: BuildableItemLevelInfo = label_info.get_level_info(buildable.current_level + 1)
         next_lvl: BuildableItemLevelInfo = tier_benefit_service(planet.tier.tier_code, next_lvl)
+
+        if buildable.health < label_info.get_level_info(buildable.current_level).health:
+            raise CantUpgradeIfHealthIsNotFullException()
 
         if planet.slots_used >= planet.slots:
             raise CantBuildSlotsFullException()
@@ -201,8 +209,8 @@ class BuildableItems:
             planet.slots_used += 1
 
         planet = resource_reserve_als(request.label, planet, next_lvl)
-        planet = give_planet_experience(planet, next_lvl.experience)
         await self.planet_repository_port.update(planet)
+        await self.planet_level_use_case.give_planet_experience(GivePlanetExperienceRequest(planet_id=str(planet.id), experience_amount=next_lvl.experience))
 
         response = BuildableResponse.from_buildable_item(buildable)
         response.metal_paid = next_lvl.cost_metal
