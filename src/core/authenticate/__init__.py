@@ -34,6 +34,7 @@ class Authenticate:
     response_port: ResponsePort
 
     #@TODO: Hacky solution :)
+    #@TODO: Add ticket
     def __ticket_testnet_access(self, address: str):
 
         if self.env == 'testnet':

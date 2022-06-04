@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 
 class LevelUpRewardClaimsRepositoryAdapter(LevelUpRewardClaimsRepositoryPort):
     async def create(self, lvl_up: LevelUpRewardClaims) -> LevelUpRewardClaims:
-        lvl_up_document = LevelUpRewardClaimsDocument(level=lvl_up.level, completed=lvl_up.completed, planet_id=lvl_up.level)
+        lvl_up_document = LevelUpRewardClaimsDocument(level=lvl_up.level, completed=lvl_up.completed, planet_id=lvl_up.planet_id)
         await lvl_up_document.save()
         return lvl_up_document.to_lvl_up()
 
@@ -26,6 +26,12 @@ class LevelUpRewardClaimsRepositoryAdapter(LevelUpRewardClaimsRepositoryPort):
 
         if lvl_up is not None:
             return lvl_up.to_lvl_up()
+
+    async def update(self, lvl_up: LevelUpRewardClaims) -> LevelUpRewardClaims:
+        lvl_up = LevelUpRewardClaimsDocument.from_lvl_up(lvl_up)
+        await lvl_up.save()
+        fresh: LevelUpRewardClaimsDocument = await LevelUpRewardClaimsDocument.get(PydanticObjectId(lvl_up.id))
+        return fresh.to_lvl_up()
 
 
 class EmailRepositoryAdapter(EmailRepositoryPort):
@@ -124,10 +130,8 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
         return [await to_planet(planet) for planet in planets]
 
     async def update(self, planet: Planet) -> Planet:
-
-        old: PlanetDocument = await PlanetDocument.get(PydanticObjectId(planet.id))
         old = from_planet(planet)
-        await old.save()
+        await old.save(link_rule=WriteRules.WRITE)
         fresh: PlanetDocument = await PlanetDocument.get(PydanticObjectId(planet.id))
         return await to_planet(fresh)
 

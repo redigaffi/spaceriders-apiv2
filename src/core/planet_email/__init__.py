@@ -18,7 +18,7 @@ class PlanetSendEmailRequest(BaseModel):
 
 
 @dataclass
-class PlanetEmails:
+class PlanetEmail:
     planet_repository_port: PlanetRepositoryPort
     email_repository_port: EmailRepositoryPort
     response_port: ResponsePort

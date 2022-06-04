@@ -22,6 +22,10 @@ class LevelUpRewardClaimsRepositoryPort(ABC):
     async def get(self, lvl_up_id: str) -> LevelUpRewardClaims|None:
         pass
 
+    @abstractmethod
+    async def update(self, lvl_up: LevelUpRewardClaims) -> LevelUpRewardClaims:
+        pass
+
 
 class EmailRepositoryPort(ABC):
     @abstractmethod

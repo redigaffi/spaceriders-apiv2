@@ -1,15 +1,18 @@
 from adapters.cronjobs import BlackHoleResponsePort
 from adapters.shared.beani_repository_adapter import BeaniUserRepositoryAdapter, BeaniPlanetRepositoryAdapter, \
-    EnergyDepositRepositoryAdapter
+    EnergyDepositRepositoryAdapter, LevelUpRewardClaimsRepositoryAdapter, EmailRepositoryAdapter
 from adapters.shared.cache_adapter import MemCacheCacheServiceAdapter
 from adapters.shared.evm_adapter import EvmChainServiceAdapter, TokenPriceAdapter
 from adapters.shared.logging_adapter import LoggingAdapter, get_logger
 from controllers.cronjobs import CronjobController
+from core.planet_email import PlanetEmail
 from core.planet_energy import PlanetEnergy
 from decouple import config
 import emcache
 import json
 from pathlib import Path
+
+from core.planet_level import PlanetLevel
 from core.planet_staking import Staking
 from core.shared.ports import CacheServicePort, ChainServicePort, TokenPricePort
 
@@ -65,6 +68,8 @@ async def contract_dependency(cache: CacheServicePort):
 user_repository = BeaniUserRepositoryAdapter()
 planet_repository = BeaniPlanetRepositoryAdapter()
 energy_repository = EnergyDepositRepositoryAdapter()
+lvl_up_repository = LevelUpRewardClaimsRepositoryAdapter()
+email_repository = EmailRepositoryAdapter()
 
 
 async def cronjob_controller():
@@ -75,4 +80,7 @@ async def cronjob_controller():
     energy_planet_use_case = PlanetEnergy(token_price_adapter, energy_repository, planet_repository, logging_adapter, contract, response_adapter)
     staking_use_case = Staking(planet_repository, token_price_adapter, contract, response_adapter)
 
-    return CronjobController(energy_planet_use_case, staking_use_case)
+    email_use_case = PlanetEmail(planet_repository, email_repository, response_adapter)
+    planet_level = PlanetLevel(planet_repository, lvl_up_repository, email_use_case, contract, response_adapter)
+
+    return CronjobController(energy_planet_use_case, staking_use_case, planet_level)

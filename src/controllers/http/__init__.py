@@ -1,9 +1,10 @@
 from dataclasses import dataclass
 
-from core import planet_emails
+from core import planet_email
 from core.nft_metadata import NftData
-from core.planet_emails import PlanetEmails
+from core.planet_email import PlanetEmail
 from core.planet_energy import PlanetEnergy, EnergyDepositRequest
+from core.planet_level import PlanetLevel
 from core.planet_staking import Staking, CreateStakingRequest, ConfirmStakingRequest, UnStakeRequest
 from core.shared.models import EnergyDeposit
 from adapters.http.security import jwt_bearer
@@ -28,8 +29,9 @@ class HttpController:
     buildable_items: BuildableItems
     planet_energy: PlanetEnergy
     nft_data: NftData
-    planet_emails: PlanetEmails
+    planet_emails: PlanetEmail
     staking: Staking
+    lvl_reward_claim: PlanetLevel
 
     async def jwt(self, req: AuthenticationDetailsRequest):
         return await self.authenticate_use_case(req)
@@ -108,6 +110,14 @@ class HttpController:
 
     async def unstake(self, request: UnStakeRequest, user=Depends(jwt_bearer)):
         re = await self.staking.unstake(request, user)
+        return jsonable_encoder(re)
+
+    async def claim_planet_level_reward_sign(self, claim_id: str, user=Depends(jwt_bearer)):
+        re = await self.lvl_reward_claim.claim_pending_lvl_up_reward_sign(claim_id, user)
+        return jsonable_encoder(re)
+
+    async def confirm_planet_level_reward(self, claim_id: str, user=Depends(jwt_bearer)):
+        re = await self.lvl_reward_claim.confirm_pending_lvl_up_reward(claim_id, user)
         return jsonable_encoder(re)
 
     async def health(self):

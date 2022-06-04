@@ -7,6 +7,7 @@ import asyncio
 import aioschedule as schedule
 import dependencies
 from adapters.shared.beani_repository_adapter import UserDocument, PlanetDocument, EnergyDepositDocument
+from adapters.shared.beanie_models_adapter import EmailDocument, LevelUpRewardClaimsDocument
 from controllers.cronjobs import CronjobController
 from core.planet_energy import PlanetEnergyRecoverEnergyDepositsRequest
 from core.shared.models import Planet
@@ -19,14 +20,15 @@ async def smart_contract_recover_cronjob(controller: CronjobController):
         request = PlanetEnergyRecoverEnergyDepositsRequest(planet_id=str(planet.id))
         await controller.recover_deposits(request)
         await controller.recover_staking(str(planet.id))
+        await controller.recover_level_up(str(planet.id))
 
-
+# @TODO: add emails when something got imported
 async def main():
     await dependencies.logging_adapter.info("App started")
     client = motor.motor_asyncio.AsyncIOMotorClient(config("DB_URL"), )
     db = client[config('DB_NAME')]
 
-    await init_beanie(database=db, document_models=[UserDocument, EnergyDepositDocument, PlanetDocument])
+    await init_beanie(database=db, document_models=[UserDocument, EnergyDepositDocument, PlanetDocument, EmailDocument, LevelUpRewardClaimsDocument])
 
     controller = await dependencies.cronjob_controller()
 
