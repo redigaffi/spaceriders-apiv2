@@ -10,6 +10,8 @@ allowed_origins = [
     'https://testnet.spaceriders.io'
 ]
 
+schedule_logger = logging.getLogger('emcache')
+schedule_logger.setLevel(level=logging.ERROR)
 # https://docs.python.org/3/library/logging.html#logrecord-attributes
 # logging.basicConfig(encoding='utf-8',
 #                     level=config('LOG_LEVEL'),
