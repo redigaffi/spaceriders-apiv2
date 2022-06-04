@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from core.shared.models import User, Planet, EnergyDeposit, Email, LevelUpRewardClaims
+from core.shared.models import User, Planet, EnergyDeposit, Email, LevelUpRewardClaims, ResourceExchange
 from typing import TypedDict
 
 
@@ -13,13 +13,27 @@ class LoggingPort(ABC):
         pass
 
 
+class ResourceExchangeRepositoryPort(ABC):
+    @abstractmethod
+    async def create(self, resource_exchange: ResourceExchange) -> ResourceExchange:
+        pass
+
+    @abstractmethod
+    async def get(self, resource_exchange: str) -> ResourceExchange | None:
+        pass
+
+    @abstractmethod
+    async def update(self, resource_exchange: ResourceExchange) -> ResourceExchange:
+        pass
+
+
 class LevelUpRewardClaimsRepositoryPort(ABC):
     @abstractmethod
     async def create(self, lvl_up: LevelUpRewardClaims) -> LevelUpRewardClaims:
         pass
 
     @abstractmethod
-    async def get(self, lvl_up_id: str) -> LevelUpRewardClaims|None:
+    async def get(self, lvl_up_id: str) -> LevelUpRewardClaims | None:
         pass
 
     @abstractmethod

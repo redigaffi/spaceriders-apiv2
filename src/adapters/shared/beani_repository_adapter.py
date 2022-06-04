@@ -2,22 +2,48 @@ from __future__ import annotations
 from beanie import PydanticObjectId, WriteRules, DeleteRules
 
 from adapters.shared.beanie_models_adapter import EnergyDepositDocument, PlanetDocument, UserDocument, to_planet, \
-    from_planet, EmailDocument, LevelUpRewardClaimsDocument
+    from_planet, EmailDocument, LevelUpRewardClaimsDocument, ResourceExchangeDocument
 from core.shared.ports import UserRepositoryPort, PlanetRepositoryPort, EnergyDepositRepositoryPort, \
-    EmailRepositoryPort, LevelUpRewardClaimsRepositoryPort
+    EmailRepositoryPort, LevelUpRewardClaimsRepositoryPort, ResourceExchangeRepositoryPort
 from core.shared.models import User, PlanetTier, Planet, UserNotFoundException, \
-    LevelUpRewardClaims, EnergyDeposit, Email
+    LevelUpRewardClaims, EnergyDeposit, Email, ResourceExchange
 
-from datetime import datetime, timezone
+from datetime import datetime
+
+
+class ResourceExchangeRepositoryAdapter(ResourceExchangeRepositoryPort):
+    async def create(self, resource_exchange: ResourceExchange) -> ResourceExchange:
+        resource_exchange_doc = ResourceExchangeDocument(created_time=resource_exchange.created_time,
+                                                         metal_usd_price=resource_exchange.metal_usd_price,
+                                                         crystal_usd_price=resource_exchange.crystal_usd_price,
+                                                         petrol_usd_price=resource_exchange.petrol_usd_price)
+
+        await resource_exchange_doc.save()
+        return resource_exchange_doc
+
+    async def get(self, resource_exchange: str) -> ResourceExchange | None:
+        resource_exchange_document = None
+        try:
+            resource_exchange_document = await ResourceExchangeDocument.get(PydanticObjectId(resource_exchange))
+        except:
+            pass
+
+        if resource_exchange_document is not None:
+            return resource_exchange_document
+
+    async def update(self, resource_exchange: ResourceExchangeDocument) -> ResourceExchange:
+        await resource_exchange.save_changes()
+        return resource_exchange
 
 
 class LevelUpRewardClaimsRepositoryAdapter(LevelUpRewardClaimsRepositoryPort):
     async def create(self, lvl_up: LevelUpRewardClaims) -> LevelUpRewardClaims:
-        lvl_up_document = LevelUpRewardClaimsDocument(level=lvl_up.level, completed=lvl_up.completed, planet_id=lvl_up.planet_id)
+        lvl_up_document = LevelUpRewardClaimsDocument(level=lvl_up.level, completed=lvl_up.completed,
+                                                      planet_id=lvl_up.planet_id)
         await lvl_up_document.save()
         return lvl_up_document.to_lvl_up()
 
-    async def get(self, lvl_up_id: str) -> LevelUpRewardClaims|None:
+    async def get(self, lvl_up_id: str) -> LevelUpRewardClaims | None:
         lvl_up = None
         try:
             lvl_up = await LevelUpRewardClaimsDocument.get(PydanticObjectId(lvl_up_id))
@@ -36,7 +62,7 @@ class LevelUpRewardClaimsRepositoryAdapter(LevelUpRewardClaimsRepositoryPort):
 
 class EmailRepositoryAdapter(EmailRepositoryPort):
     async def create(self, email: Email) -> Email:
-        email_document = EmailDocument(title=email.title, sub_title=email.sub_title,template=email.template,
+        email_document = EmailDocument(title=email.title, sub_title=email.sub_title, template=email.template,
                                        body=email.body, sender=email.sender, read=email.read, planet=email.planet)
 
         await email_document.save()
@@ -98,14 +124,14 @@ class EnergyDepositRepositoryAdapter(EnergyDepositRepositoryPort):
 class BeaniUserRepositoryAdapter(UserRepositoryPort):
 
     async def find_user(self, wallet: str) -> User | None:
-        re = await UserDocument.find_one(UserDocument.wallet==wallet)
+        re = await UserDocument.find_one(UserDocument.wallet == wallet)
         if not re:
             return User()
 
         return User(id=re.id, wallet=wallet, username=re.username)
 
     async def find_user_or_throw(self, wallet: str) -> User:
-        re = await UserDocument.find_one(UserDocument.wallet==wallet)
+        re = await UserDocument.find_one(UserDocument.wallet == wallet)
 
         if not re:
             raise UserNotFoundException()
@@ -142,7 +168,7 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
         planet = await PlanetDocument.find_one(
             PlanetDocument.id == PydanticObjectId(planet_id),
             PlanetDocument.user == user_id,
-            #fetch_links=True
+            # fetch_links=True
         )
 
         if planet is not None:
@@ -172,7 +198,7 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
 
     async def create_planet(self, planet_data: Planet) -> Planet:
 
-        user = await UserDocument.find_one(UserDocument.wallet==planet_data.user)
+        user = await UserDocument.find_one(UserDocument.wallet == planet_data.user)
 
         planet_tier = PlanetTier()
 

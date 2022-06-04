@@ -7,7 +7,7 @@ import asyncio
 import aioschedule as schedule
 import dependencies
 from adapters.shared.beani_repository_adapter import UserDocument, PlanetDocument, EnergyDepositDocument
-from adapters.shared.beanie_models_adapter import EmailDocument, LevelUpRewardClaimsDocument
+from adapters.shared.beanie_models_adapter import EmailDocument, LevelUpRewardClaimsDocument, ResourceExchangeDocument
 from controllers.cronjobs import CronjobController
 from core.planet_energy import PlanetEnergyRecoverEnergyDepositsRequest
 from core.shared.models import Planet
@@ -18,9 +18,11 @@ async def smart_contract_recover_cronjob(controller: CronjobController):
     all_claimed: list[Planet] = await dependencies.planet_repository.all_claimed_planets()
     for planet in all_claimed:
         request = PlanetEnergyRecoverEnergyDepositsRequest(planet_id=str(planet.id))
-        await controller.recover_deposits(request)
-        await controller.recover_staking(str(planet.id))
-        await controller.recover_level_up(str(planet.id))
+        # await controller.recover_deposits(request)
+        # await controller.recover_staking(str(planet.id))
+        # await controller.recover_level_up(str(planet.id))
+        await controller.generate_new_resource_price()
+
 
 # @TODO: add emails when something got imported
 async def main():
@@ -28,13 +30,12 @@ async def main():
     client = motor.motor_asyncio.AsyncIOMotorClient(config("DB_URL"), )
     db = client[config('DB_NAME')]
 
-    await init_beanie(database=db, document_models=[UserDocument, EnergyDepositDocument, PlanetDocument, EmailDocument, LevelUpRewardClaimsDocument])
-
+    await init_beanie(database=db, document_models=[UserDocument, EnergyDepositDocument, PlanetDocument, EmailDocument, LevelUpRewardClaimsDocument, ResourceExchangeDocument])
     controller = await dependencies.cronjob_controller()
 
-    # If this is not here in main function it won't work
-
+    # If this is not here in main function it won't work (also below model initialization)
     schedule.every(3).seconds.do(smart_contract_recover_cronjob, controller)
+    schedule.every(3).seconds.do(controller.generate_new_resource_price)
 
     while True:
         await schedule.run_pending()

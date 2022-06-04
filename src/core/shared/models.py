@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import List
-from pydantic import BaseModel
+from pydantic import BaseModel, root_validator
 from core.shared.static.game_data.Common import BuildableItemBaseType, CommonKeys, BuildableItemLevelInfo
 from core.shared.static.game_data.PlanetData import PlanetData
 from core.shared.static.game_data.ResourceData import ResourceData as RD, ResourceData
@@ -44,6 +44,14 @@ class NoPlanetFoundException(AppBaseException):
 
 class QueueIsFullException(AppBaseException):
     msg = "Can't upgrade, queue is full..."
+
+
+@dataclass
+class ResourceExchange:
+    created_time: float = None
+    metal_usd_price: float = None
+    crystal_usd_price: float = None
+    petrol_usd_price: float = None
 
 
 @dataclass
@@ -190,11 +198,11 @@ class Planet(BaseModel):
     def set_image_url(self, url: str):
         self.image_url = f"{url}/{self.image}.png"
 
-    # @TODO: Pydantic bug dont serialize properties
+    # @TODO: Pydantic bug dont serialize properties, using root_validator is a workaround
     # @SEE: https://github.com/samuelcolvin/pydantic/pull/2625
-    # @property
-    def calculate_energy_usage_per_min(self) -> float:
-        mines: List[BuildableItem] = self.resources_level
+    @root_validator
+    def compute_energy_usage(cls, values):
+        mines: List[BuildableItem] = values["resources_level"]
         energy_usage = 0
         mine: BuildableItem
 
@@ -218,12 +226,12 @@ class Planet(BaseModel):
 
                 energy_usage *= energy_health_factor
 
-        self.resources.energy_usage = energy_usage
-
+        values["resources.energy_usage"] = energy_usage
         # @TODO: Should be a property on resources just like this method once PR is merged
-        self.resources.energy_max_deposit = PlanetData.DATA[self.rarity][CommonKeys.ENERGY_DEPOSIT_MAX_ONCE]
+        if values["rarity"] is not None:
+            values["resources.energy_max_deposit"] = PlanetData.DATA[values["rarity"]][CommonKeys.ENERGY_DEPOSIT_MAX_ONCE]
 
-        return self.resources.energy_usage
+        return values
 
     def get_planet_resource_data(self):
         re = {}

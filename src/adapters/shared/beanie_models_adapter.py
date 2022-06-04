@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Optional, List
 from beanie import Document, Indexed, Link, PydanticObjectId
 
-from core.shared.models import EnergyDeposit, Email
+from core.shared.models import EnergyDeposit, Email, ResourceExchange
 from core.shared.models import User, PlanetTier, Resources, Planet, Reserves, BuildableItem, UserNotFoundException, \
     LevelUpRewardClaims
 from datetime import datetime, timezone
@@ -44,8 +44,6 @@ async def to_planet(planet_document: PlanetDocument) -> Planet:
     planet.energy_deposits = [(await x.fetch()).to_energy_deposit() for x in planet_document.energy_deposits if x is not None]
     planet.emails = [(await x.fetch()).to_email() for x in planet_document.emails if x is not None]
     planet.pending_levelup_reward = [(await x.fetch()).to_lvl_up() for x in planet_document.pending_levelup_reward if x is not None]
-    # @TODO: DONT REMOVE THIS LINE YET!!! Workaround until they fix PR, see method
-    planet.calculate_energy_usage_per_min()
 
     return planet
 
@@ -85,6 +83,18 @@ def from_planet(planet: Planet):
         planet_document.emails = [EmailDocument.from_email(x) for x in planet.emails]
         planet_document.pending_levelup_reward = [LevelUpRewardClaimsDocument.from_lvl_up(x) for x in planet.pending_levelup_reward]
         return planet_document
+
+
+class ResourceExchangeDocument(Document, ResourceExchange):
+    created_time: float | None = 0
+    metal_usd_price: float
+    crystal_usd_price: float
+    petrol_usd_price: float
+
+    class Settings:
+        name = "resource_exchange"
+        use_revision = True
+        use_state_management = True
 
 
 class LevelUpRewardClaimsDocument(Document):
