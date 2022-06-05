@@ -24,6 +24,9 @@ class EvmChainServiceAdapter(ChainServicePort):
     spaceriders_ticket_nft_abi: str
     router_abi: str
 
+    async def to_wei(self, amount: float) -> int:
+        return Web3.toWei(amount, 'ether')
+
     async def get_contract_address(self, contract_name: str) -> str:
         if contract_name == ChainServicePort.SPACERIDERS_TOKEN_CONTRACT:
             return self.spaceriders_token_address

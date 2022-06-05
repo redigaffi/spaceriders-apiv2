@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from core.shared.models import User, Planet, EnergyDeposit, Email, LevelUpRewardClaims, ResourceExchange
+from core.shared.models import User, Planet, EnergyDeposit, Email, LevelUpRewardClaims, ResourceExchange, \
+    TokenConversions
 from typing import TypedDict
 
 
@@ -13,6 +14,24 @@ class LoggingPort(ABC):
         pass
 
 
+class TokenConversionsRepositoryPort(ABC):
+    @abstractmethod
+    async def create(self, token_conversion: TokenConversions) -> TokenConversions:
+        pass
+
+    @abstractmethod
+    async def get(self, token_conversion: str) -> TokenConversions | None:
+        pass
+
+    @abstractmethod
+    async def get_latest(self) -> TokenConversions | None:
+        pass
+
+    @abstractmethod
+    async def update(self, token_conversion: TokenConversions) -> TokenConversions:
+        pass
+
+
 class ResourceExchangeRepositoryPort(ABC):
     @abstractmethod
     async def create(self, resource_exchange: ResourceExchange) -> ResourceExchange:
@@ -20,6 +39,10 @@ class ResourceExchangeRepositoryPort(ABC):
 
     @abstractmethod
     async def get(self, resource_exchange: str) -> ResourceExchange | None:
+        pass
+
+    @abstractmethod
+    async def get_latest(self) -> ResourceExchange | None:
         pass
 
     @abstractmethod
@@ -146,6 +169,10 @@ class ChainServicePort(ABC):
     SPACERIDERS_GAME_CONTRACT = "SPACERIDERS_GAME_CONTRACT"
     SPACERIDERS_NFT_CONTRACT = "SPACERIDERS_NFT_CONTRACT"
     SPACERIDERS_TICKET_NFT_CONTRACT = "SPACERIDERS_TICKET_NFT_CONTRACT"
+
+    @abstractmethod
+    async def to_wei(self, amount: float) -> int:
+        pass
 
     @abstractmethod
     async def get_rpc_url(self):

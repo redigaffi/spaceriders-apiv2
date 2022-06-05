@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Optional, List
 from beanie import Document, Indexed, Link, PydanticObjectId
 
-from core.shared.models import EnergyDeposit, Email, ResourceExchange
+from core.shared.models import EnergyDeposit, Email, ResourceExchange, TokenConversions
 from core.shared.models import User, PlanetTier, Resources, Planet, Reserves, BuildableItem, UserNotFoundException, \
     LevelUpRewardClaims
 from datetime import datetime, timezone
@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 
 async def to_planet(planet_document: PlanetDocument) -> Planet:
     planet = Planet()
-    planet.id = planet_document.id
+    planet.id = str(planet_document.id)
     planet.created_at = planet_document.created_at
     planet.name = planet_document.name
     planet.rarity = planet_document.rarity
@@ -82,7 +82,25 @@ def from_planet(planet: Planet):
         planet_document.energy_deposits = [EnergyDepositDocument.from_energy_deposit(x) for x in planet.energy_deposits]
         planet_document.emails = [EmailDocument.from_email(x) for x in planet.emails]
         planet_document.pending_levelup_reward = [LevelUpRewardClaimsDocument.from_lvl_up(x) for x in planet.pending_levelup_reward]
+        planet_document.resource_conversions = planet.resource_conversions
+
         return planet_document
+
+
+class TokenConversionsDocument(Document, TokenConversions):
+    completed: bool = False
+    created_time: float = None
+    metal: float = None
+    petrol: float = None
+    crystal: float = None
+    token: float = None
+    planet: Link["PlanetDocument"] = None
+    user: Link["UserDocument"] = None
+
+    class Settings:
+        name = "token_conversions"
+        use_revision = True
+        use_state_management = True
 
 
 class ResourceExchangeDocument(Document, ResourceExchange):
@@ -113,6 +131,7 @@ class LevelUpRewardClaimsDocument(Document):
         name = "level_up_reward_claims"
         # use_cache = True
         # cache_expiration_time = timedelta(seconds=60)
+
 
 class EmailDocument(Document):
     title: str = None
@@ -189,6 +208,8 @@ class PlanetDocument(Document):
     solar_system: int | None = 0
     position: int | None = 0
 
+    # below works
+    #user: Link["UserDocument"]
     user: str
 
     claimable: float = None  # timestamp
@@ -206,6 +227,7 @@ class PlanetDocument(Document):
     pending_levelup_reward: List[Link[LevelUpRewardClaimsDocument]] = []
     energy_deposits: List[Link[EnergyDepositDocument]] = []
     emails: List[Link[EmailDocument]] = []
+    resource_conversions: List[Link[TokenConversionsDocument]] = []
 
     price_paid: int = 0
     free_tokens: float | None = 0

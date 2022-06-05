@@ -47,6 +47,19 @@ class QueueIsFullException(AppBaseException):
 
 
 @dataclass
+class TokenConversions:
+    id: str = None
+    completed: bool = False
+    created_time: float = None
+    metal: float = None
+    petrol: float = None
+    crystal: float = None
+    token: float = None
+    planet: "Planet" = None
+    user: "User" = None
+
+
+@dataclass
 class ResourceExchange:
     created_time: float = None
     metal_usd_price: float = None
@@ -103,8 +116,8 @@ class Resources(BaseModel):
     crystal_last_updated: float = None
     petrol_last_updated: float = None
 
-    energy_usage: float = None
-    energy_max_deposit: float = None
+    energy_usage: float = 0
+    energy_max_deposit: float = 0
 
 
 class Reserves(BaseModel):
@@ -139,7 +152,6 @@ class Email(BaseModel):
     planet: str
 
 
-# @TODO: Add emails
 class Planet(BaseModel):
     id: str = None
     # @TODO: Change to float
@@ -183,6 +195,7 @@ class Planet(BaseModel):
     defense_items: List[BuildableItem] = []
     pending_levelup_reward: List[LevelUpRewardClaims] = []
     energy_deposits: List[EnergyDeposit] = []
+    resource_conversions: List[TokenConversions] = []
     emails: List[Email] = []
 
     def building_queue(self) -> list[BuildableItem]:
@@ -226,10 +239,10 @@ class Planet(BaseModel):
 
                 energy_usage *= energy_health_factor
 
-        values["resources.energy_usage"] = energy_usage
+        values["resources"].energy_usage = energy_usage
         # @TODO: Should be a property on resources just like this method once PR is merged
         if values["rarity"] is not None:
-            values["resources.energy_max_deposit"] = PlanetData.DATA[values["rarity"]][CommonKeys.ENERGY_DEPOSIT_MAX_ONCE]
+            values["resources"].energy_max_deposit = PlanetData.DATA[values["rarity"]][CommonKeys.ENERGY_DEPOSIT_MAX_ONCE]
 
         return values
 

@@ -5,6 +5,7 @@ from core.nft_metadata import NftData
 from core.planet_email import PlanetEmail
 from core.planet_energy import PlanetEnergy, EnergyDepositRequest
 from core.planet_level import PlanetLevel
+from core.planet_resources_conversion import PlanetResourcesConversion, ResourceConvertRequest, ConfirmConversionRequest
 from core.planet_staking import Staking, CreateStakingRequest, ConfirmStakingRequest, UnStakeRequest
 from core.shared.models import EnergyDeposit
 from adapters.http.security import jwt_bearer
@@ -32,6 +33,7 @@ class HttpController:
     planet_emails: PlanetEmail
     staking: Staking
     lvl_reward_claim: PlanetLevel
+    planet_resource_conversion: PlanetResourcesConversion
 
     async def jwt(self, req: AuthenticationDetailsRequest):
         return await self.authenticate_use_case(req)
@@ -118,6 +120,22 @@ class HttpController:
 
     async def confirm_planet_level_reward(self, claim_id: str, user=Depends(jwt_bearer)):
         re = await self.lvl_reward_claim.confirm_pending_lvl_up_reward(claim_id, user)
+        return jsonable_encoder(re)
+
+    async def planet_resources_convert_preview(self, planet_id: str, user=Depends(jwt_bearer)):
+        re = await self.planet_resource_conversion.preview_conversion(planet_id, user)
+        return jsonable_encoder(re)
+
+    async def planet_resources_convert_pending(self, planet_id: str, user=Depends(jwt_bearer)):
+        re = await self.planet_resource_conversion.pending_conversions(planet_id, user)
+        return jsonable_encoder(re)
+
+    async def planet_resources_convert_sign(self, request: ResourceConvertRequest, user=Depends(jwt_bearer)):
+        re = await self.planet_resource_conversion.convert_conversion(request, user)
+        return jsonable_encoder(re)
+
+    async def planet_resources_convert_confirm(self, request: ConfirmConversionRequest, user=Depends(jwt_bearer)):
+        re = await self.planet_resource_conversion.confirm_conversion(request, user)
         return jsonable_encoder(re)
 
     async def health(self):

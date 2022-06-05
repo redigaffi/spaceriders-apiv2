@@ -1,7 +1,7 @@
 from decouple import config
 
 from adapters.shared.beani_repository_adapter import EnergyDepositRepositoryAdapter, EmailRepositoryAdapter, \
-    LevelUpRewardClaimsRepositoryAdapter
+    LevelUpRewardClaimsRepositoryAdapter, TokenConversionsRepositoryAdapter, ResourceExchangeRepositoryAdapter
 from adapters.shared.logging_adapter import LoggingAdapter, get_logger
 from core.nft_metadata import NftData
 from core.planet_email import PlanetEmail
@@ -21,9 +21,12 @@ from pathlib import Path
 from controllers.http import HttpController
 from core.planet_level import PlanetLevel
 from core.planet_resources import PlanetResources
+from core.planet_resources_conversion import PlanetResourcesConversion
 from core.planet_staking import Staking
+from core.resource_exchange import ResourcesExchange
+from core.shared.models import ResourceExchange
 from core.shared.ports import ChainServicePort, CacheServicePort, TokenPricePort, UserRepositoryPort, \
-    PlanetRepositoryPort, EmailRepositoryPort, LevelUpRewardClaimsRepositoryPort
+    PlanetRepositoryPort, EmailRepositoryPort, LevelUpRewardClaimsRepositoryPort, TokenConversionsRepositoryPort
 
 http_response_port = HttpResponsePort()
 logging_adapter = LoggingAdapter(get_logger("http_app"))
@@ -134,6 +137,12 @@ async def get_planet_level_use_case(planet_repository_port: PlanetRepositoryPort
     return PlanetLevel(planet_repository_port, lvl_up_repo, email_use_case, chain_service_adapter, http_response_port)
 
 
+async def get_resource_exchange_use_case(resource_repository: ResourceExchangeRepositoryAdapter):
+    return ResourcesExchange(resource_repository, http_response_port)
+
+
+async def get_planet_resources_conversion_use_case(planet_repository_port: PlanetRepositoryPort, token_conversion_repository_port: TokenConversionsRepositoryPort, resource_exchange: ResourcesExchange, chain_service: ChainServicePort, token_price: TokenPricePort):
+    return PlanetResourcesConversion(planet_repository_port, token_conversion_repository_port, resource_exchange, chain_service, token_price, http_response_port)
 # Controllers
 
 async def get_middleware():
@@ -161,6 +170,8 @@ async def http_controller():
     energy_repository = EnergyDepositRepositoryAdapter()
     email_repository = EmailRepositoryAdapter()
     lvl_up_repository = LevelUpRewardClaimsRepositoryAdapter()
+    resource_repository = ResourceExchangeRepositoryAdapter()
+    token_conversions_repository = TokenConversionsRepositoryAdapter()
 
     cache = await cache_dependency()
     contract_service = await contract_dependency(cache, config('RPCS_URL'))
@@ -190,4 +201,6 @@ async def http_controller():
 
     j = await get_staking_use_case(planet_repository, token_price, contract_service)
 
-    return HttpController(a, b, c, d, e, f, g, h, j, k)
+    resource_exchange = await get_resource_exchange_use_case(resource_repository)
+    planet_resources_conversion = await get_planet_resources_conversion_use_case(planet_repository, token_conversions_repository, resource_exchange, contract_service, token_price)
+    return HttpController(a, b, c, d, e, f, g, h, j, k, planet_resources_conversion)
