@@ -86,8 +86,8 @@ async def token_price_dependency(cache: CacheServicePort, contract: ChainService
 # Use cases
 
 
-async def authenticate_use_case(user_repo: UserRepositoryPort):
-    return Authenticate(config('SECRET_KEY'), config('ENV'), user_repo, http_response_port)
+async def authenticate_use_case(user_repo: UserRepositoryPort, chain_service_adapter: ChainServicePort):
+    return Authenticate(config('SECRET_KEY'), config('ENV'), user_repo, chain_service_adapter, http_response_port)
 
 
 async def buy_planet_use_case(token_price: TokenPricePort, contract: ChainServicePort,
@@ -182,7 +182,11 @@ async def http_controller():
     h = await get_email_use_case(planet_repository, email_repository)
     k = await get_planet_level_use_case(planet_repository, lvl_up_repository, h, contract_service)
 
-    a = await authenticate_use_case(user_repository)
+    auth_contract_service = contract_service
+    if config('ENV') == "testnet":
+        auth_contract_service = contract_mainnet_service
+
+    a = await authenticate_use_case(user_repository, auth_contract_service)
     b = await buy_planet_use_case(token_price, contract_service, planet_repository)
     c = await fetch_chain_data_use_case(token_price, contract_service)
     d = await get_planets_use_case(planet_repository)

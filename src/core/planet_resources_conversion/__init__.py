@@ -30,7 +30,6 @@ class PendingConversionsResponse(BaseModel):
     petrol: float
     crystal: float
     token: float
-    planet: str
     date: float
     action: str
 
@@ -124,7 +123,7 @@ class PlanetResourcesConversion:
         return day_fee[days_passed]
 
     async def pending_conversions(self, planet_id: str, user: str) -> List[PendingConversionsResponse]:
-        planet = await self.planet_repository_port.get_my_planet(user, planet_id)
+        planet = await self.planet_repository_port.get_my_planet(user, planet_id, True)
 
         re = []
 
@@ -132,7 +131,7 @@ class PlanetResourcesConversion:
             if conversion.completed:
                 continue
 
-            conversion_data = await self.chain_service.spaceriders_game_call("conversions", conversion.id)
+            conversion_data = await self.chain_service.spaceriders_game_call("conversions", str(conversion.id))
             exists = bool(conversion_data[3])
 
             action = "CONFIRM_API"
@@ -140,19 +139,17 @@ class PlanetResourcesConversion:
                 action = "CALL_SMART_CONTRACT"
 
             tmp = PendingConversionsResponse(
-                id=conversion.id,
+                id=str(conversion.id),
                 completed=conversion.completed,
                 metal=conversion.metal,
                 petrol=conversion.petrol,
                 crystal=conversion.crystal,
                 token=conversion.token,
-                planet=conversion.planet.id,
                 date=conversion.created_time,
                 action=action
             )
             re.append(tmp)
 
-        re = []
         return await self.response_port.publish_response(re)
 
     async def preview_conversion(self, planet_id: str, user: str):
@@ -214,7 +211,6 @@ class PlanetResourcesConversion:
             petrol=request.petrol,
             crystal=request.crystal,
             token=token_amount,
-            planet=planet,
         )
 
         planet.resources.metal -= request.metal
@@ -229,7 +225,7 @@ class PlanetResourcesConversion:
             return await self.response_port.publish_response({})
 
         planet.resource_conversions.append(token_conversion)
-        await self.planet_repository_port.update(planet)
+        planet = await self.planet_repository_port.update(planet)
 
         token_wei_amount = await self.chain_service.to_wei(token_conversion.token)
 
@@ -249,20 +245,21 @@ class PlanetResourcesConversion:
 
         return await self.response_port.publish_response(re)
 
-    async def retry_conversion(self, request: RetryConversionRequest, user: str):
+    async def retry_conversion(self, request: RetryConversionRequest, user: str) -> ResourceConvertResponse:
         planet = await self.planet_repository_port.get_my_planet(user, request.planet_id)
         conversion = await self.token_conversion_repository_port.get(request.token_conversion_id)
 
         if conversion.completed:
             raise ConversionAlreadyCompletedException()
 
-        conversion_data = self.chain_service.spaceriders_game_call("conversions", conversion.id)
+        conversion_data = await self.chain_service.spaceriders_game_call("conversions", conversion.id)
         exists = bool(conversion_data[3])
 
         if exists:
             raise ConversionAlreadyCompletedException()
 
-        token_wei_amount = conversion.token * 10 ** 18
+        token_wei_amount = await self.chain_service.to_wei(conversion.token)
+
         signed_msg = await self.chain_service.sign_message(
             ['string', 'uint256', 'address'],
             [str(conversion.id), token_wei_amount, user]

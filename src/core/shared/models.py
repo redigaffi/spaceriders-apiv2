@@ -1,6 +1,8 @@
 from dataclasses import dataclass
-from typing import List
-from pydantic import BaseModel, root_validator
+from typing import List, Optional
+
+from beanie import PydanticObjectId
+from pydantic import BaseModel, root_validator, Field
 from core.shared.static.game_data.Common import BuildableItemBaseType, CommonKeys, BuildableItemLevelInfo
 from core.shared.static.game_data.PlanetData import PlanetData
 from core.shared.static.game_data.ResourceData import ResourceData as RD, ResourceData
@@ -55,8 +57,16 @@ class TokenConversions:
     petrol: float = None
     crystal: float = None
     token: float = None
-    planet: "Planet" = None
-    user: "User" = None
+
+    @staticmethod
+    def from_token_conversion(token_conversion: "TokenConversions"):
+        return TokenConversions(id=str(token_conversion.id),
+                                completed=token_conversion.completed,
+                                created_time=token_conversion.created_time,
+                                metal=token_conversion.metal,
+                                petrol=token_conversion.petrol,
+                                crystal=token_conversion.crystal,
+                                token=token_conversion.token)
 
 
 @dataclass
@@ -67,11 +77,11 @@ class ResourceExchange:
     petrol_usd_price: float = None
 
 
-@dataclass
-class User:
+class User(BaseModel):
     id: str = None
     wallet: str = None
     username: str = None
+    planets: List["Planet"] = []
 
     def exists(self):
         return self.id is not None
@@ -90,6 +100,13 @@ class LevelUpRewardClaims(BaseModel):
     level: int = None
     completed: bool = False
     planet_id: str
+
+    @staticmethod
+    def from_level_up_reward_claims(claim: "LevelUpRewardClaims"):
+        return LevelUpRewardClaims(id=str(claim.id),
+                                   level=claim.level,
+                                   completed=claim.completed,
+                                   planet_id=claim.planet_id)
 
 
 class BuildableItem(BaseModel):
@@ -133,7 +150,7 @@ class Reserves(BaseModel):
 
 
 class EnergyDeposit(BaseModel):
-    id: str = None
+    request_id: str
     created_time: float = None
     token_amount: float = None
     usd_value: float = None
@@ -154,7 +171,7 @@ class Email(BaseModel):
 
 class Planet(BaseModel):
     id: str = None
-    # @TODO: Change to float
+    request_id: str = None
     created_at: float = None
     name: str = None
     rarity: str = None
@@ -394,4 +411,89 @@ class Planet(BaseModel):
                 'body': email.body,
                 'read': email.read,
             })
+        return re
+
+
+class PlanetResponse(BaseModel):
+    id: str
+    created_at: float = None
+    name: str = None
+    rarity: str = None
+    image: str = None
+    image_url: str = None
+    level: int = None
+    experience: int = None
+    diameter: int = None
+    slots: int = None
+    slots_used: int = None
+    min_temperature: int = None
+    max_temperature: int = None
+
+    reserves: Reserves = None
+
+    # Original resources reserve
+    original_total_metal_amount: float = None
+    original_total_crystal_amount: float = None
+    original_total_petrol_amount: float = None
+
+    galaxy: int = None
+    solar_system: int = None
+    position: int = None
+    user: str = None
+
+    claimable: int = None  # timestamp
+    claimed: bool = None
+
+    tier: PlanetTier = None
+    resources: Resources = None
+
+    price_paid: int = None
+    free_tokens: float = None
+
+    resources_level: List[BuildableItem] = []
+    installation_level: List[BuildableItem] = []
+    research_level: List[BuildableItem] = []
+    defense_items: List[BuildableItem] = []
+    pending_levelup_reward: List[LevelUpRewardClaims] = []
+    energy_deposits: List[EnergyDeposit] = []
+    resource_conversions: List[TokenConversions] = []
+    emails: List[Email] = []
+
+    @staticmethod
+    def from_planet(p: Planet) -> "PlanetResponse":
+        re = PlanetResponse(id=str(p.id))
+        re.created_at = p.created_at
+        re.name = p.name
+        re.rarity = p.rarity
+        re.image = p.image
+        re.image_url = p.image_url
+        re.level = p.level
+        re.experience = p.experience
+        re.diameter = p.diameter
+        re.slots = p.slots
+        re.slots_used = p.slots_used
+        re.min_temperature = p.min_temperature
+        re.max_temperature = p.max_temperature
+        re.reserves = p.reserves
+        re.original_total_metal_amount = p.original_total_metal_amount
+        re.original_total_crystal_amount = p.original_total_crystal_amount
+        re.original_total_petrol_amount = p.original_total_petrol_amount
+        re.galaxy = p.galaxy
+        re.solar_system = p.solar_system
+        re.position = p.position
+        re.user = p.user
+        re.claimable = p.claimable
+        re.claimed = p.claimed
+        re.tier = p.tier
+        re.resources = p.resources
+        re.price_paid = p.price_paid
+        re.free_tokens = p.free_tokens
+        re.resources_level = p.resources_level
+        re.installation_level = p.installation_level
+        re.research_level = p.research_level
+        re.defense_items = p.defense_items
+        re.pending_levelup_reward = [LevelUpRewardClaims.from_level_up_reward_claims(x) for x in p.pending_levelup_reward]
+        re.energy_deposits = p.energy_deposits
+        re.resource_conversions = [ TokenConversions.from_token_conversion(x) for x in p.resource_conversions]
+        re.emails = p.emails
         return re

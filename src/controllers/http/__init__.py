@@ -1,11 +1,15 @@
 from dataclasses import dataclass
 
+from beanie import PydanticObjectId
+from bson import ObjectId
+
 from core import planet_email
 from core.nft_metadata import NftData
 from core.planet_email import PlanetEmail
 from core.planet_energy import PlanetEnergy, EnergyDepositRequest
 from core.planet_level import PlanetLevel
-from core.planet_resources_conversion import PlanetResourcesConversion, ResourceConvertRequest, ConfirmConversionRequest
+from core.planet_resources_conversion import PlanetResourcesConversion, ResourceConvertRequest, \
+    ConfirmConversionRequest, RetryConversionRequest
 from core.planet_staking import Staking, CreateStakingRequest, ConfirmStakingRequest, UnStakeRequest
 from core.shared.models import EnergyDeposit
 from adapters.http.security import jwt_bearer
@@ -19,6 +23,10 @@ from core.authenticate import AuthenticationDetailsRequest
 from fastapi import Depends
 from fastapi.encoders import jsonable_encoder
 from core.shared.models import Planet
+
+
+object_id_encoder = {PydanticObjectId: lambda x: str(x)}
+object_id_encoder1 = {ObjectId: lambda x: str(x)}
 
 
 @dataclass
@@ -68,7 +76,7 @@ class HttpController:
 
     async def fetch_all_planets(self, user=Depends(jwt_bearer)):
         re = await self.get_planets.fetch_all_planets(user)
-        return jsonable_encoder(re)
+        return jsonable_encoder(re, custom_encoder=object_id_encoder)
 
     async def fetch_planet_by_id(self, planet_id: str, user=Depends(jwt_bearer)):
         re = await self.get_planets.fetch_by_planet_id(user, planet_id)
@@ -136,6 +144,10 @@ class HttpController:
 
     async def planet_resources_convert_confirm(self, request: ConfirmConversionRequest, user=Depends(jwt_bearer)):
         re = await self.planet_resource_conversion.confirm_conversion(request, user)
+        return jsonable_encoder(re)
+
+    async def planet_resources_convert_retry(self, request: RetryConversionRequest, user=Depends(jwt_bearer)):
+        re = await self.planet_resource_conversion.retry_conversion(request, user)
         return jsonable_encoder(re)
 
     async def health(self):

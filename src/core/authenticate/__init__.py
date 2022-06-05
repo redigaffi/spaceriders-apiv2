@@ -9,6 +9,7 @@ from core.shared.ports import UserRepositoryPort, ResponsePort, ChainServicePort
 from pydantic import BaseModel
 import jwt
 from datetime import datetime, timezone
+import time
 import logging
 
 
@@ -31,14 +32,10 @@ class Authenticate:
     secret_key: str
     env: str
     user_repository_port: UserRepositoryPort
+    chain_service: ChainServicePort
     response_port: ResponsePort
 
-    #@TODO: Hacky solution :)
-    #@TODO: Add ticket
-    def __ticket_testnet_access(self, address: str):
-
-        if self.env == 'testnet':
-            rpc_url = "https://bsc-dataseed.binance.org/"
+    async def __ticket_testnet_access(self, address: str):
 
         if self.env in ['mainnet']:
             whitelisted_addr = [
@@ -58,16 +55,45 @@ class Authenticate:
 
             return True
 
-        pass
+        has_access = False
+        ticket_amount = await self.chain_service.spaceriders_ticket_nft_call("balanceOf", address)
+        if ticket_amount <= 0:
+            return False
+        elif ticket_amount > 0:
+            nft_info = []
+            for i in range(ticket_amount):
+                token_id = await self.chain_service.spaceriders_ticket_nft_call("walletTokenIds", address, i)
+                nft_info.append(
+                    await self.chain_service.spaceriders_ticket_nft_call("byTokenIdIdData", token_id)
+                )
+
+            for ticket in nft_info:
+                owner = ticket[1]
+                exists = ticket[2]
+                life_time = ticket[3]
+                expiry_date = ticket[5]
+                burned = ticket[7]
+
+                if owner != address or not exists or burned:
+                    continue
+
+                if life_time or time.time() < expiry_date:
+                    has_access = True
+                    break
+
+        return has_access
 
     async def __call__(self, auth_details_request: AuthenticationDetailsRequest) -> str:
         message = encode_defunct(text="its me:" + auth_details_request.address)
         recovered_address = w3.eth.account.recover_message(message, signature=auth_details_request.signature)
 
+        if not await self.__ticket_testnet_access(recovered_address):
+            raise NotWhiteListedException()
+
         if auth_details_request.address == recovered_address:
             user = await self.user_repository_port.find_user(recovered_address)
 
-            if not user.exists():
+            if user is None:
                 user = await self.user_repository_port.create_user(recovered_address)
 
             payload = {

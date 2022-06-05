@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from core.shared.models import Planet, PlanetIdAlreadyExistsException, AppBaseException, NotMyPlanetException, \
-    PlanetNameMissingException
+    PlanetNameMissingException, PlanetResponse
 from core.shared.ports import ResponsePort, ChainServicePort, TokenPricePort, PlanetRepositoryPort
 from pydantic import BaseModel
 import logging as log
 from core.shared.static.game_data.PlanetData import PlanetData
 import math
 from core.shared.service.planet import get_new_planet
-
+import random
 import datetime as dt
 
 
@@ -104,7 +104,32 @@ class MintPlanet:
         planet_cost, token_amount_cost = await self.__planet_cost()
         return await self.response_port.publish_response(FetchPlanetCostResponse(usd_cost=planet_cost, token_cost=token_amount_cost))
 
-    async def buy_planet(self, user: str, request: MintPaidPlanetRequest) -> Planet:
+    async def recover_planet(self, user: str):
+        user_token_ids = await self.contract_service.spaceriders_nft_call("getTokenIdByOwner", user)
+
+        not_stored_planet_ids = []
+        for i in user_token_ids:
+            tmp_planet = await self.contract_service.spaceriders_nft_call("byTokenIdIdData", i)
+
+            exists = await self.planet_repository.get_by_request_id(tmp_planet[1])
+            if exists is None:
+                not_stored_planet_ids.append(tmp_planet)
+
+        planet_names = ["Mars", "Pluto", "Jupiter"]
+
+        for planet in not_stored_planet_ids:
+            planet_id = str(planet[1])
+            last_planet = await self.planet_repository.last_created_planet()
+
+            planet: Planet = get_new_planet(user, random.choice(planet_names), last_planet, PlanetData.BUY_PLANET_COST_USD,
+                                            self.planet_images_bucket_path, True, True)
+
+            planet.request_id = planet_id
+            re = await self.planet_repository.create_planet(planet)
+
+        return await self.response_port.publish_response({})
+
+    async def buy_planet(self, user: str, request: MintPaidPlanetRequest) -> PlanetResponse:
         log.info(f"User {user} minting paid planet")
 
         planet: Planet = await self.planet_repository.get(request.planet_id)
@@ -135,13 +160,14 @@ class MintPlanet:
         planet: Planet = get_new_planet(user, request.name, last_planet, PlanetData.BUY_PLANET_COST_USD,
                                         self.planet_images_bucket_path, False, claimable)
 
+        planet.request_id = request.planet_id
         re = await self.planet_repository.create_planet(planet)
 
         log.info(f"User {user} minting paid planet finished")
-        return await self.response_port.publish_response(re)
+        return await self.response_port.publish_response(PlanetResponse.from_planet(re))
 
-    async def claim_planet(self, user: str, request: ClaimPlanetRequest):
-        planet: Planet = await self.planet_repository.get_my_planet(user, request.planet_id)
+    async def claim_planet(self, user: str, request: ClaimPlanetRequest) -> PlanetResponse:
+        planet: Planet = await self.planet_repository.get(request.planet_id)
 
         if planet.claimed:
             raise PlanetAlreadyClaimed()
@@ -155,10 +181,11 @@ class MintPlanet:
 
         planet.claimed = True
         planet.claimable = None
+        planet = await self.planet_repository.update(planet)
 
-        return await self.planet_repository.update(planet)
+        return await self.response_port.publish_response(PlanetResponse.from_planet(planet))
 
-    async def mint_free_planet(self, user: str, req: FreePlanetRequest) -> Planet:
+    async def mint_free_planet(self, user: str, req: FreePlanetRequest) -> PlanetResponse:
         log.info(f"{user} requested a free planet")
         has_free_planets = await self.planet_repository.has_free_planet(user)
 
@@ -171,7 +198,7 @@ class MintPlanet:
 
             log.info(f"{user} minted a free planet")
             re = await self.planet_repository.create_planet(planet)
-            return await self.response_port.publish_response(re)
+            return await self.response_port.publish_response(PlanetResponse.from_planet(re))
 
         log.error(f"{user} already has a free planet")
         raise CantMintMoreFreePlanets()

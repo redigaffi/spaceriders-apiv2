@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+
+from core.mint_planet import MintPlanet
 from core.planet_energy import PlanetEnergy, PlanetEnergyRecoverEnergyDepositsRequest
 from core.planet_level import PlanetLevel
 from core.planet_staking import Staking
@@ -11,6 +13,10 @@ class CronjobController:
     staking_use_case: Staking
     planet_level: PlanetLevel
     resources_exchange: ResourcesExchange
+    mint_planet: MintPlanet
+
+    async def recover_planets(self, user: str):
+        return await self.mint_planet.recover_planet(user)
 
     async def recover_deposits(self, req: PlanetEnergyRecoverEnergyDepositsRequest):
         return await self.energy_planet_use_case.recover_deposits(req)

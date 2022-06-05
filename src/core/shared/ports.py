@@ -93,6 +93,11 @@ class EnergyDepositRepositoryPort(ABC):
 
 
 class UserRepositoryPort(ABC):
+
+    @abstractmethod
+    async def all(self) -> list[User] | None:
+        pass
+
     @abstractmethod
     async def find_user(self, wallet: str) -> User:
         pass
@@ -108,7 +113,11 @@ class UserRepositoryPort(ABC):
 
 class PlanetRepositoryPort(ABC):
     @abstractmethod
-    async def all_claimed_planets(self) -> list[Planet]:
+    async def get_by_request_id(self, request_id: str, fetch_links=False) -> Planet | None:
+        pass
+
+    @abstractmethod
+    async def all_claimed_planets(self, fetch_links=False) -> list[Planet]:
         pass
 
     @abstractmethod
@@ -116,15 +125,15 @@ class PlanetRepositoryPort(ABC):
         pass
 
     @abstractmethod
-    async def all_user_planets(self, user_id: str) -> list[Planet]:
+    async def all_user_planets(self, user_id: str, fetch_links=False) -> list[Planet]:
         pass
 
     @abstractmethod
-    async def get(self, planet_id: str) -> Planet | None:
+    async def get(self, planet_id: str, fetch_links=False) -> Planet | None:
         pass
 
     @abstractmethod
-    async def get_my_planet(self, user_id: str, planet_id: str) -> Planet | None:
+    async def get_my_planet(self, user_id: str, planet_id: str, fetch_links=False) -> Planet | None:
         pass
 
     @abstractmethod
@@ -136,7 +145,7 @@ class PlanetRepositoryPort(ABC):
         pass
 
     @abstractmethod
-    async def last_created_planet(self) -> Planet|bool:
+    async def last_created_planet(self, fetch_links=False) -> Planet|bool:
         pass
 
 

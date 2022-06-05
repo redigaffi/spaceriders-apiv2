@@ -2,7 +2,7 @@ from controllers.http import HttpController
 from core.authenticate import JwtResponse
 from core.buildable_items import BuildableResponse
 from core.fetch_chain_data import FetchChainDataResponse, FetchChainTokenPriceResponse
-from core.get_planets import FetchByPlanetIdResponse
+from core.get_planets import FetchByPlanetIdResponse, PlanetResponse
 from core.mint_planet import FetchPlanetCostResponse, FetchPlanetCostDataResponse
 from core.nft_metadata import OpenseaMetadataNftResponse
 from core.planet_level import ClaimPendingLvlUpRewardResponse
@@ -16,11 +16,11 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
     return [
         dict(path="/jwt", response_model=JwtResponse, endpoint=http_controller.jwt, methods=["post"]),
 
-        dict(path="/planet/buy", response_model=Planet, endpoint=http_controller.buy_planet, methods=["post"]),
+        dict(path="/planet/buy", response_model=PlanetResponse, endpoint=http_controller.buy_planet, methods=["post"]),
 
-        dict(path="/planet/claim", response_model=Planet, endpoint=http_controller.claim_planet, methods=["post"]),
+        dict(path="/planet/claim", response_model=PlanetResponse, endpoint=http_controller.claim_planet, methods=["post"]),
 
-        dict(path="/planet/free", response_model=Planet, endpoint=http_controller.mint_free_planet, methods=["post"]),
+        dict(path="/planet/free", response_model=PlanetResponse, endpoint=http_controller.mint_free_planet, methods=["post"]),
 
         dict(path="/planet/cost", response_model=FetchPlanetCostResponse,
              endpoint=http_controller.planet_cost, methods=["get"]),
@@ -34,7 +34,7 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
         dict(path="/chain/tokenprice", response_model=FetchChainTokenPriceResponse,
              endpoint=http_controller.get_chain_token_price, methods=["get"]),
 
-        dict(path=r"/planets", response_model=list[Planet],
+        dict(path=r"/planets", response_model=list[PlanetResponse],
              endpoint=http_controller.fetch_all_planets, methods=["get"]),
 
         dict(path=r"/planet/{planet_id}", response_model=FetchByPlanetIdResponse,
@@ -82,10 +82,13 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
         dict(path=r"/planet/resources/convert/{planet_id}/pending", response_model=list[PendingConversionsResponse],
              endpoint=http_controller.planet_resources_convert_pending, methods=["get"]),
 
-        dict(path=r"/planet/resources/convert/{planet_id}/sign", response_model=ResourceConvertResponse,
+        dict(path=r"/planet/resources/convert/sign", response_model=ResourceConvertResponse,
              endpoint=http_controller.planet_resources_convert_sign, methods=["post"]),
 
-        dict(path=r"/planet/resources/convert/{planet_id}/confirm",
+        dict(path=r"/planet/resources/convert/retry", response_model=ResourceConvertResponse,
+             endpoint=http_controller.planet_resources_convert_retry, methods=["post"]),
+
+        dict(path=r"/planet/resources/convert/confirm",
              endpoint=http_controller.planet_resources_convert_confirm, methods=["post"]),
 
         dict(path=r"/health",

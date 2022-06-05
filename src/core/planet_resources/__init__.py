@@ -25,7 +25,8 @@ class PlanetResources:
 
         resource_levels: list[BuildableItem] = planet.resources_level
         mines: list[BuildableItem] = list(
-            filter(lambda x: x.label in [RD.METAL_MINE, RD.CRYSTAL_MINE, RD.PETROL_MINE], resource_levels))
+            filter(lambda x: x.label in [RD.METAL_MINE, RD.CRYSTAL_MINE, RD.PETROL_MINE], resource_levels)
+        )
 
         warehouses = {
             RD.METAL_WAREHOUSE: next((x for x in resource_levels if x.label == RD.METAL_WAREHOUSE), False),
@@ -44,9 +45,10 @@ class PlanetResources:
             RD.CRYSTAL_MINE: "crystal",
             RD.PETROL_MINE: "petrol",
         }
-
-        mine: BuildableItem
+        #mine: BuildableItem
         for mine in mines:
+            planet: Planet = await self.planet_repository_port.get(request.planet_id)
+
             now = datetime.datetime.timestamp(datetime.datetime.now())
             label = mine.label
 
@@ -63,7 +65,7 @@ class PlanetResources:
 
             if mine.building or mine.repairing:
                 setattr(planet.resources, last_update_field_names[label], now)
-                await self.planet_repository_port.update(planet)
+                planet = await self.planet_repository_port.update(planet)
                 continue
 
             mine_info: BuildableItemLevelInfo = RD.get_item(label).get_level_info(mine.current_level)
@@ -92,9 +94,11 @@ class PlanetResources:
                 energy_usage = 0
 
             self.__update_resources(planet, label, warehouses, production, energy_usage)
-            setattr(planet.resources, last_update_field_names[label], now)
+            setattr(planet.resources, last_update_field_names[label], datetime.datetime.timestamp(datetime.datetime.now()))
 
-        await self.planet_repository_port.update(planet)
+            # Dont save without changes
+            planet = await self.planet_repository_port.update(planet)
+
         return await self.response_port.publish_response(planet)
 
     def __update_resources(self, planet: Planet, label: str, warehouses: dict[str, BuildableItem], production: float, energy_usage: float):

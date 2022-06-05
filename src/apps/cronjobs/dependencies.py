@@ -6,6 +6,7 @@ from adapters.shared.cache_adapter import MemCacheCacheServiceAdapter
 from adapters.shared.evm_adapter import EvmChainServiceAdapter, TokenPriceAdapter
 from adapters.shared.logging_adapter import LoggingAdapter, get_logger
 from controllers.cronjobs import CronjobController
+from core.mint_planet import MintPlanet
 from core.planet_email import PlanetEmail
 from core.planet_energy import PlanetEnergy
 from decouple import config
@@ -84,6 +85,9 @@ async def cronjob_controller():
 
     email_use_case = PlanetEmail(planet_repository, email_repository, response_adapter)
     planet_level = PlanetLevel(planet_repository, lvl_up_repository, email_use_case, contract, response_adapter)
-
     resource_exchange = ResourcesExchange(resource_repository, response_adapter)
-    return CronjobController(energy_planet_use_case, staking_use_case, planet_level, resource_exchange)
+
+    planet_mint = MintPlanet(token_price_adapter, contract, config('API_ENDPOINT'), config('PLANET_IMAGES_BUCKET_PATH'),
+                      planet_repository, response_adapter)
+
+    return CronjobController(energy_planet_use_case, staking_use_case, planet_level, resource_exchange, planet_mint)

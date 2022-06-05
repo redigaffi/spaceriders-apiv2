@@ -126,6 +126,8 @@ class BuildableItems:
 
                 item.finish = None
                 item.building = False
+                # Dont save without changes it will break
+                planet = await self.planet_repository_port.update(planet)
 
             elif item.repairing:
                 info = game_data.get_item(item.label).get_level_info(item.current_level)
@@ -135,8 +137,8 @@ class BuildableItems:
                 item.health = info.health
                 item.repairing = False
                 item.finish = None
-
-        await self.planet_repository_port.update(planet)
+            # Dont save without changes it will break
+                planet = await self.planet_repository_port.update(planet)
 
         return await self.response_port.publish_response(planet)
 
@@ -209,7 +211,7 @@ class BuildableItems:
             planet.slots_used += 1
 
         planet = resource_reserve_als(request.label, planet, next_lvl)
-        await self.planet_repository_port.update(planet)
+        planet = await self.planet_repository_port.update(planet)
         await self.planet_level_use_case.give_planet_experience(GivePlanetExperienceRequest(planet_id=str(planet.id), experience_amount=next_lvl.experience))
 
         response = BuildableResponse.from_buildable_item(buildable)

@@ -1,8 +1,6 @@
 from __future__ import annotations
 from beanie import PydanticObjectId, WriteRules, DeleteRules
-
-from adapters.shared.beanie_models_adapter import EnergyDepositDocument, PlanetDocument, UserDocument, to_planet, \
-    from_planet, EmailDocument, LevelUpRewardClaimsDocument, ResourceExchangeDocument, TokenConversionsDocument
+from adapters.shared.beanie_models_adapter import EnergyDepositDocument, PlanetDocument, UserDocument, EmailDocument, LevelUpRewardClaimsDocument, ResourceExchangeDocument, TokenConversionsDocument
 from core.shared.ports import UserRepositoryPort, PlanetRepositoryPort, EnergyDepositRepositoryPort, \
     EmailRepositoryPort, LevelUpRewardClaimsRepositoryPort, ResourceExchangeRepositoryPort, \
     TokenConversionsRepositoryPort
@@ -13,23 +11,21 @@ from datetime import datetime
 
 class TokenConversionsRepositoryAdapter(TokenConversionsRepositoryPort):
     async def create(self, token_conversion: TokenConversions) -> TokenConversions:
-        TokenConversionsDocument.update_forward_refs()
+        #TokenConversionsDocument.update_forward_refs()
         token_conversion_doc = TokenConversionsDocument(completed=token_conversion.completed,
                                                         created_time=token_conversion.created_time,
                                                         metal=token_conversion.metal,
                                                         petrol=token_conversion.petrol,
                                                         crystal=token_conversion.crystal,
-                                                        token=token_conversion.token,
-                                                        planet=token_conversion.planet,
-                                                        user=token_conversion.user)
+                                                        token=token_conversion.token)
 
         await token_conversion_doc.save()
         return token_conversion_doc
 
     async def get(self, token_conversion: str) -> TokenConversions | None:
-        TokenConversionsDocument.update_forward_refs()
+        #TokenConversionsDocument.update_forward_refs()
 
-        return await TokenConversionsDocument.get(PydanticObjectId(token_conversion))
+        return await TokenConversionsDocument.find_one(TokenConversionsDocument.id == PydanticObjectId(token_conversion))
 
     async def get_latest(self) -> TokenConversions | None:
         TokenConversionsDocument.update_forward_refs()
@@ -58,14 +54,7 @@ class ResourceExchangeRepositoryAdapter(ResourceExchangeRepositoryPort):
         return resource_exchange_doc
 
     async def get(self, resource_exchange: str) -> ResourceExchange | None:
-        resource_exchange_document = None
-        try:
-            resource_exchange_document = await ResourceExchangeDocument.get(PydanticObjectId(resource_exchange))
-        except:
-            pass
-
-        if resource_exchange_document is not None:
-            return resource_exchange_document
+        return  await ResourceExchangeDocument.get(PydanticObjectId(resource_exchange))
 
     async def get_latest(self) -> ResourceExchange | None:
         last_price = await ResourceExchangeDocument.all().sort(-ResourceExchangeDocument.created_time).limit(1).to_list()
@@ -83,23 +72,15 @@ class LevelUpRewardClaimsRepositoryAdapter(LevelUpRewardClaimsRepositoryPort):
         lvl_up_document = LevelUpRewardClaimsDocument(level=lvl_up.level, completed=lvl_up.completed,
                                                       planet_id=lvl_up.planet_id)
         await lvl_up_document.save()
-        return lvl_up_document.to_lvl_up()
+        return lvl_up_document
 
     async def get(self, lvl_up_id: str) -> LevelUpRewardClaims | None:
-        lvl_up = None
-        try:
-            lvl_up = await LevelUpRewardClaimsDocument.get(PydanticObjectId(lvl_up_id))
-        except:
-            pass
+        return await LevelUpRewardClaimsDocument.get(PydanticObjectId(lvl_up_id))
 
-        if lvl_up is not None:
-            return lvl_up.to_lvl_up()
 
-    async def update(self, lvl_up: LevelUpRewardClaims) -> LevelUpRewardClaims:
-        lvl_up = LevelUpRewardClaimsDocument.from_lvl_up(lvl_up)
-        await lvl_up.save()
-        fresh: LevelUpRewardClaimsDocument = await LevelUpRewardClaimsDocument.get(PydanticObjectId(lvl_up.id))
-        return fresh.to_lvl_up()
+    async def update(self, lvl_up: LevelUpRewardClaimsDocument) -> LevelUpRewardClaims:
+        await lvl_up.save_changes()
+        return lvl_up
 
 
 class EmailRepositoryAdapter(EmailRepositoryPort):
@@ -108,69 +89,51 @@ class EmailRepositoryAdapter(EmailRepositoryPort):
                                        body=email.body, sender=email.sender, read=email.read, planet=email.planet)
 
         await email_document.save()
-        return email_document.to_email()
+        return email_document
 
-    async def update(self, email: Email) -> Email:
-        email_document = EmailDocument.from_email(email)
-        await email_document.save()
-        fresh: EmailDocument = await EmailDocument.get(PydanticObjectId(email.id))
-        return fresh.to_email()
+    async def update(self, email: EmailDocument) -> Email:
+        await email.save_changes()
+        return email
+
 
     async def delete(self, email: Email):
         email_document: EmailDocument = await EmailDocument.get(PydanticObjectId(email.id))
         planet = await PlanetDocument.get(PydanticObjectId(email.planet))
         await planet.fetch_link(PlanetDocument.emails)
-        planet.emails = [x.to_email() for x in planet.emails if str(x.id) != email.id]
-        planet_document = from_planet(planet)
-        await planet_document.save()
+        planet.emails = [x for x in planet.emails if str(x.id) != email.id]
+
+        await planet.save_changes()
         await email_document.delete(link_rule=DeleteRules.DELETE_LINKS)
 
     async def get(self, email_id) -> Email:
-        email = None
-        try:
-            email = await EmailDocument.get(PydanticObjectId(email_id))
-        except:
-            pass
-
-        if email is not None:
-            return email.to_email()
+        email = await EmailDocument.get(PydanticObjectId(email_id))
+        return email
 
 
 class EnergyDepositRepositoryAdapter(EnergyDepositRepositoryPort):
 
     async def get(self, id: str) -> EnergyDeposit | None:
-        energy_deposit = None
-        try:
-            energy_deposit = await EnergyDepositDocument.get(PydanticObjectId(id))
-        except:
-            pass
-
-        if energy_deposit is not None:
-            return energy_deposit.to_energy_deposit()
+        return await EnergyDepositDocument.find_one(EnergyDepositDocument.request_id == id)
 
     async def create_energy_deposit(self, energy_deposit: EnergyDeposit) -> EnergyDeposit:
-        energy_document = EnergyDepositDocument(planet_id=energy_deposit.planet_id,
+        energy_document = EnergyDepositDocument(request_id=energy_deposit.request_id,
+                                                planet_id=energy_deposit.planet_id,
                                                 was_recovered=energy_deposit.was_recovered,
                                                 created_time=energy_deposit.created_time,
                                                 token_amount=energy_deposit.token_amount,
                                                 usd_value=energy_deposit.usd_value)
-
-        if energy_deposit.id is not None:
-            energy_document.id = PydanticObjectId(energy_deposit.id)
-
         await energy_document.save()
-
-        return energy_document.to_energy_deposit()
+        return energy_document
 
 
 class BeaniUserRepositoryAdapter(UserRepositoryPort):
 
+    async def all(self) -> list[User] | None:
+        return await UserDocument.all().to_list()
+
     async def find_user(self, wallet: str) -> User | None:
         re = await UserDocument.find_one(UserDocument.wallet == wallet)
-        if not re:
-            return User()
-
-        return User(id=re.id, wallet=wallet, username=re.username)
+        return re
 
     async def find_user_or_throw(self, wallet: str) -> User:
         re = await UserDocument.find_one(UserDocument.wallet == wallet)
@@ -178,49 +141,49 @@ class BeaniUserRepositoryAdapter(UserRepositoryPort):
         if not re:
             raise UserNotFoundException()
 
-        return User(id=re.id, wallet=re.wallet, username=re.username)
+        return re
 
     async def create_user(self, wallet: str) -> User:
         user = UserDocument(wallet=wallet)
         await user.create()
-        return User(id=user.id, wallet=wallet)
+        return user
 
 
 class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
-
+    # seems like you cant update if it had fetch_links
     async def all_claimed_planets(self) -> list[Planet]:
-
         planets = await PlanetDocument.find(PlanetDocument.claimed == True).to_list()
-        return [await to_planet(planet) for planet in planets]
+        return planets
 
-    async def all_user_planets(self, user_id: str) -> list[Planet]:
-        planets = await PlanetDocument.find(PlanetDocument.user == user_id).to_list()
-        return [await to_planet(planet) for planet in planets]
+    async def all_user_planets(self, user_id: str, fetch_links=False) -> list[Planet]:
+        planets = await PlanetDocument.find(PlanetDocument.user == user_id, fetch_links=fetch_links).to_list()
+        return planets
 
-    async def update(self, planet: Planet) -> Planet:
-        old = from_planet(planet)
-        await old.save(link_rule=WriteRules.WRITE)
-        fresh: PlanetDocument = await PlanetDocument.get(PydanticObjectId(planet.id))
-        return await to_planet(fresh)
+    async def update(self, planet: PlanetDocument) -> Planet:
+        await planet.save_changes()
+        return planet
 
-    async def get_my_planet(self, user_id: str, planet_id: str) -> Planet | None:
+    async def get_my_planet(self, user_id: str, planet_id: str, fetch_links=False) -> Planet | None:
         # if fetch_links provided energy_deposits comes null?
         # @README: seems like fetch_link works with emails but not with energy_deposits, only difference is that
         # on energy deposit we set our own id.
         planet = await PlanetDocument.find_one(
             PlanetDocument.id == PydanticObjectId(planet_id),
             PlanetDocument.user == user_id,
-            # fetch_links=True
+            fetch_links=fetch_links
         )
 
-        if planet is not None:
-            return await to_planet(planet)
+        return planet
 
-    async def get(self, planet_id: str) -> Planet | None:
+    async def get(self, planet_id: str, fetch_links=False) -> Planet | None:
+        #TokenConversionsDocument.update_forward_refs()
+        planet = await PlanetDocument.find_one(PlanetDocument.id == PydanticObjectId(planet_id), fetch_links=fetch_links)
+        return planet
 
-        planet = await PlanetDocument.get(PydanticObjectId(planet_id))
-        if planet is not None:
-            return await to_planet(planet)
+    async def get_by_request_id(self, request_id: str, fetch_links=False) -> Planet | None:
+        #TokenConversionsDocument.update_forward_refs()
+        planet = await PlanetDocument.find_one(PlanetDocument.request_id == request_id, fetch_links=fetch_links)
+        return planet
 
     async def has_free_planet(self, user_id: str) -> bool:
 
@@ -229,14 +192,14 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
 
         return len(free_planet) > 0
 
-    async def last_created_planet(self) -> Planet | bool:
+    async def last_created_planet(self, fetch_links=False) -> Planet | bool:
 
-        last_planet = await PlanetDocument.all().sort(-PlanetDocument.created_at).limit(1).to_list()
+        last_planet = await PlanetDocument.all(fetch_links=fetch_links).sort(-PlanetDocument.created_at).limit(1).to_list()
 
         if not last_planet:
             return False
 
-        return await to_planet(last_planet[0])
+        return last_planet[0]
 
     async def create_planet(self, planet_data: Planet) -> Planet:
 
@@ -246,6 +209,7 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
 
         # id = bson.objectid.ObjectId()
         new_planet = PlanetDocument(
+            request_id=planet_data.request_id,
             name=planet_data.name,
             created_at=datetime.timestamp(datetime.now()),
             rarity=planet_data.rarity,
@@ -283,4 +247,4 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
         user.planets.append(new_planet)
         await user.save(link_rule=WriteRules.WRITE)
 
-        return await to_planet(new_planet)
+        return new_planet

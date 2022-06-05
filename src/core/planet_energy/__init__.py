@@ -43,11 +43,11 @@ class PlanetEnergy:
 
         planet = await self.planet_repository_port.get(request.planet_id)
 
-        energy_deposit_count = await self.contract_service.spaceriders_game_call("getEnergyDepositsMapCount", request.planet_id)
+        energy_deposit_count = await self.contract_service.spaceriders_game_call("getEnergyDepositsMapCount", str(request.planet_id))
 
         result = []
         for i in range(energy_deposit_count):
-            energy_deposit_id_sm = await self.contract_service.spaceriders_game_call("energyDepositsMap", request.planet_id, i)
+            energy_deposit_id_sm = await self.contract_service.spaceriders_game_call("energyDepositsMap", str(request.planet_id), i)
             energy_deposit = await self.energy_repository_port.get(energy_deposit_id_sm)
 
             if energy_deposit is None:
@@ -60,15 +60,16 @@ class PlanetEnergy:
                 token_amount = amount / 10 ** 18
                 usd_value = token_amount * await self.token_price.fetch_token_price_usd()
 
-                energy_deposit = EnergyDeposit(id=energy_deposit_id_sm,
+                energy_deposit = EnergyDeposit(request_id=energy_deposit_id_sm,
                                                created_time=created_timestamp,
                                                token_amount=token_amount,
                                                usd_value=usd_value,
                                                planet_id=request.planet_id,
                                                was_recovered=True)
 
-                await self.energy_repository_port.create_energy_deposit(energy_deposit)
+                energy_deposit = await self.energy_repository_port.create_energy_deposit(energy_deposit)
                 planet.energy_deposits.append(energy_deposit)
+                planet.resources.energy += round(usd_value, 0)
                 await self.planet_repository_port.update(planet)
                 result.append(energy_deposit)
 
@@ -88,7 +89,7 @@ class PlanetEnergy:
             now = datetime.datetime.timestamp(datetime.datetime.now())
             usd_value = request.amount * await self.token_price.fetch_token_price_usd()
 
-            energy_deposit = EnergyDeposit(id=request.deposit_id,
+            energy_deposit = EnergyDeposit(request_id=request.deposit_id,
                                            created_time=now,
                                            token_amount=request.amount,
                                            usd_value=usd_value,
@@ -122,14 +123,14 @@ class PlanetEnergy:
 
         now = datetime.datetime.timestamp(datetime.datetime.now())
 
-        energy_deposit = EnergyDeposit(id=request.deposit_id,
+        energy_deposit = EnergyDeposit(request_id=request.deposit_id,
                                        created_time=now,
                                        token_amount=token_amount,
                                        usd_value=usd_value,
                                        planet_id=request.planet_id,
                                        was_recovered=False)
 
-        await self.energy_repository_port.create_energy_deposit(energy_deposit)
+        energy_deposit = await self.energy_repository_port.create_energy_deposit(energy_deposit)
         planet.energy_deposits.append(energy_deposit)
         planet.resources.energy += round(usd_value, 0)
         await self.planet_repository_port.update(planet)

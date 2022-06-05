@@ -93,7 +93,9 @@ async def middleware(request: Request, call_next):
 
     if active_planet is not None:
         await planet_staking.tier_expired_reset(planet_id=active_planet)
+        await asyncio.sleep(0.01)
         await items_use_case.finish_build(FinishBuildRequest(planet_id=active_planet))
+        await asyncio.sleep(0.01)
         await planet_resources_use_case(PlanetResourcesUpdateRequest(planet_id=active_planet))
 
     return await call_next(request)
