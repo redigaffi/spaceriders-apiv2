@@ -4,7 +4,7 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from core.shared.models import Email, AppBaseException, PlanetTier
+from core.shared.models import Email, AppBaseException, PlanetTier, PlanetResponse
 from core.shared.ports import ResponsePort, EmailRepositoryPort, PlanetRepositoryPort, TokenPricePort, ChainServicePort
 from core.shared.static.game_data.StakingData import StakingData, StakingBenefits
 
@@ -209,8 +209,9 @@ class Staking:
         planet.tier.time_release = None
         planet.tier.staked = False
         planet = await self.planet_repository_port.update(planet)
-
-        return await self.response_port.publish_response(planet)
+        planet = await self.planet_repository_port.get_my_planet(user, request.planet_id, True)
+        re = PlanetResponse.from_planet(planet)
+        return await self.response_port.publish_response(re)
 
     async def tier_expired_reset(self, planet_id: str):
         """

@@ -1,3 +1,5 @@
+import beanie.exceptions
+from beanie.exceptions import RevisionIdWasChanged
 from fastapi import FastAPI, Request, Query
 from starlette.background import BackgroundTask
 
@@ -64,6 +66,9 @@ async def exception_handler(request: Request, call_next):
                 content={"message": exc.msg},
             )
 
+        if isinstance(exc, beanie.exceptions.RevisionIdWasChanged):
+            return await call_next(request)
+
         log.critical("Something unexpected happened", exc)
         return JSONResponse(
             status_code=500,
@@ -92,11 +97,15 @@ async def middleware(request: Request, call_next):
     active_planet = request.headers.get("x-active-planet")
 
     if active_planet is not None:
-        await planet_staking.tier_expired_reset(planet_id=active_planet)
-        await asyncio.sleep(0.01)
-        await items_use_case.finish_build(FinishBuildRequest(planet_id=active_planet))
-        await asyncio.sleep(0.01)
-        await planet_resources_use_case(PlanetResourcesUpdateRequest(planet_id=active_planet))
+        try:
+            await asyncio.sleep(0.01)
+            await planet_staking.tier_expired_reset(planet_id=active_planet)
+            await asyncio.sleep(0.01)
+            await items_use_case.finish_build(FinishBuildRequest(planet_id=active_planet))
+            await asyncio.sleep(0.01)
+            await planet_resources_use_case(PlanetResourcesUpdateRequest(planet_id=active_planet))
+        except:
+            pass
 
     return await call_next(request)
 
