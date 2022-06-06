@@ -4,6 +4,7 @@ from core.mint_planet import MintPlanet
 from core.planet_energy import PlanetEnergy, PlanetEnergyRecoverEnergyDepositsRequest
 from core.planet_level import PlanetLevel
 from core.planet_staking import Staking
+from core.pve.asteroid import Asteroid
 from core.resource_exchange import ResourcesExchange
 
 
@@ -14,6 +15,7 @@ class CronjobController:
     planet_level: PlanetLevel
     resources_exchange: ResourcesExchange
     mint_planet: MintPlanet
+    asteroid: Asteroid
 
     async def recover_planets(self, user: str):
         return await self.mint_planet.recover_planet(user)
@@ -29,3 +31,6 @@ class CronjobController:
 
     async def generate_new_resource_price(self):
         return await self.resources_exchange.new_resource_exchange_price()
+
+    async def asteroid_pve(self, planet_id: str):
+        return await self.asteroid(planet_id)

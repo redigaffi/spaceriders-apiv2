@@ -14,6 +14,12 @@ from core.shared.models import Planet
 import settings
 
 
+async def asteroid(controller: CronjobController):
+    all_claimed: list[Planet] = await dependencies.planet_repository.all_claimed_planets()
+    for planet in all_claimed:
+        await controller.asteroid_pve(str(planet.id))
+
+
 async def smart_contract_recover_user_cronjob(controller: CronjobController):
     all_users = await dependencies.user_repository.all()
     for user in all_users:
@@ -42,6 +48,8 @@ async def main():
     #schedule.every(3).seconds.do(smart_contract_recover_planet_cronjob, controller)
     schedule.every(3).seconds.do(smart_contract_recover_user_cronjob, controller)
     #schedule.every(3).seconds.do(controller.generate_new_resource_price)
+    schedule.every(3).seconds.do(asteroid, controller)
+
 
     while True:
         await schedule.run_pending()

@@ -1,12 +1,11 @@
 import bson
 
-from core.shared.models import Planet, Reserves, BuildableItem, LevelUpRewardClaims
-from core.shared.static.game_data.Common import BuildableItemBaseType, CommonKeys, BuildableItemLevelInfo
-from core.shared.static.game_data.PlanetLevelData import PlanetLevelData
-from core.shared.static.game_data.ResourceData import ResourceData as RD, ResourceData
-from core.shared.static.game_data.InstallationData import InstallationData as ID
-from core.shared.static.game_data.ResearchData import ResearchData as RE
-from core.shared.static.game_data.DefenseData import DefenseData as DD
+from core.shared.models import Planet, Reserves, BuildableItem
+from core.shared.static.game_data.Common import BuildableItemBaseType, BuildableItemLevelInfo
+from core.shared.static.game_data.ResourceData import ResourceData
+from core.shared.static.game_data.InstallationData import InstallationData
+from core.shared.static.game_data.ResearchData import ResearchData
+from core.shared.static.game_data.DefenseData import DefenseData
 from core.shared.static.game_data.PlanetData import PlanetData
 import random
 import math
@@ -147,28 +146,28 @@ def create_levels() -> tuple:
     research_level = []
     defense_items = []
 
-    for resource_data in RD.TYPES:
-        item: BuildableItemBaseType = RD.get_item(resource_data)
+    for resource_data in ResourceData.TYPES:
+        item: BuildableItemBaseType = ResourceData.get_item(resource_data)
         level_info: BuildableItemLevelInfo = item.get_level_info()
 
         rl = BuildableItem(label=item.label,
-                           type=RD.TYPE,
+                           type=ResourceData.TYPE,
                            current_level=0,
                            health=level_info.health )
         resource_levels.append(rl)
 
-    for installation_type in ID.TYPES:
-        item: BuildableItemBaseType = ID.get_item(installation_type)
-        il = BuildableItem(label=item.label, type=ID.TYPE, current_level=0)
+    for installation_type in InstallationData.TYPES:
+        item: BuildableItemBaseType = InstallationData.get_item(installation_type)
+        il = BuildableItem(label=item.label, type=InstallationData.TYPE, current_level=0)
         installation_level.append(il)
 
-    for research_type in RE.TYPES:
-        item: BuildableItemBaseType = RE.get_item(research_type)
-        rl = BuildableItem(label=item.label, type=ID.TYPE, current_level=0)
+    for research_type in ResearchData.TYPES:
+        item: BuildableItemBaseType = ResearchData.get_item(research_type)
+        rl = BuildableItem(label=item.label, type=ResearchData.TYPE, current_level=0)
         research_level.append(rl)
 
-    for defense_item in DD.TYPES:
-        di = BuildableItem(label=defense_item, type=ID.TYPE, quantity=0)
+    for defense_item in DefenseData.TYPES:
+        di = BuildableItem(label=defense_item, type=DefenseData.TYPE, quantity=0)
         defense_items.append(di)
 
     return resource_levels, installation_level, research_level, defense_items

@@ -30,7 +30,7 @@ class DefenseData(GameData):
                                                     0: BuildableItemLevelInfo(0, 100, 0, 60, 0, 0, 0, 50, 50,
                                                                               50, 10,
                                                                               [BuildableItemRequirement(ID.TYPE,
-                                                                                                        ID.HANGAR, 2)],
+                                                                                                        ID.HANGAR, 0)],
                                                                               0),
                                                 }
                                                 ),

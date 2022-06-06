@@ -14,7 +14,6 @@ class ResourcesExchange:
     async def get_current_price(self) -> ResourceExchange:
         return await self.resource_repository.get_latest()
 
-
     async def new_resource_exchange_price(self):
         metal = random.uniform(0.001, 0.01)
         crystal = random.uniform(0.001, 0.01)

@@ -122,6 +122,7 @@ class BuildableItems:
                     new_health = item.quantity * data.health
 
                     item.quantity += item.quantity_building
+                    item.quantity_building = 0
                     item.health += new_health
 
                 item.finish = None
@@ -182,7 +183,7 @@ class BuildableItems:
         next_lvl: BuildableItemLevelInfo = label_info.get_level_info(buildable.current_level + 1)
         next_lvl: BuildableItemLevelInfo = tier_benefit_service(planet.tier.tier_code, next_lvl)
 
-        if buildable.health < label_info.get_level_info(buildable.current_level).health:
+        if request.type == ResourceData.TYPE and buildable.health < label_info.get_level_info(buildable.current_level).health:
             raise CantUpgradeIfHealthIsNotFullException()
 
         if planet.slots_used >= planet.slots:
@@ -191,7 +192,6 @@ class BuildableItems:
         if planet.resources.metal < next_lvl.cost_metal or planet.resources.crystal < next_lvl.cost_crystal or planet.resources.petrol < next_lvl.cost_petrol:
             raise NotEnoughFundsForBuildException()
 
-        planet.slots_used += 1
         planet.resources.metal -= next_lvl.cost_metal
         planet.resources.crystal -= next_lvl.cost_crystal
         planet.resources.petrol -= next_lvl.cost_petrol
@@ -200,6 +200,7 @@ class BuildableItems:
         time = next_lvl.time
         if request.type in [DefenseData.TYPE]:
             time *= request.quantity
+            buildable.quantity_building = request.quantity
 
         now = datetime.datetime.timestamp(datetime.datetime.now())
         buildable.finish = now + datetime.timedelta(seconds=time).total_seconds()
