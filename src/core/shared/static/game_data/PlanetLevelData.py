@@ -69,6 +69,32 @@ class PlanetLevelData:
                 CK.PURCHASING_POWER: 10  # Additional (in usd)
             }
         },
+        12: {
+            CK.EXPERIENCE: 60000,
+            CK.REWARDS: {
+                CK.PURCHASING_POWER: 10  # Additional (in usd)
+            }
+        },
+        13: {
+            CK.EXPERIENCE: 90000,
+            CK.REWARDS: {
+                CK.PURCHASING_POWER: 10  # Additional (in usd)
+            }
+        },
+
+        14: {
+            CK.EXPERIENCE: 120000,
+            CK.REWARDS: {
+                CK.PURCHASING_POWER: 10  # Additional (in usd)
+            }
+        },
+
+        15: {
+            CK.EXPERIENCE: 150000,
+            CK.REWARDS: {
+                CK.PURCHASING_POWER: 5000  # Additional (in usd)
+            }
+        },
 
     }
 

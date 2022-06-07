@@ -27,18 +27,18 @@ class DefenseData(GameData):
         MISSILE_LAUNCHER: BuildableItemBaseType("Missile Launcher", MISSILE_LAUNCHER, TYPE, None,
                                                 "Missile launcher is a cheap yet effective defense mechanism",
                                                 {
-                                                    0: BuildableItemLevelInfo(0, 100, 0, 60, 0, 0, 0, 50, 50,
-                                                                              50, 10,
+                                                    0: BuildableItemLevelInfo(0, 100, 50, 40, 0, 0, 0, 50, 50,
+                                                                              40, 10,
                                                                               [BuildableItemRequirement(ID.TYPE,
-                                                                                                        ID.HANGAR, 0)],
+                                                                                                        ID.HANGAR, 2)],
                                                                               0),
                                                 }
                                                 ),
         LASER_LAUNCHER: BuildableItemBaseType("Laser Launcher", LASER_LAUNCHER, TYPE, None,
                                               "The Laser Launcher is a more powerful defense when compared to the simple missile launcher",
                                               {
-                                                  0: BuildableItemLevelInfo(0, 100, 0, 60, 0, 0, 0, 50, 50,
-                                                                            50, 10,
+                                                  0: BuildableItemLevelInfo(0, 200, 150, 80, 0, 0, 0, 50, 50,
+                                                                            150, 10,
                                                                             [BuildableItemRequirement(ID.TYPE,
                                                                                                       ID.HANGAR, 2),
                                                                              BuildableItemRequirement(RD.TYPE,
