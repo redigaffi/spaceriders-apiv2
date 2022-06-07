@@ -106,6 +106,8 @@ class MintPlanet:
 
     async def recover_planet(self, user: str):
         user_token_ids = await self.contract_service.spaceriders_nft_call("getTokenIdByOwner", user)
+        if not user_token_ids:
+            return await self.response_port.publish_response({})
 
         not_stored_planet_ids = []
         for i in user_token_ids:

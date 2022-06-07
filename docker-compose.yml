@@ -13,8 +13,9 @@ services:
     environment:
       - DB_URL=mongodb://root:example@db:27017/
       - PYTHONUNBUFFERED=0
-    entrypoint: ["python", "-u", "/app/src/apps/cronjobs/__init__.py"]
 
+    working_dir: "/app/src"
+    entrypoint: ["python", "-m", "apps.cronjobs.__init__"]
     volumes:
       - ".:/app"
 

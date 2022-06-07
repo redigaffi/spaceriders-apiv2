@@ -5,13 +5,14 @@ from decouple import config
 import motor.motor_asyncio
 import asyncio
 import aioschedule as schedule
-import dependencies
+import apps.cronjobs.dependencies as dependencies
 from adapters.shared.beani_repository_adapter import UserDocument, PlanetDocument, EnergyDepositDocument
-from adapters.shared.beanie_models_adapter import EmailDocument, LevelUpRewardClaimsDocument, ResourceExchangeDocument
+from adapters.shared.beanie_models_adapter import EmailDocument, LevelUpRewardClaimsDocument, ResourceExchangeDocument, \
+    TokenConversionsDocument
 from controllers.cronjobs import CronjobController
 from core.planet_energy import PlanetEnergyRecoverEnergyDepositsRequest
 from core.shared.models import Planet
-import settings
+import apps.cronjobs.settings as settings
 
 
 async def asteroid(controller: CronjobController):
@@ -20,13 +21,13 @@ async def asteroid(controller: CronjobController):
         await controller.asteroid_pve(str(planet.id))
 
 
-async def smart_contract_recover_user_cronjob(controller: CronjobController):
+async def smart_contract_recover_by_user_cronjob(controller: CronjobController):
     all_users = await dependencies.user_repository.all()
     for user in all_users:
         await controller.recover_planets(user.wallet)
 
 
-async def smart_contract_recover_planet_cronjob(controller: CronjobController):
+async def smart_contract_recover_by_planet_cronjob(controller: CronjobController):
     all_claimed: list[Planet] = await dependencies.planet_repository.all_claimed_planets()
     for planet in all_claimed:
         request = PlanetEnergyRecoverEnergyDepositsRequest(planet_id=str(planet.id))
@@ -41,16 +42,18 @@ async def main():
     client = motor.motor_asyncio.AsyncIOMotorClient(config("DB_URL"), )
     db = client[config('DB_NAME')]
 
-    await init_beanie(database=db, document_models=[UserDocument, EnergyDepositDocument, PlanetDocument, EmailDocument, LevelUpRewardClaimsDocument, ResourceExchangeDocument])
+    await init_beanie(database=db, document_models=[UserDocument, TokenConversionsDocument, ResourceExchangeDocument, EnergyDepositDocument,
+                       PlanetDocument, EmailDocument, LevelUpRewardClaimsDocument])
+
     controller = await dependencies.cronjob_controller()
 
     # If this is not here in main function it won't work (also below model initialization)
-    #schedule.every(3).seconds.do(smart_contract_recover_planet_cronjob, controller)
-    schedule.every(3).seconds.do(smart_contract_recover_user_cronjob, controller)
-    #schedule.every(3).seconds.do(controller.generate_new_resource_price)
-    schedule.every(3).seconds.do(asteroid, controller)
+    schedule.every(30).seconds.do(smart_contract_recover_by_planet_cronjob, controller)
+    schedule.every(30).seconds.do(smart_contract_recover_by_user_cronjob, controller)
+    schedule.every(6).hours.do(controller.generate_new_resource_price)
+    schedule.every(24).hours.do(asteroid, controller)
 
-
+    print("Starting cronjobs")
     while True:
         await schedule.run_pending()
         await asyncio.sleep(0.1)

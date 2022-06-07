@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from pydantic import BaseModel
 
 from core.planet_email import PlanetEmail, PlanetSendEmailRequest
-from core.shared.models import LevelUpRewardClaims, Planet, AppBaseException
+from core.shared.models import LevelUpRewardClaims, Planet, AppBaseException, PlanetResponse
 from core.shared.ports import LevelUpRewardClaimsRepositoryPort, PlanetRepositoryPort, ResponsePort, ChainServicePort
 from core.shared.static.game_data.Common import CommonKeys
 from core.shared.static.game_data.PlanetLevelData import PlanetLevelData
@@ -108,8 +108,8 @@ class PlanetLevel:
             claimed = await self.contract_service.spaceriders_game_call("claimedExtraPurchasingPower", level_up.id)
 
             if claimed:
-                level_up.completed = True
+                lvl_up_claim = await self.lvl_up_repository_port.get(level_up.id)
+                lvl_up_claim.completed = True
+                await self.lvl_up_repository_port.update(lvl_up_claim)
 
-        await self.planet_repository_port.update(planet)
-        return await self.response_port.publish_response(planet)
-
+        return await self.response_port.publish_response(PlanetResponse.from_planet(planet))
