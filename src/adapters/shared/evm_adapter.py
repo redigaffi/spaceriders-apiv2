@@ -53,12 +53,16 @@ class EvmChainServiceAdapter(ChainServicePort):
         contract = contract_instance.functions
 
         start = time.time()
-
-        if func_name not in ["address"]:
-            func = getattr(contract, func_name)(*args)
-            re = func.call()
-        else:
-            re = getattr(contract, "address")
+        error = False
+        re = False
+        try:
+            if func_name not in ["address"]:
+                func = getattr(contract, func_name)(*args)
+                re = func.call()
+            else:
+                re = getattr(contract, "address")
+        except Exception as e:
+            error = True
 
         end = time.time()
 
@@ -66,6 +70,7 @@ class EvmChainServiceAdapter(ChainServicePort):
             'start': start,
             'end': end,
             'rpc': url,
+            'error': error,
             're': re
         }
 
@@ -87,7 +92,11 @@ class EvmChainServiceAdapter(ChainServicePort):
                 done, not_done = concurrent.futures.wait(results, return_when=concurrent.futures.FIRST_COMPLETED)
                 multi_call_result = (done.pop()).result()
 
-                await self.cache.set(key, multi_call_result, 60)
+                while multi_call_result['error'] and len(not_done) > 0:
+                    done, not_done = concurrent.futures.wait(not_done, return_when=concurrent.futures.FIRST_COMPLETED)
+                    multi_call_result = (done.pop()).result()
+
+                await self.cache.set(key, multi_call_result, 120)
 
             if not await self.cache.get(CacheServicePort.FASTEST_RPC):
                 await self.cache.set(CacheServicePort.FASTEST_RPC, multi_call_result['rpc'], 60)
@@ -137,9 +146,9 @@ class TokenPriceAdapter(TokenPricePort):
     contract_service: ChainServicePort
 
     async def fetch_token_price_usd(self) -> float:
-        # re = await self.cache.get('TOKEN_PRICE')
-        # if re is not None:
-        #     return re
+        re = await self.cache.get('TOKEN_PRICE')
+        if re is not None:
+            return re
 
         spaceriders_address = await self.contract_service.spaceriders_token_call("address")
         busd_address = await self.contract_service.spaceriders_token_call("busdAddress")
@@ -157,5 +166,5 @@ class TokenPriceAdapter(TokenPricePort):
         except:
             price = -1
 
-        # await self.cache.set('TOKEN_PRICE', price, 60)
+        await self.cache.set('TOKEN_PRICE', price, 60)
         return price

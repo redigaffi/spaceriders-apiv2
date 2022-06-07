@@ -112,7 +112,7 @@ async def middleware(request: Request, call_next):
 
 @app.on_event("startup")
 async def app_init():
-    dependencies.logging_adapter.info("App started v2")
+    await dependencies.logging_adapter.info("App started v2")
 
     client = motor.motor_asyncio.AsyncIOMotorClient(
         host=config('DB_URL'),
@@ -129,7 +129,6 @@ async def app_init():
     urls = await register_fastapi_routes(http_controller)
     for url in urls:
         app.router.add_api_route(**url)
-
 
 # if __name__ == "__main__":
 #     uvicorn.run("__main__:app", port=8000, host='0.0.0.0', reload=True, workers=1, debug=True)
