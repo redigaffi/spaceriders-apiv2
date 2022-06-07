@@ -16,17 +16,17 @@ def resource_reserve_als(label: str, planet: Planet, next_level_info: BuildableI
         return planet
 
     fields = {
-        RD.METAL_MINE: {
+        ResourceData.METAL_MINE: {
             'total_reserve': 'original_total_metal_amount',
             'reserve_left': 'total_metal',
             'visible_reserve': 'metal'
         },
-        RD.CRYSTAL_MINE: {
+        ResourceData.CRYSTAL_MINE: {
             'total_reserve': 'original_total_crystal_amount',
             'reserve_left': 'total_crystal',
             'visible_reserve': 'crystal'
         },
-        RD.PETROL_MINE: {
+        ResourceData.PETROL_MINE: {
             'total_reserve': 'original_total_petrol_amount',
             'reserve_left': 'total_petrol',
             'visible_reserve': 'petrol'

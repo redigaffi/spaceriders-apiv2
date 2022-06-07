@@ -1,4 +1,3 @@
 #! /bin/bash
-
-echo 'LOL'
-python /app/src/apps/cronjobs/__init__.py
+cd src;
+gunicorn apps.http.__init__:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000

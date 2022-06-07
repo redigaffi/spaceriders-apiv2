@@ -67,6 +67,8 @@ async def exception_handler(request: Request, call_next):
             )
 
         if isinstance(exc, beanie.exceptions.RevisionIdWasChanged):
+            log.critical("revision id changed", exc)
+
             return await call_next(request)
 
         log.critical("Something unexpected happened", exc)
@@ -92,29 +94,32 @@ async def middleware(request: Request, call_next):
     if request.method == 'OPTIONS':
         return await call_next(request)
 
-    items_use_case, planet_resources_use_case, planet_staking = await get_middleware()
-
-    active_planet = request.headers.get("x-active-planet")
-
-    if active_planet is not None:
-        try:
+    try:
+        items_use_case, planet_resources_use_case, planet_staking = await get_middleware()
+        active_planet = request.headers.get("x-active-planet")
+        if active_planet is not None:
             await asyncio.sleep(0.01)
             await planet_staking.tier_expired_reset(planet_id=active_planet)
             await asyncio.sleep(0.01)
             await items_use_case.finish_build(FinishBuildRequest(planet_id=active_planet))
             await asyncio.sleep(0.01)
             await planet_resources_use_case(PlanetResourcesUpdateRequest(planet_id=active_planet))
-        except:
-            pass
+    except:
+        pass
 
     return await call_next(request)
 
 
 @app.on_event("startup")
 async def app_init():
-    await dependencies.logging_adapter.info("Http App started")
+    dependencies.logging_adapter.info("App started v2")
 
-    client = motor.motor_asyncio.AsyncIOMotorClient(config("DB_URL"), )
+    client = motor.motor_asyncio.AsyncIOMotorClient(
+        host=config('DB_URL'),
+       # username="root",
+       # password="example"
+    )
+
     db = client[config('DB_NAME')]
     await init_beanie(database=db,
                       document_models=[UserDocument, TokenConversionsDocument, ResourceExchangeDocument, EnergyDepositDocument, PlanetDocument, EmailDocument, LevelUpRewardClaimsDocument]

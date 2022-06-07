@@ -48,8 +48,7 @@ class QueueIsFullException(AppBaseException):
     msg = "Can't upgrade, queue is full..."
 
 
-@dataclass
-class TokenConversions:
+class TokenConversions(BaseModel):
     id: str = None
     completed: bool = False
     created_time: float = None

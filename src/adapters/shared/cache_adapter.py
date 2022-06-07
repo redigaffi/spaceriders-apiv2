@@ -23,7 +23,10 @@ class MemCacheCacheServiceAdapter(CacheServicePort):
         )
 
     async def get(self, key: str):
-        item = await self.client.get(key.encode())
+        try:
+            item = await self.client.get(key.encode())
+        except:
+            return None
 
         if item is None:
             return None

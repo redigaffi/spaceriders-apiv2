@@ -47,7 +47,10 @@ class HttpController:
         return await self.authenticate_use_case(req)
 
     async def buy_planet(self, req: MintPaidPlanetRequest, user=Depends(jwt_bearer)) -> Planet:
+        print("PLANET 1")
         re: Planet = await self.buy_planet_use_case.buy_planet(user, req)
+        print("PLANET 2")
+
         return jsonable_encoder(re)
 
     async def claim_planet(self, req: ClaimPlanetRequest, user=Depends(jwt_bearer)) -> Planet:
