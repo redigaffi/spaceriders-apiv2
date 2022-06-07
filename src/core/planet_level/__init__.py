@@ -99,7 +99,7 @@ class PlanetLevel:
         return await self.response_port.publish_response(lvl_up_claim)
 
     async def recover_level_up(self, planet_id: str):
-        planet = await self.planet_repository_port.get(planet_id)
+        planet = await self.planet_repository_port.get(planet_id, fetch_links=True)
 
         for level_up in planet.pending_levelup_reward:
             if level_up.completed:

@@ -51,7 +51,7 @@ async def main():
     schedule.every(30).seconds.do(smart_contract_recover_by_planet_cronjob, controller)
     schedule.every(30).seconds.do(smart_contract_recover_by_user_cronjob, controller)
     schedule.every(6).hours.do(controller.generate_new_resource_price)
-    schedule.every(24).hours.do(asteroid, controller)
+    schedule.every(12).hours.do(asteroid, controller)
 
     print("Starting cronjobs")
     while True:

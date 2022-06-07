@@ -30,7 +30,7 @@ class Asteroid:
         try:
             diameter, distance, speed, health = AsteroidData.get_asteroid_data_level(planet.level)
         except:
-            print("error retrieving asteroid information")
+            print("error retrieving asteroid information, planet outside of asteroid range")
             return
 
         asteroid_attack = diameter * health
@@ -151,7 +151,7 @@ class Asteroid:
                     continue
 
                 min_damage_building = math.floor(asteroid_attack * 0.2)
-                max_damage_building = math.floor(asteroid_attack * 0.7)
+                max_damage_building = math.floor(asteroid_attack * 0.5)
 
                 damage = random.randint(min_damage_building, max_damage_building)
 

@@ -8,19 +8,19 @@ class AsteroidData:
      Data class representing in game items
     """
     LEVELS = [
-        "0-9"
+        "1-9"
     ]
 
     ASTEROIDS = {
-        "0-9": {
+        "1-9": {
             # Expressed in km
-            "diameter": (5, 15),
+            "diameter": (40, 70),
             # Expressed in meters
-            "distance": (10000, 12000),
+            "distance": (3000, 8000),
             # Expressed in meters/s
-            "speed": (100, 200),
+            "speed": (400, 1200),
             # Health is asteroid health and also asteroid attack points
-            "health_per_diameter": (10, 50)
+            "health_per_diameter": (30, 80)
         }
     }
 
