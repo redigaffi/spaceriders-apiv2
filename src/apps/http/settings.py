@@ -1,6 +1,7 @@
 import logging
 from decouple import config
-
+import resource
+resource.setrlimit(resource.RLIMIT_NOFILE, (65536, 65536))
 allowed_origins = [
     '*',
     'http://127.0.0.1:8080',
