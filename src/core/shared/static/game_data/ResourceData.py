@@ -62,7 +62,7 @@ class ResourceData(GameData):
         CRYSTAL_MINE: BuildableItemBaseType("Crystal Mine", CRYSTAL_MINE, TYPE, MINE_CATEGORY,  "Crystal mine to extract metal",
                                             {
                                                 0: BuildableItemLevelInfo(0, 100, 50, 0, 0, 0, 0, 1200, 10, 0, 0, [], 0),
-                                                1: BuildableItemLevelInfo(1, 50, 10, 0, 1, 2, 0, 10, 500, 0, 0, [], 0),
+                                                1: BuildableItemLevelInfo(1, 50, 10, 0, 0.01, 2, 0, 10, 500, 0, 0, [], 1),
 
                                                 2: BuildableItemLevelInfo(2, 100, 150, 0, 0.03, 4, 0, 1200, 500, 0, 0,
                                                                           [], 1),
@@ -96,7 +96,7 @@ class ResourceData(GameData):
         PETROL_MINE: BuildableItemBaseType("Petrol Mine", PETROL_MINE, TYPE, MINE_CATEGORY, "Petrol mine to extract metal",
                                            {
                                                0: BuildableItemLevelInfo(0, 100, 10, 60, 0, 0, 0, 1200, 10, 0, 0, [], 0),
-                                               1: BuildableItemLevelInfo(1, 40, 10, 30, 1, 5, 0, 10, 500, 0, 0, [], 0),
+                                               1: BuildableItemLevelInfo(1, 40, 10, 30, 0.01, 5, 0, 10, 500, 0, 0, [], 1),
                                                2: BuildableItemLevelInfo(2, 100, 150, 80, 0.03, 40, 0, 1200, 500, 0, 0,
                                                                          [], 1),
 

@@ -55,13 +55,14 @@ class PlanetLevel:
                 lvl_claim = await self.lvl_up_repository_port.create(lvl_claim)
                 planet.pending_levelup_reward.append(lvl_claim)
 
-            await self.planet_repository_port.update(planet)
-            email: PlanetSendEmailRequest = PlanetSendEmailRequest(planet_id_receiver=str(planet.id),
-                                                                   title="Pending level up claim!",
-                                                                   sub_title="You lovi'n it!",
-                                                                   template="plain",
-                                                                   body=f"You have reached level {planet.level} as reward your $SPR Purchasing Power increases by {PlanetLevelData.LEVEL[planet.level][CommonKeys.REWARDS][CommonKeys.PURCHASING_POWER]}$. You can claim your reward in planet overview.")
-            await self.email_use_case.create(email)
+                await self.planet_repository_port.update(planet)
+                email: PlanetSendEmailRequest = PlanetSendEmailRequest(planet_id_receiver=str(planet.id),
+                                                                       title="Pending level up claim!",
+                                                                       sub_title="You lovi'n it!",
+                                                                       template="plain",
+                                                                       body=f"You have reached level {planet.level} as reward your $SPR Purchasing Power increases by {PlanetLevelData.LEVEL[planet.level][CommonKeys.REWARDS][CommonKeys.PURCHASING_POWER]}$. You can claim your reward in planet overview.")
+                await self.email_use_case.create(email)
+
             return await self.response_port.publish_response(planet)
 
         planet.experience += request.experience_amount
