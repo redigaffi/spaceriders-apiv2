@@ -10,6 +10,7 @@ fastapi = "^0.78.0"
 uvicorn = "^0.17.6"
 gunicorn = "^20.1.0"
 python-decouple = "^3.6"
+pymongo = {version="3.12.3", extras = ["srv"]}
 beanie = { git = "https://github.com/roman-right/beanie.git", tag = "1.11.1" }
 web3 = "^5.29.1"
 PyJWT = "^2.4.0"

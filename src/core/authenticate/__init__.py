@@ -98,7 +98,7 @@ class Authenticate:
 
             payload = {
                 "user_id": user.wallet,
-                "exp": datetime.timestamp(datetime.now())+3600,
+                "exp": datetime.timestamp(datetime.now())+43200,
                 "token_type": "access",
             }
 

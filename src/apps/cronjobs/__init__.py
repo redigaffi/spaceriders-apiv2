@@ -48,8 +48,8 @@ async def main():
     controller = await dependencies.cronjob_controller()
 
     # If this is not here in main function it won't work (also below model initialization)
-    schedule.every(30).seconds.do(smart_contract_recover_by_planet_cronjob, controller)
-    schedule.every(30).seconds.do(smart_contract_recover_by_user_cronjob, controller)
+    schedule.every(600).seconds.do(smart_contract_recover_by_planet_cronjob, controller)
+    schedule.every(600).seconds.do(smart_contract_recover_by_user_cronjob, controller)
     schedule.every(6).hours.do(controller.generate_new_resource_price)
     schedule.every(12).hours.do(asteroid, controller)
 

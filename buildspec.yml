@@ -24,7 +24,15 @@ phases:
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
       - echo Writing image definitions file...
-      - printf '[{"name":"spaceriders-api","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
-      - cat imagedefinitions.json 
+      - printf '[{"name":"api","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions1.json
+      - printf '[{"name":"cronjobs","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions2.json
 artifacts:
-    files: imagedefinitions.json
+  secondary-artifacts:
+    api:
+      files: imagedefinitions1.json
+      name: api
+    cronjobs:
+      files: imagedefinitions2.json
+      name: cronjobs
+
+
