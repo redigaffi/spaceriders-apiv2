@@ -1,5 +1,5 @@
 import logging
-from decouple import config
+
 
 allowed_origins = [
     '*',
@@ -11,7 +11,6 @@ allowed_origins = [
     'https://testnet.spaceriders.io'
 ]
 
-schedule_logger = logging.getLogger('emcache')
-schedule_logger.setLevel(level=logging.ERROR)
+logging.getLogger('root').setLevel(level=logging.ERROR)
 
 

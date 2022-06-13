@@ -24,9 +24,6 @@ from core.buildable_items import BuildableItems, FinishBuildRequest
 from core.planet_resources import PlanetResourcesUpdateRequest
 from core.shared.models import AppBaseException
 from apps.http.urls import register_fastapi_routes
-import time
-import logging
-
 
 
 #@TODO: Add logger port
