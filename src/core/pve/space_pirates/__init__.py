@@ -140,6 +140,26 @@ class SpacePirates:
                 resource += 1
                 i += 0.01
 
+            if planet.resources.metal >= resources_to_steal[0]:
+                planet.resources.metal -= resources_to_steal[0]
+            else:
+                resources_to_steal[0] = planet.resources.metal
+                planet.resources.metal = 0
+
+            if planet.resources.crystal >= resources_to_steal[1]:
+                planet.resources.crystal -= resources_to_steal[1]
+            else:
+                resources_to_steal[1] = planet.resources.crystal
+                planet.resources.crystal = 0
+
+            if planet.resources.petrol >= resources_to_steal[2]:
+                planet.resources.petrol -= resources_to_steal[2]
+            else:
+                resources_to_steal[2] = planet.resources.petrol
+                planet.resources.petrol = 0
+
+            await self.planet_repository_port.update(planet)
+
             report["result"] = {}
             report["result"]["ships_left"] = space_pirates_left
             report["result"]["total_health_ships_left"] = total_health
