@@ -30,7 +30,7 @@ class Asteroid:
         try:
             diameter, distance, speed, health = AsteroidData.get_asteroid_data_level(planet.level)
         except:
-            print("error retrieving asteroid information, planet outside of asteroid range")
+            print("error retrieving asteroid information, planet outside of asteroid level range")
             return
 
         asteroid_attack = diameter * health
@@ -73,10 +73,11 @@ class Asteroid:
 
         # Actual attacking the asteroid
         # Shooting missing chance
-        percentage_miss = 50
-        asteroid_precision_info: BuildableItem = [x for x in planet.research_level if x.label == ResearchData.ASTEROID_PRECISION][0]
+        percentage_miss = 80
+        asteroid_precision_info: BuildableItem = [x for x in planet.research_level if x.label ==
+                                                  ResearchData.ASTEROID_PRECISION][0]
 
-        percentage_miss -= asteroid_precision_info.current_level
+        percentage_miss -= asteroid_precision_info.current_level*3
 
         # Rounds
         rounds = math.floor(distance / speed)

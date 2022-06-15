@@ -95,11 +95,11 @@ async def middleware(request: Request, call_next):
         items_use_case, planet_resources_use_case, planet_staking = await get_middleware()
         active_planet = request.headers.get("x-active-planet")
         if active_planet is not None:
-            #await asyncio.sleep(0.01)
+            await asyncio.sleep(0.01)
             await planet_staking.tier_expired_reset(planet_id=active_planet)
-            #await asyncio.sleep(0.01)
+            await asyncio.sleep(0.01)
             await items_use_case.finish_build(FinishBuildRequest(planet_id=active_planet))
-            #await asyncio.sleep(0.01)
+            await asyncio.sleep(0.01)
             await planet_resources_use_case(PlanetResourcesUpdateRequest(planet_id=active_planet))
     except:
         pass

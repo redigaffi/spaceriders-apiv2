@@ -21,6 +21,12 @@ async def asteroid(controller: CronjobController):
         await controller.asteroid_pve(str(planet.id))
 
 
+async def space_pirate(controller: CronjobController):
+    all_claimed: list[Planet] = await dependencies.planet_repository.all_claimed_planets()
+    for planet in all_claimed:
+        await controller.space_pirate_pve(str(planet.id))
+
+
 async def smart_contract_recover_by_user_cronjob(controller: CronjobController):
     all_users = await dependencies.user_repository.all()
     for user in all_users:
@@ -52,6 +58,7 @@ async def main():
     schedule.every(600).seconds.do(smart_contract_recover_by_user_cronjob, controller)
     schedule.every(6).hours.do(controller.generate_new_resource_price)
     schedule.every(12).hours.do(asteroid, controller)
+    schedule.every(4).hours.do(space_pirate, controller)
 
     print("Starting cronjobs")
     while True:
