@@ -17,6 +17,7 @@ from pathlib import Path
 from core.planet_level import PlanetLevel
 from core.planet_staking import Staking
 from core.pve.asteroid import Asteroid
+from core.pve.space_pirates import SpacePirates
 from core.resource_exchange import ResourcesExchange
 from core.shared.ports import CacheServicePort, ChainServicePort, TokenPricePort
 
@@ -92,4 +93,12 @@ async def cronjob_controller():
                       planet_repository, response_adapter)
 
     asteroid_pve = Asteroid(planet_repository, planet_level, email_use_case, response_adapter)
-    return CronjobController(energy_planet_use_case, staking_use_case, planet_level, resource_exchange, planet_mint, asteroid_pve)
+    space_pirate_pve = SpacePirates(planet_repository, planet_level, email_use_case, response_adapter)
+
+    return CronjobController(energy_planet_use_case,
+                             staking_use_case,
+                             planet_level,
+                             resource_exchange,
+                             planet_mint,
+                             asteroid_pve,
+                             space_pirate_pve)
