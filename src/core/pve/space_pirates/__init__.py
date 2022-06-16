@@ -143,18 +143,27 @@ class SpacePirates:
             if planet.resources.metal >= resources_to_steal[0]:
                 planet.resources.metal -= resources_to_steal[0]
             else:
+                total_to_steal -= resources_to_steal[0]
+                total_to_steal += planet.resources.metal
+
                 resources_to_steal[0] = planet.resources.metal
                 planet.resources.metal = 0
 
             if planet.resources.crystal >= resources_to_steal[1]:
                 planet.resources.crystal -= resources_to_steal[1]
             else:
+                total_to_steal -= resources_to_steal[1]
+                total_to_steal += planet.resources.crystal
+
                 resources_to_steal[1] = planet.resources.crystal
                 planet.resources.crystal = 0
 
             if planet.resources.petrol >= resources_to_steal[2]:
                 planet.resources.petrol -= resources_to_steal[2]
             else:
+                total_to_steal -= resources_to_steal[2]
+                total_to_steal += planet.resources.petrol
+
                 resources_to_steal[2] = planet.resources.petrol
                 planet.resources.petrol = 0
 
