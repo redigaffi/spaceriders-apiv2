@@ -8,11 +8,11 @@ class SpacePiratesData:
      Data class representing in game items
     """
     LEVELS = [
-        "1-9"
+        "0-9"
     ]
 
     SPACE_PIRATES = {
-        "1-9": {
+        "0-9": {
             # Amount of spacepirates
             "amount": (1, 9),
             "amount_steal_per_surviving_pirate": (200, 900),
