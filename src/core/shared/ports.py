@@ -129,6 +129,10 @@ class PlanetRepositoryPort(ABC):
         pass
 
     @abstractmethod
+    async def by_position_range(self, galaxy: int, from_solar_system: int, to_solar_system: int, fetch_links=False) -> list[Planet]:
+        pass
+
+    @abstractmethod
     async def get(self, planet_id: str, fetch_links=False) -> Planet | None:
         pass
 

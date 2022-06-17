@@ -16,7 +16,7 @@ from adapters.http.security import jwt_bearer
 from core.authenticate import Authenticate
 from core.buildable_items import BuildableItems, BuildableRequest
 from core.fetch_chain_data import FetchChainData
-from core.get_planets import GetPlanets
+from core.get_planets import GetPlanets, FetchByPlanetPositionRangeRequest
 from core.mint_planet import FreePlanetRequest, MintPlanet, MintPaidPlanetRequest, FetchPlanetCostResponse, \
     FetchPlanetCostDataRequest, ClaimPlanetRequest
 from core.authenticate import AuthenticationDetailsRequest
@@ -80,6 +80,14 @@ class HttpController:
     async def fetch_all_planets(self, user=Depends(jwt_bearer)):
         re = await self.get_planets.fetch_all_planets(user)
         return jsonable_encoder(re, custom_encoder=object_id_encoder)
+
+    async def fetch_planets_by_position(self, galaxy: int, from_solar_system: int, to_solar_system: int, user=Depends(jwt_bearer)):
+        request = FetchByPlanetPositionRangeRequest(galaxy=galaxy,
+                                                    from_solar_system=from_solar_system,
+                                                    to_solar_system=to_solar_system)
+
+        re = await self.get_planets.fetch_by_position_range(request)
+        return jsonable_encoder(re)
 
     async def fetch_planet_by_id(self, planet_id: str, user=Depends(jwt_bearer)):
         re = await self.get_planets.fetch_by_planet_id(user, planet_id)
