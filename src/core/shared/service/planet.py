@@ -106,7 +106,7 @@ def get_new_planet_position(latest_planet: Planet | bool) -> tuple:
         solar_system = latest_planet.solar_system
         galaxy = latest_planet.galaxy
 
-        if position > 10:
+        if position > 13:
             position = 1
             solar_system += 1
 
