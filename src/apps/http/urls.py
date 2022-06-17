@@ -2,7 +2,7 @@ from controllers.http import HttpController
 from core.authenticate import JwtResponse
 from core.buildable_items import BuildableResponse
 from core.fetch_chain_data import FetchChainDataResponse, FetchChainTokenPriceResponse
-from core.get_planets import FetchByPlanetIdResponse, PlanetResponse
+from core.get_planets import FetchByPlanetIdResponse, PlanetResponse, FetchByPlanetPositionRangeResponse
 from core.mint_planet import FetchPlanetCostResponse, FetchPlanetCostDataResponse
 from core.nft_metadata import OpenseaMetadataNftResponse
 from core.planet_level import ClaimPendingLvlUpRewardResponse
@@ -36,6 +36,9 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
 
         dict(path=r"/planets", response_model=list[PlanetResponse],
              endpoint=http_controller.fetch_all_planets, methods=["get"]),
+
+        dict(path=r"/planets/{galaxy}/{from_solar_system}/{to_solar_system}", response_model=FetchByPlanetPositionRangeResponse,
+             endpoint=http_controller.fetch_planets_by_position, methods=["get"]),
 
         dict(path=r"/planet/{planet_id}", response_model=FetchByPlanetIdResponse,
              endpoint=http_controller.fetch_planet_by_id, methods=["get"]),
