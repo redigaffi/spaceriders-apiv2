@@ -26,7 +26,7 @@ class PlanetInformationResponse(BaseModel):
     rarity: str = None
     image: str = None
     image_url: str = None
-    image_bg_url: str = None
+    image_url_bg: str = None
     level: int = None
     galaxy: int = None
     solar_system: int = None
@@ -41,6 +41,7 @@ class PlanetInformationResponse(BaseModel):
         re.rarity = p.rarity
         re.image = p.image
         re.image_url = p.image_url
+        re.image_url_bg = p.image_url_bg
         re.level = p.level
         re.galaxy = p.galaxy
         re.solar_system = p.solar_system
@@ -113,7 +114,6 @@ class GetPlanets:
             planet.set_image_url(self.planet_images_bucket_path)
             planet_position = f"{planet.galaxy}:{planet.solar_system}:{planet.position}"
             planet_response_raw = PlanetResponse.from_planet(planet)
-            # re.planets[planet_position] = PlanetInformationResponse.from_planet_response(planet_response)
             planets_by_position[planet_position] = PlanetInformationResponse.from_planet_response(planet_response_raw)
 
         re = FetchByPlanetPositionRangeResponse()
@@ -125,9 +125,10 @@ class GetPlanets:
 
                 try:
                     re.planets[a][b] = planets_by_position[pos]
-                    planet_rarity = planets_by_position[pos].rarity.lower()
-                    planet_image = planets_by_position[pos].image
-                    re.planets[a][b].image_bg_url = f"{self.planet_images_bucket_path}/{planet_image}-{planet_rarity}.png"
+
+                    re.planets[a][b].image_url = planets_by_position[pos].image_url
+                    re.planets[a][b].image_url_bg = planets_by_position[pos].image_url_bg
+
                 except KeyError:
                     empty_planet = PlanetInformationResponse()
                     empty_planet.galaxy = request.galaxy

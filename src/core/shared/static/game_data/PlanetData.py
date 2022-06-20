@@ -6,17 +6,59 @@ from .Common import CommonKeys as CK
 class PlanetData:
     BUY_PLANET_COST_USD = 10
 
-    IMAGES = 12
+    IMAGES = 5
 
+    UNCOMMON = "uncommon"
     COMMON = "common"
+    RARE = "RARE"
     EPIC = "epic"
     LEGENDARY = "legendary"
 
-    RARITY_WEIGHTS = (90, 9, 1)
-    RARITIES = [COMMON, EPIC, LEGENDARY]
+    RARITY_WEIGHTS = (50, 30, 10, 9, 1)
+    RARITIES = [UNCOMMON, COMMON, RARE, EPIC, LEGENDARY]
 
     DATA = {
+        UNCOMMON: {
+            CK.ENERGY_DEPOSIT_MAX_ONCE: 50,
+            "diameter": {
+                "range": (120000, 140000),
+            },
+            "reserves": {
+                "range": (400000, 600000),
+            },
+            CK.INITIAL_RESERVE: {
+                CK.METAL: 200,
+                CK.PETROL: 300,
+                CK.CRYSTAL: 150,
+                CK.ENERGY: 1.5,
+            },
+            CK.RESOURCE_EXTRACTION_MULTIPLIER: {
+                CK.METAL: 1,
+                CK.PETROL: 1,
+                CK.CRYSTAL: 1
+            }
+        },
         COMMON: {
+            CK.ENERGY_DEPOSIT_MAX_ONCE: 50,
+            "diameter": {
+                "range": (120000, 140000),
+            },
+            "reserves": {
+                "range": (400000, 600000),
+            },
+            CK.INITIAL_RESERVE: {
+                CK.METAL: 200,
+                CK.PETROL: 300,
+                CK.CRYSTAL: 150,
+                CK.ENERGY: 1.5,
+            },
+            CK.RESOURCE_EXTRACTION_MULTIPLIER: {
+                CK.METAL: 1,
+                CK.PETROL: 1,
+                CK.CRYSTAL: 1
+            }
+        },
+        RARE: {
             CK.ENERGY_DEPOSIT_MAX_ONCE: 50,
             "diameter": {
                 "range": (120000, 140000),
@@ -56,7 +98,6 @@ class PlanetData:
                 CK.CRYSTAL: 1.1
             }
         },
-
         LEGENDARY: {
             CK.ENERGY_DEPOSIT_MAX_ONCE: 1500,
             "diameter": {
