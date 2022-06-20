@@ -24,7 +24,6 @@ from core.planet_resources import PlanetResources
 from core.planet_resources_conversion import PlanetResourcesConversion
 from core.planet_staking import Staking
 from core.resource_exchange import ResourcesExchange
-from core.shared.models import ResourceExchange
 from core.shared.ports import ChainServicePort, CacheServicePort, TokenPricePort, UserRepositoryPort, \
     PlanetRepositoryPort, EmailRepositoryPort, LevelUpRewardClaimsRepositoryPort, TokenConversionsRepositoryPort
 
