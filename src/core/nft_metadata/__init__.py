@@ -50,7 +50,7 @@ class NftData:
 
         ]
 
-        image_name = f"{planet.image}-{planet.rarity}.png"
+        image_name = f"{planet.image}-{planet.rarity}-bg.webp"
         response = OpenseaMetadataNftResponse(description="Deep space is dangerous, this is your home, fight for it.",
                                               external_url=f"{self.api_endpoint}/nft/{planet_id}",
                                               image=f"{self.planet_images_base_url}/{image_name}",

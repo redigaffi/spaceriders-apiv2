@@ -174,8 +174,9 @@ class Planet(BaseModel):
     created_at: float = None
     name: str = None
     rarity: str = None
-    image: str = None
-    image_url: str = None
+    image: str = None  # image num
+    image_url: str = None  # image without bg
+    image_url_bg: str = None  # image with bg
     level: int = None
     experience: int = None
     diameter: int = None
@@ -225,7 +226,9 @@ class Planet(BaseModel):
         return self.price_paid == 0
 
     def set_image_url(self, url: str):
-        self.image_url = f"{url}/{self.image}.png"
+        self.image_url = f"{url}/{self.image}-{self.rarity}.webp"
+        self.image_url_bg = f"{url}/{self.image}-{self.rarity}-bg.webp"
+
 
     # @TODO: Pydantic bug dont serialize properties, using root_validator is a workaround
     # @SEE: https://github.com/samuelcolvin/pydantic/pull/2625
@@ -420,6 +423,7 @@ class PlanetResponse(BaseModel):
     rarity: str = None
     image: str = None
     image_url: str = None
+    image_url_bg: str = None
     level: int = None
     experience: int = None
     diameter: int = None
@@ -466,6 +470,7 @@ class PlanetResponse(BaseModel):
         re.rarity = p.rarity
         re.image = p.image
         re.image_url = p.image_url
+        re.image_url_bg = p.image_url_bg
         re.level = p.level
         re.experience = p.experience
         re.diameter = p.diameter
@@ -493,6 +498,6 @@ class PlanetResponse(BaseModel):
         re.defense_items = p.defense_items
         re.pending_levelup_reward = [LevelUpRewardClaims.from_level_up_reward_claims(x) for x in p.pending_levelup_reward]
         re.energy_deposits = p.energy_deposits
-        re.resource_conversions = [ TokenConversions.from_token_conversion(x) for x in p.resource_conversions]
+        re.resource_conversions = [TokenConversions.from_token_conversion(x) for x in p.resource_conversions]
         re.emails = p.emails
         return re
