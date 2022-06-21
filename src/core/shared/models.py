@@ -1,7 +1,6 @@
 from dataclasses import dataclass
-from typing import List, Optional
-
-from beanie import PydanticObjectId
+from datetime import datetime
+from typing import List, Optional, Any
 from pydantic import BaseModel, root_validator, Field
 from core.shared.static.game_data.Common import BuildableItemBaseType, CommonKeys, BuildableItemLevelInfo
 from core.shared.static.game_data.PlanetData import PlanetData
@@ -501,3 +500,67 @@ class PlanetResponse(BaseModel):
         re.resource_conversions = [TokenConversions.from_token_conversion(x) for x in p.resource_conversions]
         re.emails = p.emails
         return re
+
+# Open/Partially Filled/ Completed Orders
+class CurrencyMarketOrder(BaseModel):
+    order_type: str  # buy, sell
+    user_id: str
+    planet_id: str
+    created_time: float
+    updated_time: float
+    market_code: str  # Metal/Petrol - Metal/Spr ...
+    price: float
+    amount: float
+    amount_filled: float
+    state: str  # not_filled, partially_filled, fully_filled
+    # only make visible new balance for user if state completed
+    # balance should be withdrawn/deposited right after placing an order
+
+    def to_be_filled(self):
+        return self.amount - self.amount_filled
+
+    def update_state(self):
+        to_be_filled = self.to_be_filled()
+
+        if to_be_filled <= 0:
+            self.state = "fully_filled"
+        elif to_be_filled >= 0:
+            self.state = "partially_filled"
+
+
+# Completed Trade
+class CurrencyMarketTrade(BaseModel):
+    market_code: str  # Metal/Petrol - Metal/Spr ...
+    price: float
+    amount: float
+    created_time: datetime = None
+
+
+class MetadataResponse(BaseModel):
+    response_type: str
+    data: Any
+
+
+class OpenOrdersGroupedByPrice(BaseModel):
+    order_type: str
+    grouped_price: float
+    sum_amount: float
+    sum_amount_filled: float
+    sum_to_be_filled: float
+    total_price: float
+
+
+class PriceCandleDataGroupedByTimeInterval(BaseModel):
+    id: dict = Field(None, alias="_id")
+    open: float = None
+    close: float = None
+    high: float = None
+    low: float = None
+
+
+class Volume24Info(BaseModel):
+    max_24: float = None
+    min_24: float = None
+    pair1_volume: float = None
+    pair2_volume: float = None
+
