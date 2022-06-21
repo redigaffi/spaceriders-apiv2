@@ -121,7 +121,7 @@ def get_planet_data(is_free: bool):
     rarity = random.choices(PlanetData.RARITIES, weights=PlanetData.RARITY_WEIGHTS, k=1)[0]
 
     if is_free:
-        rarity = PlanetData.COMMON
+        rarity = PlanetData.UNCOMMON
 
     image = f"{random.randint(1, PlanetData.IMAGES)}"
     diameter_range = PlanetData.DATA[rarity]["diameter"]["range"]
