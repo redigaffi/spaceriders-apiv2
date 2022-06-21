@@ -1,10 +1,9 @@
 from __future__ import annotations
 from typing import Optional, List
 from beanie import Document, Indexed, Link, PydanticObjectId
-from bson import ObjectId
-from pydantic import Field
-
-from core.shared.models import EnergyDeposit, Email, ResourceExchange, TokenConversions
+from datetime import datetime
+from core.shared.models import EnergyDeposit, Email, ResourceExchange, TokenConversions, CurrencyMarketOrder, \
+    CurrencyMarketTrade
 from core.shared.models import User, PlanetTier, Resources, Planet, Reserves, BuildableItem, UserNotFoundException, \
     LevelUpRewardClaims
 
@@ -164,20 +163,6 @@ class EnergyDepositDocument(Document, EnergyDeposit):
     planet_id: str
     was_recovered: bool = False
 
-    # def to_energy_deposit(self) -> EnergyDeposit:
-    #     return EnergyDeposit(id=str(self.id), planet_id=self.planet_id, was_recovered=self.was_recovered, created_time=self.created_time,
-    #                          token_amount=self.token_amount, usd_value=self.usd_value)
-    #
-    # @staticmethod
-    # def from_energy_deposit(energy_deposit: EnergyDeposit) -> EnergyDepositDocument:
-    #     energy_document = EnergyDepositDocument(planet_id=energy_deposit.planet_id)
-    #     energy_document.id = energy_deposit.id
-    #     energy_document.was_recovered = energy_deposit.was_recovered
-    #     energy_document.created_time = energy_deposit.created_time
-    #     energy_document.token_amount = energy_document.token_amount
-    #     energy_document.usd_value = energy_deposit.usd_value
-    #     return energy_document
-
     class Settings:
         name = "energy_deposits"
         use_revision = True
@@ -248,3 +233,32 @@ class UserDocument(Document, User):
         use_revision = True
         use_state_management = True
 
+
+class CurrencyMarketOrderDocument(Document, CurrencyMarketOrder):
+    order_type: str  # buy, sell
+    user_id: str
+    planet_id: str
+    created_time: float | None = None
+    updated_time: float | None = None
+    market_code: str  # Metal/Petrol - Metal/Spr ...
+    price: float
+    amount: float
+    amount_filled: float
+    state: str
+
+    class Settings:
+        name = "currency_market_order"
+        use_revision = True
+        use_state_management = True
+
+
+class CurrencyMarketTradeDocument(Document, CurrencyMarketTrade):
+    market_code: str  # Metal/Petrol - Metal/Spr ...
+    price: float = None
+    amount: float = None
+    created_time: datetime
+
+    class Settings:
+        name = "currency_market_trade"
+        use_revision = True
+        use_state_management = True

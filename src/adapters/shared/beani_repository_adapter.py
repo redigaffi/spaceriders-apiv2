@@ -1,12 +1,22 @@
 from __future__ import annotations
+
+from typing import Any, Tuple
+
 from beanie import PydanticObjectId, WriteRules, DeleteRules
-from adapters.shared.beanie_models_adapter import EnergyDepositDocument, PlanetDocument, UserDocument, EmailDocument, LevelUpRewardClaimsDocument, ResourceExchangeDocument, TokenConversionsDocument
+from pydantic import BaseModel
+
+from adapters.shared.beanie_models_adapter import EnergyDepositDocument, PlanetDocument, UserDocument, EmailDocument, \
+    LevelUpRewardClaimsDocument, ResourceExchangeDocument, TokenConversionsDocument, CurrencyMarketTradeDocument, \
+    CurrencyMarketOrderDocument
+from core.shared.models import OpenOrdersGroupedByPrice, PriceCandleDataGroupedByTimeInterval
 from core.shared.ports import UserRepositoryPort, PlanetRepositoryPort, EnergyDepositRepositoryPort, \
     EmailRepositoryPort, LevelUpRewardClaimsRepositoryPort, ResourceExchangeRepositoryPort, \
-    TokenConversionsRepositoryPort
+    TokenConversionsRepositoryPort, CurrencyMarketTradeRepositoryPort, CurrencyMarketOrderRepositoryPort
 from core.shared.models import User, PlanetTier, Planet, UserNotFoundException, \
-    LevelUpRewardClaims, EnergyDeposit, Email, ResourceExchange, TokenConversions
+    LevelUpRewardClaims, EnergyDeposit, Email, ResourceExchange, TokenConversions, CurrencyMarketTrade, \
+    CurrencyMarketOrder
 from datetime import datetime
+from beanie.operators import In
 
 
 class TokenConversionsRepositoryAdapter(TokenConversionsRepositoryPort):
@@ -124,6 +134,233 @@ class EnergyDepositRepositoryAdapter(EnergyDepositRepositoryPort):
                                                 usd_value=energy_deposit.usd_value)
         await energy_document.save()
         return energy_document
+
+
+class BeaniCurrencyMarketOrderRepositoryAdapter(CurrencyMarketOrderRepositoryPort):
+
+    async def update(self, order: CurrencyMarketOrderDocument) -> CurrencyMarketOrder:
+        await order.save_changes()
+        return order
+
+    async def find_matching_orders(self,  market_code: str, order_type: str, price: float) -> list[CurrencyMarketOrder]:
+        matching_orders = []
+
+        if order_type == "buy":
+            matching_orders = await CurrencyMarketOrderDocument.find(
+                CurrencyMarketOrderDocument.market_code == market_code,
+                CurrencyMarketOrderDocument.price <= price,
+                CurrencyMarketOrderDocument.order_type == "sell",
+                In(CurrencyMarketOrderDocument.state, ["not_filled", "partially_filled"])
+            ).sort(+CurrencyMarketOrderDocument.price, +CurrencyMarketOrderDocument.created_time).to_list()
+        elif order_type == "sell":
+            matching_orders = await CurrencyMarketOrderDocument.find(
+                CurrencyMarketOrderDocument.market_code == market_code,
+                CurrencyMarketOrderDocument.price >= price,
+                CurrencyMarketOrderDocument.order_type == "buy",
+                In(CurrencyMarketOrderDocument.state, ["not_filled", "partially_filled"])
+            ).sort(-CurrencyMarketOrderDocument.price, +CurrencyMarketOrderDocument.created_time).to_list()
+
+        return matching_orders
+
+    async def open_orders_grouped_price(self,  market_code: str) -> Tuple[list[OpenOrdersGroupedByPrice], list[OpenOrdersGroupedByPrice]]:
+        def q(order):
+            return [
+                # limit before but in case of huge trading data
+                # {
+                #     "$limit": 500
+                # },
+                {
+                    "$sort":
+                        {
+                            "price": order
+                        }
+                },
+                {
+                    "$group":
+                    {
+                        "_id": "$price",
+                        "order_type": {"$first": "$order_type"},
+                        "grouped_price": {"$first": "$price"},
+                        "sum_amount": {"$sum": "$amount"},
+                        "sum_amount_filled": {"$sum": "$amount_filled"}
+                    }
+                },
+
+                {
+                    "$addFields":
+                    {
+                        "sum_to_be_filled": {"$subtract": ["$sum_amount", "$sum_amount_filled"]},
+                        "total_price": {"$multiply": ["$grouped_price", {"$subtract": ["$sum_amount", "$sum_amount_filled"]}]},
+                    }
+                },
+                {
+                    "$sort":
+                        {
+                            "grouped_price": order
+                        }
+                },
+                {
+                    "$limit": 8
+                },
+            ]
+
+        buy_group = await CurrencyMarketOrderDocument.find(
+            CurrencyMarketOrderDocument.market_code == market_code,
+            In(CurrencyMarketOrderDocument.state, ["not_filled", "partially_filled"]),
+            CurrencyMarketOrderDocument.order_type == "buy"
+        ).aggregate(
+            q(-1),
+            projection_model=OpenOrdersGroupedByPrice
+        ).to_list()
+
+        sell_group = await CurrencyMarketOrderDocument.find(
+            CurrencyMarketOrderDocument.market_code == market_code,
+            In(CurrencyMarketOrderDocument.state, ["not_filled", "partially_filled"]),
+            CurrencyMarketOrderDocument.order_type == "sell"
+        ).aggregate(
+            q(1),
+            projection_model=OpenOrdersGroupedByPrice
+        ).to_list()
+
+        return buy_group, sell_group
+
+    async def create_order(self, order: CurrencyMarketOrder) -> CurrencyMarketOrder | None:
+        order = CurrencyMarketOrderDocument(
+            order_type=order.order_type,
+            user_id=order.user_id,
+            planet_id=order.planet_id,
+            created_time=order.created_time,
+            updated_time=order.updated_time,
+            market_code=order.market_code,
+            price=order.price,
+            amount=order.amount,
+            amount_filled=order.amount_filled,
+            state=order.state
+        )
+
+        await order.create()
+        return order
+
+
+class BeaniCurrencyMarketTradeRepositoryAdapter(CurrencyMarketTradeRepositoryPort):
+    async def price_volume_date(self):
+        pass
+
+    async def price_candle_data_grouped_time_range(self, market_code: str, interval: int, time_start: datetime, time_end: datetime) -> list[PriceCandleDataGroupedByTimeInterval]:
+        # https://stackoverflow.com/a/26814496
+        return await CurrencyMarketTradeDocument.find(
+            CurrencyMarketTradeDocument.market_code == market_code
+        ).aggregate(
+            [
+                {
+                  "$match": {
+                      "created_time": {"$gte": time_start, "$lte": time_end},
+                  }
+                },
+                {
+                    "$sort":
+                        {
+                            "created_time": 1
+                        }
+                },
+                {
+                    "$group":
+                        {
+                            "_id": {
+                                "minute": {"$minute": "$created_time"},
+                                "date_formatted": {"$dateToString": {
+                                    "format": "%Y-%m-%dT%H:%M:00.000000Z", "date": "$created_time"
+                                }},
+                                "interval": {
+                                    "$subtract": [
+                                        {"$minute": "$created_time"},
+                                        {"$mod": [{"$minute": "$created_time"}, 1]}
+                                    ]
+                                },
+                            },
+                            # "date": {"$first": "$created_time"},
+                            ## need to remove seconds from candle
+                            # "date": {"$dateToString": {"$date": {"$first": "$created_time"}, "$format": "%Y-%m-%dT%H:%M"}},
+                            "open": {"$first": "$price"},
+                            "close": {"$last": "$price"},
+                            "high": {"$max": "$price"},
+                            "low": {"$min": "$price"}
+                        }
+                },
+
+                {
+                    "$limit": 300
+                },
+            ],
+            projection_model=PriceCandleDataGroupedByTimeInterval
+        ).to_list()
+
+    async def price_candle_data_grouped_time(self, market_code: str, interval: int) -> list[PriceCandleDataGroupedByTimeInterval]:
+        # https://stackoverflow.com/a/26814496
+        return await CurrencyMarketTradeDocument.find(
+            CurrencyMarketTradeDocument.market_code == market_code
+        ).aggregate(
+            [
+                {
+                    "$sort":
+                        {
+                            "created_time": -1
+                        }
+                },
+                {
+                    "$group":
+                    {
+                        "_id": {
+                          "minute": {"$minute": "$created_time"},
+                          "date_formatted": {"$dateToString": {
+                              "format": "%Y-%m-%dT%H:%M:00.000000Z", "date": "$created_time"
+                          }},
+                          "interval": {
+                                "$subtract": [
+                                    {"$minute": "$created_time"},
+                                    {"$mod": [{"$minute": "$created_time"}, 1]}
+                                ]
+                            },
+                        },
+                        #"date": {"$first": "$created_time"},
+                        ## need to remove seconds from candle
+                        #"date": {"$dateToString": {"$date": {"$first": "$created_time"}, "$format": "%Y-%m-%dT%H:%M"}},
+                        "open": {"$first": "$price"},
+                        "close": {"$last": "$price"},
+                        "high": {"$max": "$price"},
+                        "low": {"$min": "$price"}
+                    }
+                },
+
+                {
+                    "$limit": 300
+                },
+            ],
+            projection_model=PriceCandleDataGroupedByTimeInterval
+        ).to_list()
+
+    async def last(self) -> list[CurrencyMarketTradeDocument]:
+        return await CurrencyMarketTradeDocument.all().sort(-CurrencyMarketTradeDocument.created_time).limit(1).to_list()
+
+
+    async def all(self) -> list[CurrencyMarketTradeDocument] | None:
+        return await CurrencyMarketTradeDocument.all().to_list()
+
+    async def all_descending_limit(self, market_code: str, limit: int) -> list[CurrencyMarketTradeDocument] | None:
+        return await CurrencyMarketTradeDocument.find(
+            CurrencyMarketTradeDocument.market_code == market_code
+        ).sort(+CurrencyMarketTradeDocument.created_time).limit(limit).to_list()
+
+    async def create_trade(self, trade: CurrencyMarketTrade) -> CurrencyMarketTrade | None:
+        trade = CurrencyMarketTradeDocument(
+            market_code=trade.market_code,
+            price=trade.price,
+            amount=trade.amount,
+            created_time=datetime.utcnow()
+        )
+
+        await trade.create()
+        return trade
 
 
 class BeaniUserRepositoryAdapter(UserRepositoryPort):

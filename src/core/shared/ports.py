@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
+
+from core.shared.models import OpenOrdersGroupedByPrice, PriceCandleDataGroupedByTimeInterval
 from core.shared.models import User, Planet, EnergyDeposit, Email, LevelUpRewardClaims, ResourceExchange, \
-    TokenConversions
-from typing import TypedDict
+    TokenConversions, CurrencyMarketTrade, CurrencyMarketOrder
+from typing import TypedDict, Tuple
 
 
 class LoggingPort(ABC):
@@ -90,6 +93,52 @@ class EnergyDepositRepositoryPort(ABC):
     @abstractmethod
     async def create_energy_deposit(self, energy_deposit: EnergyDeposit) -> EnergyDeposit:
         pass
+
+
+class CurrencyMarketOrderRepositoryPort(ABC):
+    @abstractmethod
+    async def open_orders_grouped_price(self, market_code: str) -> Tuple[list[OpenOrdersGroupedByPrice], list[OpenOrdersGroupedByPrice]]:
+        pass
+
+    @abstractmethod
+    async def create_order(self, order: CurrencyMarketOrder) -> CurrencyMarketOrder | None:
+        pass
+
+    @abstractmethod
+    async def find_matching_orders(self, market_code: str, order_type: str, price: float) -> list[CurrencyMarketOrder]:
+        pass
+
+    @abstractmethod
+    async def update(self, order: CurrencyMarketOrder) -> CurrencyMarketOrder:
+        pass
+
+
+class CurrencyMarketTradeRepositoryPort(ABC):
+    @abstractmethod
+    async def last(self) -> list[CurrencyMarketTrade]:
+        pass
+
+    @abstractmethod
+    async def price_candle_data_grouped_time_range(self, market_code: str, interval: int, time_start: datetime, time_end: datetime) -> list[PriceCandleDataGroupedByTimeInterval]:
+        pass
+
+    @abstractmethod
+    async def price_candle_data_grouped_time(self, market_code: str, interval: int) -> list[PriceCandleDataGroupedByTimeInterval]:
+        pass
+
+    @abstractmethod
+    async def all(self) -> list[CurrencyMarketTrade] | None:
+        pass
+
+    @abstractmethod
+    async def all_descending_limit(self, market_code: str, limit: int) -> list[CurrencyMarketTrade] | None:
+        pass
+
+    @abstractmethod
+    async def create_trade(self, trade: CurrencyMarketTrade) -> CurrencyMarketTrade | None:
+        pass
+
+
 
 
 class UserRepositoryPort(ABC):
