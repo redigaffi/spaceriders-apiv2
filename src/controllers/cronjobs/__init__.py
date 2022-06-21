@@ -32,6 +32,7 @@ class CronjobController:
         return await self.planet_level.recover_level_up(planet_id)
 
     async def generate_new_resource_price(self):
+        print("generate new price")
         return await self.resources_exchange.new_resource_exchange_price()
 
     async def asteroid_pve(self, planet_id: str):
