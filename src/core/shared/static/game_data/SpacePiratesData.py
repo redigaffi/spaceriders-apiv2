@@ -14,13 +14,12 @@ class SpacePiratesData:
     SPACE_PIRATES = {
         "0-9": {
             # Amount of spacepirates
-            "amount": (1, 9),
-            "amount_steal_per_surviving_pirate": (200, 900),
+            "amount": (2, 3),
+            "amount_steal_per_surviving_pirate": (50, 100),
             # Expressed in meters
-            "distance": (3000, 8000),
+            "distance": (3500, 8000),
             # Expressed in meters/s
-            "speed": (400, 1200),
-            # Health is asteroid health and also asteroid attack points
+            "speed": (400, 1000),
             "health_per_space_ship": (30, 80)
         }
     }
