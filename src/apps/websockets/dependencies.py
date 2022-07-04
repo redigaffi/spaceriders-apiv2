@@ -10,7 +10,7 @@ from adapters.shared.beani_repository_adapter import BeaniCurrencyMarketOrderRep
 from core.shared.models import MetadataResponse
 from core.shared.ports import ResponsePort
 from core.currency_market import TradeRequest
-from src.core.currency_market import CurrencyMarket
+from core.currency_market import CurrencyMarket
 
 from controllers.websockets import WebsocketController
 
