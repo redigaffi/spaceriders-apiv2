@@ -596,6 +596,7 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
 
     async def by_position_range(self, galaxy: int, from_solar_system: int, to_solar_system: int, fetch_links=False) -> \
             list[Planet]:
+
         planets = await PlanetDocument.find(PlanetDocument.galaxy == galaxy,
                                             PlanetDocument.solar_system >= from_solar_system,
                                             PlanetDocument.solar_system <= to_solar_system,
