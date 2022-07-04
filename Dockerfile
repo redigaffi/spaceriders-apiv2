@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/python:3.10-buster
+FROM public.ecr.aws/docker/library/python:3.10.5-buster
 
 ADD . /app
 WORKDIR /app
