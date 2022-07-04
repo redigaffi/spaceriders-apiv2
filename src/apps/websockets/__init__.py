@@ -8,7 +8,7 @@ from adapters.shared.beanie_models_adapter import UserDocument, EnergyDepositDoc
 from decouple import config
 from beanie import init_beanie
 import motor.motor_asyncio
-import src.apps.websockets.dependencies as dependencies
+import apps.websockets.dependencies as dependencies
 
 app = FastAPI()
 
