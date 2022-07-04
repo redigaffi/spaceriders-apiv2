@@ -35,5 +35,10 @@ async def app_init():
     ws_entry_point = await dependencies.ws_entry_point()
     app.add_api_websocket_route(path="/ws", endpoint=ws_entry_point)
 
+    async def health():
+        return {}
+
+    app.router.add_api_route(path=r"/health", endpoint=health)
+
 if __name__ == "__main__":
     uvicorn.run("__main__:app", port=8011, host='0.0.0.0', reload=True, workers=1, debug=True)
