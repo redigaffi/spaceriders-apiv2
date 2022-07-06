@@ -2,8 +2,9 @@ from datetime import datetime
 from datetime import timedelta
 from pydantic import BaseModel
 from core.shared.models import CurrencyMarketOrder, CurrencyMarketTrade, OpenOrdersGroupedByPrice, \
-    PriceCandleDataGroupedByTimeInterval, Volume24Info
-from core.shared.ports import ResponsePort, CurrencyMarketOrderRepositoryPort, CurrencyMarketTradeRepositoryPort
+    PriceCandleDataGroupedByTimeInterval, Volume24Info, AppBaseException, Planet
+from core.shared.ports import ResponsePort, CurrencyMarketOrderRepositoryPort, CurrencyMarketTradeRepositoryPort, \
+    PlanetRepositoryPort
 from dataclasses import dataclass
 
 
@@ -14,9 +15,9 @@ class TradeRequest(BaseModel):
     order_type: str = None  # 'buy' or 'sell'
     pair1: str = None  # metal/petrol
     pair2: str = None  # metal/petrol
-    price: float = None  # price to be paid in pair 2
+    price_unit: float = None  # price to be paid in pair 2
     amount: float = None  # amount in pair 1 to be bought
-    total: float = None  # only used for limit orders
+    total: float = None  # total = price_unit * amount ; only used for limit orders
 
 
 class TradeResponse(BaseModel):
@@ -32,9 +33,21 @@ class FetchHistoricalData(BaseModel):
     last_24_info: Volume24Info | None
 
 
+class NotEnoughFundsException(AppBaseException):
+    msg = "Level up has already been claimed"
+
+    @staticmethod
+    def from_resource_name(resource_name: str):
+        ex = NotEnoughFundsException()
+        ex.msg = f"Not holding enough {resource_name}"
+        return ex
+
+
 # @TODO: Add index to created time
+# @TODO: Add index to price?
 @dataclass
 class CurrencyMarket:
+    planet_repository: PlanetRepositoryPort
     currency_market_order_repository: CurrencyMarketOrderRepositoryPort
     currency_market_trade_repository: CurrencyMarketTradeRepositoryPort
     response_port: ResponsePort
@@ -175,12 +188,43 @@ class CurrencyMarket:
                                    price_candle_data=[],
                                    last_24_info=None)
 
+    async def _order_complete_transfer_balance(self, pair1: str, pair2: str, planet: Planet, order: CurrencyMarketOrder) -> Planet:
+        if order.order_type == "buy":
+            pair1_qty_available = getattr(planet.resources, pair1)
+            pair1_qty_available += order.amount
+            setattr(planet.resources, pair1, pair1_qty_available)
+
+        elif order.order_type == "sell":
+            pair2_qty_available = getattr(planet.resources, pair2)
+            pair2_qty_available += order.amount*order.price
+            setattr(planet.resources, pair2, pair2_qty_available)
+        return planet
+
     async def _limit_order_trade(self, req: TradeRequest, market_code: str, matching_orders: list[CurrencyMarketOrder]):
-        # @TODO: This will be different for market orders as:
-        # - Limit order: You tell how much of X you want to buy
-        # - Market order: You tell how much in PAIR2 worth you want
         amount_left = req.amount
         completed_trades = []
+
+        planet = await self.planet_repository.get_my_planet(req.user_id, req.planet_id)
+
+        if req.order_type == "buy":
+            total_price = req.amount*req.price_unit
+            pair2_qty_available = getattr(planet.resources, req.pair2.lower())
+            if total_price > pair2_qty_available:
+                raise NotEnoughFundsException.from_resource_name(req.pair2)
+
+            pair2_qty_available -= total_price
+            setattr(planet.resources, req.pair2.lower(), pair2_qty_available)
+        elif req.order_type == "sell":
+            pair1_qty = getattr(planet.resources, req.pair1.lower())
+            if req.amount > pair1_qty:
+                raise NotEnoughFundsException.from_resource_name(req.pair1)
+
+            pair1_qty -= req.amount
+            setattr(planet.resources, req.pair1.lower(), pair1_qty)
+
+        planet = await self.planet_repository.update(planet)
+        planet = await self.planet_repository.get_my_planet(req.user_id, req.planet_id)
+
 
         # We can match buy/sell offers
         for matching_order in matching_orders:
@@ -209,6 +253,14 @@ class CurrencyMarket:
             matching_order.update_state()
             matching_order.updated_time = now
 
+            if matching_order.state == "fully_filled":
+                matched_order_planet = await self.planet_repository.get(matching_order.planet_id)
+                matched_order_planet = await self._order_complete_transfer_balance(req.pair1.lower(),
+                                                            req.pair2.lower(),
+                                                            matched_order_planet,
+                                                            matching_order)
+                await self.planet_repository.update(matched_order_planet)
+
             await self.currency_market_order_repository.update(matching_order)
             await self.currency_market_trade_repository.create_trade(completed_trade)
             completed_trades.append(completed_trade)
@@ -222,6 +274,18 @@ class CurrencyMarket:
         elif amount_left == 0:
             state = "fully_filled"
 
+            if req.order_type == "buy":
+                pair1_amt = getattr(planet.resources, req.pair1.lower())
+                pair1_amt += req.amount
+                setattr(planet.resources, req.pair1.lower(), pair1_amt)
+                #await self.planet_repository.update(planet)
+
+            elif req.order_type == "sell":
+                pair2_amt = getattr(planet.resources, req.pair2.lower())
+                pair2_amt += req.amount*req.price_unit
+                setattr(planet.resources, req.pair2.lower(), pair2_amt)
+                #await self.planet_repository.update(planet)
+
         now = datetime.timestamp(datetime.now())
         order = CurrencyMarketOrder(
             order_type=req.order_type,
@@ -230,18 +294,29 @@ class CurrencyMarket:
             created_time=now,
             updated_time=now,
             market_code=market_code,
-            price=req.price,
+            price=req.price_unit,
             amount=req.amount,
             amount_filled=req.amount - amount_left,
             state=state
         )
 
+        await self.planet_repository.update(planet)
         return order, completed_trades
 
     async def _market_order_trade(self, req: TradeRequest, market_code: str, matching_orders: list[CurrencyMarketOrder]):
-
         # Weighted average calculation
         # ((quantity 1 * price 1) + (quantity 2 * price 2)) / (quantity 1 + quantity 2)
+        planet = await self.planet_repository.get_my_planet(req.user_id, req.planet_id)
+
+        if req.order_type == "buy":
+            pair2_qty_available = getattr(planet.resources, req.pair2.lower())
+            if req.total > pair2_qty_available:
+                raise NotEnoughFundsException.from_resource_name(req.pair2)
+
+        elif req.order_type == "sell":
+            pair1_qty = getattr(planet.resources, req.pair1.lower())
+            if req.total > pair1_qty:
+                raise NotEnoughFundsException.from_resource_name(req.pair1)
 
         total_left = req.total
         completed_trades = []
@@ -284,12 +359,21 @@ class CurrencyMarket:
             matching_order.update_state()
             matching_order.updated_time = now
 
+            if matching_order.state == "fully_filled":
+                matched_order_planet = await self.planet_repository.get(matching_order.planet_id)
+                matched_order_planet = await self._order_complete_transfer_balance(req.pair1.lower(),
+                                                            req.pair2.lower(),
+                                                            matched_order_planet,
+                                                            matching_order)
+                await self.planet_repository.update(matched_order_planet)
+
             await self.currency_market_order_repository.update(matching_order)
             await self.currency_market_trade_repository.create_trade(completed_trade)
             completed_trades.append(completed_trade)
 
             if total_left <= 0:
                 break
+
 
         order = None
         if total_left < req.total:
@@ -307,6 +391,26 @@ class CurrencyMarket:
                 state="fully_filled"
             )
 
+            if req.order_type == "buy":
+                pair1_amt = getattr(planet.resources, req.pair1.lower())
+                pair1_amt += total_amount
+                setattr(planet.resources, req.pair1.lower(), pair1_amt)
+
+                pair2_amt = getattr(planet.resources, req.pair2.lower())
+                pair2_amt -= total_cost
+                setattr(planet.resources, req.pair2.lower(), pair2_amt)
+
+            elif req.order_type == "sell":
+                pair1_amt = getattr(planet.resources, req.pair1.lower())
+                pair1_amt -= total_amount
+                setattr(planet.resources, req.pair1.lower(), pair1_amt)
+
+                pair2_amt = getattr(planet.resources, req.pair2.lower())
+                pair2_amt += total_cost
+                setattr(planet.resources, req.pair2.lower(), pair2_amt)
+
+            await self.planet_repository.update(planet)
+
         return order, completed_trades
 
     async def trade(self, req: TradeRequest):
@@ -315,7 +419,7 @@ class CurrencyMarket:
         matching_orders = await self.currency_market_order_repository.find_matching_orders(market_code,
                                                                                            req.trade_type,
                                                                                            req.order_type,
-                                                                                           req.price)
+                                                                                           req.price_unit)
         order, completed_trades = None, None
         if req.trade_type == "limit":
             order, completed_trades = await self._limit_order_trade(req, market_code, matching_orders)

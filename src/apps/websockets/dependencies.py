@@ -6,8 +6,8 @@ from pydantic import BaseModel
 from starlette.websockets import WebSocketState
 
 from adapters.shared.beani_repository_adapter import BeaniCurrencyMarketOrderRepositoryAdapter, \
-    BeaniCurrencyMarketTradeRepositoryAdapter
-from core.shared.models import MetadataResponse
+    BeaniCurrencyMarketTradeRepositoryAdapter, BeaniPlanetRepositoryAdapter
+from core.shared.models import MetadataResponse, AppBaseException
 from core.shared.ports import ResponsePort
 from core.currency_market import TradeRequest
 from core.currency_market import CurrencyMarket
@@ -99,6 +99,10 @@ class WebsocketEntryPoint:
                 #     # request not found
                 #     await self.websocket_manager.send_personal_message('{}', websocket)
 
+        except AppBaseException as ex:
+            re = MetadataResponse(response_type="error", data=ex.msg)
+            await self.websocket_manager.send_personal_message(re.json(), websocket)
+
         except WebSocketDisconnect:
             self.websocket_manager.disconnect(websocket)
 
@@ -109,19 +113,24 @@ class WebsocketEntryPoint:
                                          order_type=data['data']["order_type"],
                                          pair1=data['data']["pair1"],
                                          pair2=data['data']["pair2"],
-                                         price=data['data']["price"],
+                                         price_unit=data['data']["price"],
                                          amount=data['data']["amount"],
                                          total=data['data']["total"])
 
         return await self.websocket_controller.trade(req)
 
 
+planet_repository = BeaniPlanetRepositoryAdapter()
 currency_market_order_repository = BeaniCurrencyMarketOrderRepositoryAdapter()
 currency_market_trade_repository = BeaniCurrencyMarketTradeRepositoryAdapter()
 
 
 async def ws_controller():
-    trading_use_case = CurrencyMarket(currency_market_order_repository, currency_market_trade_repository, response_port)
+    trading_use_case = CurrencyMarket(planet_repository,
+                                      currency_market_order_repository,
+                                      currency_market_trade_repository,
+                                      response_port)
+
     return WebsocketController(trading_use_case)
 
 

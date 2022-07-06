@@ -87,8 +87,8 @@ class Authenticate:
         message = encode_defunct(text="its me:" + auth_details_request.address)
         recovered_address = w3.eth.account.recover_message(message, signature=auth_details_request.signature)
 
-        if not await self.__ticket_testnet_access(recovered_address):
-            raise NotWhiteListedException()
+        # if not await self.__ticket_testnet_access(recovered_address):
+        #     raise NotWhiteListedException()
 
         if auth_details_request.address == recovered_address:
             user = await self.user_repository_port.find_user(recovered_address)

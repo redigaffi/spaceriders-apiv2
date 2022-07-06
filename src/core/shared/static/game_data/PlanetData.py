@@ -27,9 +27,9 @@ class PlanetData:
                 "range": (400000, 600000),
             },
             CK.INITIAL_RESERVE: {
-                CK.METAL: 200,
-                CK.PETROL: 300,
-                CK.CRYSTAL: 150,
+                CK.METAL: 5000,
+                CK.PETROL: 5000,
+                CK.CRYSTAL: 5000,
                 CK.ENERGY: 1.5,
             },
             CK.RESOURCE_EXTRACTION_MULTIPLIER: {

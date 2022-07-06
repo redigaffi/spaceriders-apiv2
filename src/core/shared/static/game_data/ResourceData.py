@@ -129,7 +129,7 @@ class ResourceData(GameData):
         METAL_WAREHOUSE: BuildableItemBaseType("Metal Warehouse", METAL_WAREHOUSE, TYPE, WAREHOUSE_CATEGORY,
                                                "Metal warehouse to store metal",
                                                {
-                                                   0: BuildableItemLevelInfo(0, 100, 50, 60, 0, 0, 200, 1200, 10, 0, 0, [],
+                                                   0: BuildableItemLevelInfo(0, 100, 50, 60, 0, 0, 5000, 1200, 10, 0, 0, [],
                                                                              0),
                                                    1: BuildableItemLevelInfo(1, 30, 10, 20, 0, 0, 500, 10, 30, 0, 0, [],
                                                                              0),
@@ -161,7 +161,7 @@ class ResourceData(GameData):
         CRYSTAL_WAREHOUSE: BuildableItemBaseType("Crystal Warehouse", CRYSTAL_WAREHOUSE, TYPE, WAREHOUSE_CATEGORY,
                                                  "Crystal warehouse to store crystal",
                                                  {
-                                                     0: BuildableItemLevelInfo(0, 100, 50, 60, 0, 0, 150, 1200, 10, 0, 0,
+                                                     0: BuildableItemLevelInfo(0, 100, 50, 60, 0, 0, 5000, 1200, 10, 0, 0,
                                                                                [],
                                                                                0),
                                                      1: BuildableItemLevelInfo(1, 30, 10, 20, 0, 0, 500, 10, 30, 0, 0,
@@ -202,7 +202,7 @@ class ResourceData(GameData):
         PETROL_WAREHOUSE: BuildableItemBaseType("Petrol Warehouse", PETROL_WAREHOUSE, TYPE, WAREHOUSE_CATEGORY,
                                                 "Petrol warehouse to store petrol",
                                                 {
-                                                    0: BuildableItemLevelInfo(0, 100, 50, 60, 0, 0, 300, 1200, 10, 0, 0,
+                                                    0: BuildableItemLevelInfo(0, 100, 50, 60, 0, 0, 5000, 1200, 10, 0, 0,
                                                                               [],
                                                                               0),
                                                     1: BuildableItemLevelInfo(1, 30, 10, 20, 0, 0, 500, 10, 30, 0, 0,
