@@ -4,6 +4,7 @@ from beanie import PydanticObjectId
 from bson import ObjectId
 
 from core import planet_email
+from core.currency_market import CurrencyMarket, MyOpenOrdersResponse
 from core.nft_metadata import NftData
 from core.planet_email import PlanetEmail
 from core.planet_energy import PlanetEnergy, EnergyDepositRequest
@@ -42,15 +43,13 @@ class HttpController:
     staking: Staking
     lvl_reward_claim: PlanetLevel
     planet_resource_conversion: PlanetResourcesConversion
+    currency_market: CurrencyMarket
 
     async def jwt(self, req: AuthenticationDetailsRequest):
         return await self.authenticate_use_case(req)
 
     async def buy_planet(self, req: MintPaidPlanetRequest, user=Depends(jwt_bearer)) -> Planet:
-        print("PLANET 1")
         re: Planet = await self.buy_planet_use_case.buy_planet(user, req)
-        print("PLANET 2")
-
         return jsonable_encoder(re)
 
     async def claim_planet(self, req: ClaimPlanetRequest, user=Depends(jwt_bearer)) -> Planet:
@@ -159,6 +158,14 @@ class HttpController:
 
     async def planet_resources_convert_retry(self, request: RetryConversionRequest, user=Depends(jwt_bearer)):
         re = await self.planet_resource_conversion.retry_conversion(request, user)
+        return jsonable_encoder(re)
+
+    async def currency_market_fetch_open_orders(self, market_code: str, planet_id: str) -> list[MyOpenOrdersResponse]:
+        re = await self.currency_market.fetch_my_open_orders(market_code, planet_id)
+        return jsonable_encoder(re)
+
+    async def currency_market_close_open_order(self, order_id: str):
+        re = await self.currency_market.cancel_open_order(order_id)
         return jsonable_encoder(re)
 
     async def health(self):

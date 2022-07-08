@@ -137,6 +137,19 @@ class EnergyDepositRepositoryAdapter(EnergyDepositRepositoryPort):
 
 
 class BeaniCurrencyMarketOrderRepositoryAdapter(CurrencyMarketOrderRepositoryPort):
+    async def delete(self, id: str):
+        order = await CurrencyMarketOrderDocument.get(PydanticObjectId(id))
+        await order.delete()
+
+    async def get_by_id(self, id: str) -> CurrencyMarketOrder:
+        return await CurrencyMarketOrderDocument.get(PydanticObjectId(id))
+
+    async def my_open_orders_by_planet(self, market_code: str, planet_id: str) -> list[CurrencyMarketOrder]:
+        return await CurrencyMarketOrderDocument.find(
+            CurrencyMarketOrderDocument.market_code == market_code,
+            CurrencyMarketOrderDocument.planet_id == planet_id,
+            In(CurrencyMarketOrderDocument.state, ["not_filled", "partially_filled"])
+        ).sort(+CurrencyMarketOrderDocument.price, +CurrencyMarketOrderDocument.created_time).to_list()
 
     async def update(self, order: CurrencyMarketOrderDocument) -> CurrencyMarketOrder:
         await order.save_changes()

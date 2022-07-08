@@ -97,6 +97,10 @@ class EnergyDepositRepositoryPort(ABC):
 
 class CurrencyMarketOrderRepositoryPort(ABC):
     @abstractmethod
+    async def delete(self, id: str):
+        pass
+
+    @abstractmethod
     async def open_orders_grouped_price(self, market_code: str) -> Tuple[list[OpenOrdersGroupedByPrice], list[OpenOrdersGroupedByPrice]]:
         pass
 
@@ -106,6 +110,14 @@ class CurrencyMarketOrderRepositoryPort(ABC):
 
     @abstractmethod
     async def find_matching_orders(self, market_code: str, trade_type: str, order_type: str, price: float) -> list[CurrencyMarketOrder]:
+        pass
+
+    @abstractmethod
+    async def my_open_orders_by_planet(self, market_code: str, planet_id: str) -> list[CurrencyMarketOrder]:
+        pass
+
+    @abstractmethod
+    async def get_by_id(self, id: str) -> CurrencyMarketOrder | None:
         pass
 
     @abstractmethod
