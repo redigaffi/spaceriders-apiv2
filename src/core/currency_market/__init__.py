@@ -42,6 +42,11 @@ class MyOpenOrdersResponse(BaseModel):
     amount_filled: float
 
 
+class MarketInfoResponse(BaseModel):
+    market: str
+    last_price: float
+
+
 class NotEnoughFundsException(AppBaseException):
     msg = "Level up has already been claimed"
 
@@ -60,6 +65,34 @@ class CurrencyMarket:
     currency_market_order_repository: CurrencyMarketOrderRepositoryPort
     currency_market_trade_repository: CurrencyMarketTradeRepositoryPort
     response_port: ResponsePort
+
+    async def get_all_market_info(self) -> list[MarketInfoResponse]:
+        re = []
+
+        markets = [
+            "METAL_CRYSTAL",
+            "METAL_PETROL",
+            "PETROL_METAL",
+            "PETROL_CRYSTAL",
+            "CRYSTAL_METAL",
+            "CRYSTAL_PETROL",
+        ]
+
+        for market in markets:
+            last_trade_arr = await self.currency_market_trade_repository.last(market_code=market)
+
+            last_price = -1
+            if len(last_trade_arr) > 0:
+                last_price = last_trade_arr[0].price
+
+            pairs = market.split("_")
+            market_front_code = f"{pairs[0]}/{pairs[1]}"
+            re.append(MarketInfoResponse(
+                market=market_front_code,
+                last_price=last_price
+            ))
+
+        return re
 
     async def _price_candle_data(self, market_code: str, candle_time_frame: str):
         # @TODO: ADD caching
@@ -86,7 +119,7 @@ class CurrencyMarket:
 
         current_price = None
         if not len(price_candle_data):
-            last_trade_arr = await self.currency_market_trade_repository.last()
+            last_trade_arr = await self.currency_market_trade_repository.last(market_code)
             if len(last_trade_arr) > 0:
                 last_trade = last_trade_arr[0]
                 minute = day1ago.strftime("%M")

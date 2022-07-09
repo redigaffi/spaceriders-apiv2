@@ -101,6 +101,9 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
         dict(path=r"/currency_market/order/{order_id}/close", endpoint=http_controller.currency_market_close_open_order,
              methods=["post"]),
 
+        dict(path=r"/currency_market/all", endpoint=http_controller.fetch_all_market_info,
+             methods=["get"]),
+
         dict(path=r"/health",
              endpoint=http_controller.health, methods=["get"]),
     ]

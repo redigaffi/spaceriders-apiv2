@@ -549,8 +549,8 @@ class BeaniCurrencyMarketTradeRepositoryAdapter(CurrencyMarketTradeRepositoryPor
             projection_model=PriceCandleDataGroupedByTimeInterval
         ).to_list())
 
-    async def last(self) -> list[CurrencyMarketTradeDocument]:
-        return await CurrencyMarketTradeDocument.all().sort(-CurrencyMarketTradeDocument.created_time).limit(
+    async def last(self, market_code: str) -> list[CurrencyMarketTradeDocument]:
+        return await CurrencyMarketTradeDocument.find(CurrencyMarketTradeDocument.market_code == market_code).sort(-CurrencyMarketTradeDocument.created_time).limit(
             2).to_list()
 
     async def all(self) -> list[CurrencyMarketTradeDocument] | None:

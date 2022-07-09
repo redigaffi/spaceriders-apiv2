@@ -84,6 +84,11 @@ class WebsocketEntryPoint:
                     await self.websocket_manager.broadcast(re1.json())
                     await self.websocket_manager.broadcast(re2.json())
 
+                elif use_case == "trade_fetch_order_book_data":
+                    fetch_data_ob = await self.websocket_controller.trade_fetch_order_book_data(data['data']['market_code'])
+                    re = MetadataResponse(response_type="trade_fetch_order_book_data", data=fetch_data_ob)
+                    await self.websocket_manager.send_personal_message(re.json(), websocket)
+
                 elif use_case == "trade_fetch_current_candle":
                     fetch_data_cc = await self.websocket_controller.trade_fetch_current_candle(data['data']['market_code'],
                                                                                                data['data']['candle_time_frame'])

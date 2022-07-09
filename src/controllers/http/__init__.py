@@ -168,5 +168,9 @@ class HttpController:
         re = await self.currency_market.cancel_open_order(order_id)
         return jsonable_encoder(re)
 
+    async def fetch_all_market_info(self):
+        re = await self.currency_market.get_all_market_info()
+        return jsonable_encoder(re)
+
     async def health(self):
         return jsonable_encoder({})

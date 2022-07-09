@@ -2,7 +2,7 @@ from decouple import config
 
 from adapters.shared.beani_repository_adapter import EnergyDepositRepositoryAdapter, EmailRepositoryAdapter, \
     LevelUpRewardClaimsRepositoryAdapter, TokenConversionsRepositoryAdapter, ResourceExchangeRepositoryAdapter, \
-    BeaniCurrencyMarketOrderRepositoryAdapter
+    BeaniCurrencyMarketOrderRepositoryAdapter, BeaniCurrencyMarketTradeRepositoryAdapter
 from adapters.shared.logging_adapter import LoggingAdapter, get_logger
 from core.currency_market import CurrencyMarket
 from core.nft_metadata import NftData
@@ -174,7 +174,7 @@ async def http_controller():
     resource_repository = ResourceExchangeRepositoryAdapter()
     token_conversions_repository = TokenConversionsRepositoryAdapter()
     currency_market_order_repository = BeaniCurrencyMarketOrderRepositoryAdapter()
-    currency_market_trade_repository = BeaniCurrencyMarketOrderRepositoryAdapter()
+    currency_market_trade_repository = BeaniCurrencyMarketTradeRepositoryAdapter()
 
     cache = await cache_dependency()
     contract_service = await contract_dependency(cache, config('RPCS_URL'))
