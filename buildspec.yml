@@ -26,6 +26,7 @@ phases:
       - echo Writing image definitions file...
       - printf '[{"name":"api","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions1.json
       - printf '[{"name":"cronjobs","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions2.json
+      - printf '[{"name":"websockets","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions3.json
 artifacts:
   secondary-artifacts:
     api:
@@ -34,5 +35,8 @@ artifacts:
     cronjobs:
       files: imagedefinitions2.json
       name: cronjobs
+    websockets:
+      files: imagedefinitions3.json
+      name: websockets
 
 
