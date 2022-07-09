@@ -1,6 +1,7 @@
 from controllers.http import HttpController
 from core.authenticate import JwtResponse
 from core.buildable_items import BuildableResponse
+from core.currency_market import MyOpenOrdersResponse
 from core.fetch_chain_data import FetchChainDataResponse, FetchChainTokenPriceResponse
 from core.get_planets import FetchByPlanetIdResponse, PlanetResponse, FetchByPlanetPositionRangeResponse
 from core.mint_planet import FetchPlanetCostResponse, FetchPlanetCostDataResponse
@@ -93,6 +94,15 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
 
         dict(path=r"/planet/resources/convert/confirm",
              endpoint=http_controller.planet_resources_convert_confirm, methods=["post"]),
+
+        dict(path=r"/currency_market/orders/open/{market_code}/{planet_id}",
+             response_model=list[MyOpenOrdersResponse], endpoint=http_controller.currency_market_fetch_open_orders, methods=["get"]),
+
+        dict(path=r"/currency_market/order/{order_id}/close", endpoint=http_controller.currency_market_close_open_order,
+             methods=["post"]),
+
+        dict(path=r"/currency_market/all", endpoint=http_controller.fetch_all_market_info,
+             methods=["get"]),
 
         dict(path=r"/health",
              endpoint=http_controller.health, methods=["get"]),

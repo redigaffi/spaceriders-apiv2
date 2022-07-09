@@ -6,8 +6,8 @@ from pydantic import BaseModel
 from starlette.websockets import WebSocketState
 
 from adapters.shared.beani_repository_adapter import BeaniCurrencyMarketOrderRepositoryAdapter, \
-    BeaniCurrencyMarketTradeRepositoryAdapter
-from core.shared.models import MetadataResponse
+    BeaniCurrencyMarketTradeRepositoryAdapter, BeaniPlanetRepositoryAdapter
+from core.shared.models import MetadataResponse, AppBaseException
 from core.shared.ports import ResponsePort
 from core.currency_market import TradeRequest
 from core.currency_market import CurrencyMarket
@@ -84,6 +84,11 @@ class WebsocketEntryPoint:
                     await self.websocket_manager.broadcast(re1.json())
                     await self.websocket_manager.broadcast(re2.json())
 
+                elif use_case == "trade_fetch_order_book_data":
+                    fetch_data_ob = await self.websocket_controller.trade_fetch_order_book_data(data['data']['market_code'])
+                    re = MetadataResponse(response_type="trade_fetch_order_book_data", data=fetch_data_ob)
+                    await self.websocket_manager.send_personal_message(re.json(), websocket)
+
                 elif use_case == "trade_fetch_current_candle":
                     fetch_data_cc = await self.websocket_controller.trade_fetch_current_candle(data['data']['market_code'],
                                                                                                data['data']['candle_time_frame'])
@@ -99,6 +104,10 @@ class WebsocketEntryPoint:
                 #     # request not found
                 #     await self.websocket_manager.send_personal_message('{}', websocket)
 
+        except AppBaseException as ex:
+            re = MetadataResponse(response_type="error", data=ex.msg)
+            await self.websocket_manager.send_personal_message(re.json(), websocket)
+
         except WebSocketDisconnect:
             self.websocket_manager.disconnect(websocket)
 
@@ -109,19 +118,24 @@ class WebsocketEntryPoint:
                                          order_type=data['data']["order_type"],
                                          pair1=data['data']["pair1"],
                                          pair2=data['data']["pair2"],
-                                         price=data['data']["price"],
+                                         price_unit=data['data']["price"],
                                          amount=data['data']["amount"],
                                          total=data['data']["total"])
 
         return await self.websocket_controller.trade(req)
 
 
+planet_repository = BeaniPlanetRepositoryAdapter()
 currency_market_order_repository = BeaniCurrencyMarketOrderRepositoryAdapter()
 currency_market_trade_repository = BeaniCurrencyMarketTradeRepositoryAdapter()
 
 
 async def ws_controller():
-    trading_use_case = CurrencyMarket(currency_market_order_repository, currency_market_trade_repository, response_port)
+    trading_use_case = CurrencyMarket(planet_repository,
+                                      currency_market_order_repository,
+                                      currency_market_trade_repository,
+                                      response_port)
+
     return WebsocketController(trading_use_case)
 
 

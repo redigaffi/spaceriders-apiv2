@@ -1,8 +1,10 @@
 from decouple import config
 
 from adapters.shared.beani_repository_adapter import EnergyDepositRepositoryAdapter, EmailRepositoryAdapter, \
-    LevelUpRewardClaimsRepositoryAdapter, TokenConversionsRepositoryAdapter, ResourceExchangeRepositoryAdapter
+    LevelUpRewardClaimsRepositoryAdapter, TokenConversionsRepositoryAdapter, ResourceExchangeRepositoryAdapter, \
+    BeaniCurrencyMarketOrderRepositoryAdapter, BeaniCurrencyMarketTradeRepositoryAdapter
 from adapters.shared.logging_adapter import LoggingAdapter, get_logger
+from core.currency_market import CurrencyMarket
 from core.nft_metadata import NftData
 from core.planet_email import PlanetEmail
 from core.planet_energy import PlanetEnergy
@@ -171,6 +173,8 @@ async def http_controller():
     lvl_up_repository = LevelUpRewardClaimsRepositoryAdapter()
     resource_repository = ResourceExchangeRepositoryAdapter()
     token_conversions_repository = TokenConversionsRepositoryAdapter()
+    currency_market_order_repository = BeaniCurrencyMarketOrderRepositoryAdapter()
+    currency_market_trade_repository = BeaniCurrencyMarketTradeRepositoryAdapter()
 
     cache = await cache_dependency()
     contract_service = await contract_dependency(cache, config('RPCS_URL'))
@@ -206,4 +210,10 @@ async def http_controller():
 
     resource_exchange = await get_resource_exchange_use_case(resource_repository)
     planet_resources_conversion = await get_planet_resources_conversion_use_case(planet_repository, token_conversions_repository, resource_exchange, contract_service, token_price)
-    return HttpController(a, b, c, d, e, f, g, h, j, k, planet_resources_conversion)
+
+    trading_use_case = CurrencyMarket(planet_repository,
+                                      currency_market_order_repository,
+                                      currency_market_trade_repository,
+                                      http_response_port)
+
+    return HttpController(a, b, c, d, e, f, g, h, j, k, planet_resources_conversion, trading_use_case)

@@ -137,6 +137,19 @@ class EnergyDepositRepositoryAdapter(EnergyDepositRepositoryPort):
 
 
 class BeaniCurrencyMarketOrderRepositoryAdapter(CurrencyMarketOrderRepositoryPort):
+    async def delete(self, id: str):
+        order = await CurrencyMarketOrderDocument.get(PydanticObjectId(id))
+        await order.delete()
+
+    async def get_by_id(self, id: str) -> CurrencyMarketOrder:
+        return await CurrencyMarketOrderDocument.get(PydanticObjectId(id))
+
+    async def my_open_orders_by_planet(self, market_code: str, planet_id: str) -> list[CurrencyMarketOrder]:
+        return await CurrencyMarketOrderDocument.find(
+            CurrencyMarketOrderDocument.market_code == market_code,
+            CurrencyMarketOrderDocument.planet_id == planet_id,
+            In(CurrencyMarketOrderDocument.state, ["not_filled", "partially_filled"])
+        ).sort(+CurrencyMarketOrderDocument.price, +CurrencyMarketOrderDocument.created_time).to_list()
 
     async def update(self, order: CurrencyMarketOrderDocument) -> CurrencyMarketOrder:
         await order.save_changes()
@@ -536,8 +549,8 @@ class BeaniCurrencyMarketTradeRepositoryAdapter(CurrencyMarketTradeRepositoryPor
             projection_model=PriceCandleDataGroupedByTimeInterval
         ).to_list())
 
-    async def last(self) -> list[CurrencyMarketTradeDocument]:
-        return await CurrencyMarketTradeDocument.all().sort(-CurrencyMarketTradeDocument.created_time).limit(
+    async def last(self, market_code: str) -> list[CurrencyMarketTradeDocument]:
+        return await CurrencyMarketTradeDocument.find(CurrencyMarketTradeDocument.market_code == market_code).sort(-CurrencyMarketTradeDocument.created_time).limit(
             2).to_list()
 
     async def all(self) -> list[CurrencyMarketTradeDocument] | None:
