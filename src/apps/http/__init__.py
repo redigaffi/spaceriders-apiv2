@@ -8,8 +8,6 @@ from adapters.shared.beanie_models_adapter import UserDocument, EnergyDepositDoc
     LevelUpRewardClaimsDocument, ResourceExchangeDocument, TokenConversionsDocument, CurrencyMarketOrderDocument, \
     CurrencyMarketTradeDocument
 from apps.http.dependencies import get_middleware
-from controllers.http import HttpController
-import uvicorn
 from decouple import config
 from beanie import init_beanie
 import motor.motor_asyncio
@@ -25,6 +23,7 @@ from core.buildable_items import BuildableItems, FinishBuildRequest
 from core.planet_resources import PlanetResourcesUpdateRequest
 from core.shared.models import AppBaseException
 from apps.http.urls import register_fastapi_routes
+from starlette.middleware.base import BaseHTTPMiddleware
 
 
 #@TODO: Add logger port
@@ -87,25 +86,41 @@ app.add_middleware(
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 
-@app.middleware("http")
-async def middleware(request: Request, call_next):
-    if request.method == 'OPTIONS':
+class MyBaseHTTPMiddleware(BaseHTTPMiddleware):
+
+    async def __call__(self, scope, receive, send):
+        try:
+            await super().__call__(scope, receive, send)
+        except RuntimeError as exc:
+            if str(exc) == 'No response returned.':
+                request = Request(scope, receive=receive)
+                if await request.is_disconnected():
+                    return
+            raise
+
+    async def dispatch(self, request, call_next):
+        raise NotImplementedError()
+
+
+class UpdateDataMiddleWare(MyBaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        try:
+            if request.method == 'OPTIONS':
+                return await call_next(request)
+
+            items_use_case, planet_resources_use_case, planet_staking = await get_middleware()
+            active_planet = request.headers.get("x-active-planet")
+            if active_planet is not None:
+                await planet_staking.tier_expired_reset(planet_id=active_planet)
+                await items_use_case.finish_build(FinishBuildRequest(planet_id=active_planet))
+                await planet_resources_use_case(PlanetResourcesUpdateRequest(planet_id=active_planet))
+        except:
+            pass
+
         return await call_next(request)
 
-    try:
-        items_use_case, planet_resources_use_case, planet_staking = await get_middleware()
-        active_planet = request.headers.get("x-active-planet")
-        if active_planet is not None:
-            await asyncio.sleep(0.01)
-            await planet_staking.tier_expired_reset(planet_id=active_planet)
-            await asyncio.sleep(0.01)
-            await items_use_case.finish_build(FinishBuildRequest(planet_id=active_planet))
-            await asyncio.sleep(0.01)
-            await planet_resources_use_case(PlanetResourcesUpdateRequest(planet_id=active_planet))
-    except:
-        pass
 
-    return await call_next(request)
+app.add_middleware(UpdateDataMiddleWare)
 
 
 @app.on_event("startup")
