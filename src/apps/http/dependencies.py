@@ -56,6 +56,9 @@ async def contract_dependency(cache: CacheServicePort, rpc_urls: str):
         spaceriders_game_address: str = contract_addresses[ChainServicePort.SPACERIDERS_GAME_CONTRACT]
         spaceriders_nft_address: str = contract_addresses[ChainServicePort.SPACERIDERS_NFT_CONTRACT]
         spaceriders_ticket_nft_address: str = contract_addresses[ChainServicePort.SPACERIDERS_TICKET_NFT_CONTRACT]
+        router_address: str = contract_addresses[ChainServicePort.ROUTER_CONTRACT]
+        busd_address: str = contract_addresses[ChainServicePort.BUSD_CONTRACT]
+        pair_address: str = contract_addresses[ChainServicePort.PAIR_CONTRACT]
 
     abi_base_path = str(root) + f"/static/abi"
 
@@ -76,7 +79,7 @@ async def contract_dependency(cache: CacheServicePort, rpc_urls: str):
 
     return EvmChainServiceAdapter(cache, rpc_urls, config('PRIVATE_KEY'), spaceriders_token_address,
                                   spaceriders_game_address, spaceriders_nft_address,
-                                  spaceriders_ticket_nft_address, spaceriders_token_abi, spaceriders_game_abi,
+                                  spaceriders_ticket_nft_address, router_address, busd_address, pair_address, spaceriders_token_abi, spaceriders_game_abi,
                                   spaceriders_nft_abi, spaceriders_ticket_nft_abi, router_abi)
 
 

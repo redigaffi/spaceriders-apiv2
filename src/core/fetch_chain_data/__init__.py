@@ -28,12 +28,11 @@ class FetchChainData:
     response_port: ResponsePort
 
     async def get_chain_data(self):
-        router_address = await self.contract_service.spaceriders_token_call("dexAddresses", 0)
-        pair_address = await self.contract_service.spaceriders_token_call("dexPairAddress", router_address)
-        busd_address = await self.contract_service.spaceriders_token_call("busdAddress")
 
         rpc_url = await self.contract_service.get_rpc_url()
-
+        busd_address = await self.contract_service.get_contract_address(ChainServicePort.BUSD_CONTRACT)
+        pair_address = await self.contract_service.get_contract_address(ChainServicePort.PAIR_CONTRACT)
+        router_address = await self.contract_service.get_contract_address(ChainServicePort.ROUTER_CONTRACT)
         token_contract = await self.contract_service.get_contract_address(ChainServicePort.SPACERIDERS_TOKEN_CONTRACT)
         game_contract = await self.contract_service.get_contract_address(ChainServicePort.SPACERIDERS_GAME_CONTRACT)
         nft_contract = await self.contract_service.get_contract_address(ChainServicePort.SPACERIDERS_NFT_CONTRACT)

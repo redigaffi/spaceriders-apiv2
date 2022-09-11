@@ -37,6 +37,7 @@ class CreateStakingResponse(BaseModel):
     v: int = None
     r: str = None
     s: str = None
+    router: str = None
 
 
 class PlanetAlreadyStakedException(AppBaseException):
@@ -114,7 +115,7 @@ class Staking:
         if request.tier_code == StakingData.TIER_0:
             raise StakeTier0Exception()
 
-        user_token_balance_raw = await self.chain_service_port.spaceriders_token_call("totalBalanceOf", user)
+        user_token_balance_raw = await self.chain_service_port.spaceriders_token_call("balanceOf", user)
         user_token_balance = user_token_balance_raw / 10**18
 
         current_token_price = await self.token_price_port.fetch_token_price_usd()
@@ -144,6 +145,7 @@ class Staking:
             v=signed_message['v'],
             r=signed_message['r'],
             s=signed_message['s'],
+            router=await self.chain_service_port.get_contract_address(self.chain_service_port.ROUTER_CONTRACT)
         )
 
         return await self.response_port.publish_response(response)

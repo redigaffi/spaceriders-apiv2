@@ -152,5 +152,5 @@ async def app_init():
         app.router.add_api_route(**url)
 
 
-# if __name__ == "__main__":
-#     uvicorn.run("__main__:app", port=8010, host='0.0.0.0', reload=True, workers=1, debug=True)
+ #if __name__ == "__main__":
+ #    uvicorn.run("__main__:app", port=8010, host='0.0.0.0', reload=True, workers=1, debug=True)
