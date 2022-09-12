@@ -7,8 +7,7 @@ import asyncio
 import aioschedule as schedule
 import apps.cronjobs.dependencies as dependencies
 from adapters.shared.beani_repository_adapter import UserDocument, PlanetDocument, EnergyDepositDocument
-from adapters.shared.beanie_models_adapter import EmailDocument, ResourceExchangeDocument, \
-    TokenConversionsDocument
+from adapters.shared.beanie_models_adapter import EmailDocument
 from controllers.cronjobs import CronjobController
 from core.planet_energy import PlanetEnergyRecoverEnergyDepositsRequest
 from core.shared.models import Planet
@@ -54,7 +53,7 @@ async def main():
     client = motor.motor_asyncio.AsyncIOMotorClient(config("DB_URL"), )
     db = client[config('DB_NAME')]
 
-    await init_beanie(database=db, document_models=[UserDocument, TokenConversionsDocument, ResourceExchangeDocument, EnergyDepositDocument,
+    await init_beanie(database=db, document_models=[UserDocument, EnergyDepositDocument,
                        PlanetDocument, EmailDocument])
 
     controller = await dependencies.cronjob_controller()
@@ -62,7 +61,6 @@ async def main():
     # If this is not here in main function it won't work (also below model initialization)
     schedule.every(600).seconds.do(smart_contract_recover_by_planet_cronjob, controller)
     schedule.every(1200).seconds.do(smart_contract_recover_by_user_cronjob, controller)
-    schedule.every(6).hours.do(controller.generate_new_resource_price)
     schedule.every(12).hours.do(asteroid, controller)
     schedule.every(4).hours.do(space_pirate, controller)
 

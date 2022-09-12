@@ -46,35 +46,6 @@ class NoPlanetFoundException(AppBaseException):
 class QueueIsFullException(AppBaseException):
     msg = "Can't upgrade, queue is full..."
 
-
-class TokenConversions(BaseModel):
-    id: str = None
-    completed: bool = False
-    created_time: float = None
-    metal: float = None
-    petrol: float = None
-    crystal: float = None
-    token: float = None
-
-    @staticmethod
-    def from_token_conversion(token_conversion: "TokenConversions"):
-        return TokenConversions(id=str(token_conversion.id),
-                                completed=token_conversion.completed,
-                                created_time=token_conversion.created_time,
-                                metal=token_conversion.metal,
-                                petrol=token_conversion.petrol,
-                                crystal=token_conversion.crystal,
-                                token=token_conversion.token)
-
-
-@dataclass
-class ResourceExchange:
-    created_time: float = None
-    metal_usd_price: float = None
-    crystal_usd_price: float = None
-    petrol_usd_price: float = None
-
-
 class User(BaseModel):
     id: str = None
     wallet: str = None
@@ -195,7 +166,6 @@ class Planet(BaseModel):
     research_level: List[BuildableItem] = []
     defense_items: List[BuildableItem] = []
     energy_deposits: List[EnergyDeposit] = []
-    resource_conversions: List[TokenConversions] = []
     emails: List[Email] = []
 
     def building_queue(self) -> list[BuildableItem]:
@@ -430,14 +400,12 @@ class PlanetResponse(BaseModel):
     resources: Resources = None
 
     price_paid: int = None
-    free_tokens: float = None
 
     resources_level: List[BuildableItem] = []
     installation_level: List[BuildableItem] = []
     research_level: List[BuildableItem] = []
     defense_items: List[BuildableItem] = []
     energy_deposits: List[EnergyDeposit] = []
-    resource_conversions: List[TokenConversions] = []
     emails: List[Email] = []
 
     @staticmethod
@@ -469,13 +437,11 @@ class PlanetResponse(BaseModel):
         re.tier = p.tier
         re.resources = p.resources
         re.price_paid = p.price_paid
-        re.free_tokens = p.free_tokens
         re.resources_level = p.resources_level
         re.installation_level = p.installation_level
         re.research_level = p.research_level
         re.defense_items = p.defense_items
         re.energy_deposits = p.energy_deposits
-        re.resource_conversions = [TokenConversions.from_token_conversion(x) for x in p.resource_conversions]
         re.emails = p.emails
         return re
 

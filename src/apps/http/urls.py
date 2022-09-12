@@ -6,8 +6,6 @@ from core.fetch_chain_data import FetchChainDataResponse, FetchChainTokenPriceRe
 from core.get_planets import FetchByPlanetIdResponse, PlanetResponse, FetchByPlanetPositionRangeResponse
 from core.mint_planet import FetchPlanetCostResponse, FetchPlanetCostDataResponse
 from core.nft_metadata import OpenseaMetadataNftResponse
-from core.planet_resources_conversion import PreviewConversionResponse, PendingConversionsResponse, \
-    ResourceConvertResponse
 from core.planet_staking import TierInfoResponse, CreateStakingResponse
 from core.shared.models import Planet, BuildableItem, EnergyDeposit, PlanetTier
 
@@ -70,21 +68,6 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
 
         dict(path=r"/planet/staking/unstake", response_model=PlanetTier,
              endpoint=http_controller.unstake, methods=["post"]),
-
-        dict(path=r"/planet/resources/convert/{planet_id}/preview", response_model=PreviewConversionResponse,
-             endpoint=http_controller.planet_resources_convert_preview, methods=["get"]),
-
-        dict(path=r"/planet/resources/convert/{planet_id}/pending", response_model=list[PendingConversionsResponse],
-             endpoint=http_controller.planet_resources_convert_pending, methods=["get"]),
-
-        dict(path=r"/planet/resources/convert/sign", response_model=ResourceConvertResponse,
-             endpoint=http_controller.planet_resources_convert_sign, methods=["post"]),
-
-        dict(path=r"/planet/resources/convert/retry", response_model=ResourceConvertResponse,
-             endpoint=http_controller.planet_resources_convert_retry, methods=["post"]),
-
-        dict(path=r"/planet/resources/convert/confirm",
-             endpoint=http_controller.planet_resources_convert_confirm, methods=["post"]),
 
         dict(path=r"/currency_market/orders/open/{market_code}/{planet_id}",
              response_model=list[MyOpenOrdersResponse], endpoint=http_controller.currency_market_fetch_open_orders, methods=["get"]),

@@ -12,6 +12,7 @@ class GivePlanetExperienceRequest(BaseModel):
     planet_id: str
     experience_amount: float
 
+
 class LvlUpAlreadyClaimedException(AppBaseException):
     msg = "Level up has already been claimed"
 

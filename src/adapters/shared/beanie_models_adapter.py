@@ -1,39 +1,10 @@
 from __future__ import annotations
 from typing import Optional, List
 from beanie import Document, Indexed, Link, PydanticObjectId
-import pymongo
 from datetime import datetime
-from core.shared.models import EnergyDeposit, Email, ResourceExchange, TokenConversions, CurrencyMarketOrder, \
+from core.shared.models import EnergyDeposit, Email, CurrencyMarketOrder, \
     CurrencyMarketTrade
 from core.shared.models import User, PlanetTier, Resources, Planet, Reserves, BuildableItem, UserNotFoundException
-
-
-class TokenConversionsDocument(Document, TokenConversions):
-    completed: bool = False
-    created_time: float = None
-    metal: float = None
-    petrol: float = None
-    crystal: float = None
-    token: float = None
-
-    class Settings:
-        name = "token_conversions"
-        use_revision = True
-        use_state_management = True
-
-
-class ResourceExchangeDocument(Document, ResourceExchange):
-    created_time: float | None = 0
-    metal_usd_price: float
-    crystal_usd_price: float
-    petrol_usd_price: float
-
-    class Settings:
-        name = "resource_exchange"
-        use_revision = True
-        use_state_management = True
-
-
 
 
 class EmailDocument(Document, Email):
@@ -116,7 +87,6 @@ class PlanetDocument(Document, Planet):
 
     energy_deposits: List[Link[EnergyDepositDocument]] = []
     emails: List[Link[EmailDocument]] = []
-    resource_conversions: List[Link[TokenConversionsDocument]] = []
 
     price_paid: int = 0
 

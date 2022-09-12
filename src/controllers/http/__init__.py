@@ -8,11 +8,7 @@ from core.currency_market import CurrencyMarket, MyOpenOrdersResponse
 from core.nft_metadata import NftData
 from core.planet_email import PlanetEmail
 from core.planet_energy import PlanetEnergy, EnergyDepositRequest
-from core.planet_level import PlanetLevel
-from core.planet_resources_conversion import PlanetResourcesConversion, ResourceConvertRequest, \
-    ConfirmConversionRequest, RetryConversionRequest
 from core.planet_staking import Staking, CreateStakingRequest, ConfirmStakingRequest, UnStakeRequest
-from core.shared.models import EnergyDeposit
 from adapters.http.security import jwt_bearer
 from core.authenticate import Authenticate
 from core.buildable_items import BuildableItems, BuildableRequest
@@ -41,8 +37,6 @@ class HttpController:
     nft_data: NftData
     planet_emails: PlanetEmail
     staking: Staking
-    lvl_reward_claim: PlanetLevel
-    planet_resource_conversion: PlanetResourcesConversion
     currency_market: CurrencyMarket
 
     async def jwt(self, req: AuthenticationDetailsRequest):
@@ -126,34 +120,6 @@ class HttpController:
 
     async def unstake(self, request: UnStakeRequest, user=Depends(jwt_bearer)):
         re = await self.staking.unstake(request, user)
-        return jsonable_encoder(re)
-
-    async def claim_planet_level_reward_sign(self, claim_id: str, user=Depends(jwt_bearer)):
-        re = await self.lvl_reward_claim.claim_pending_lvl_up_reward_sign(claim_id, user)
-        return jsonable_encoder(re)
-
-    async def confirm_planet_level_reward(self, claim_id: str, user=Depends(jwt_bearer)):
-        re = await self.lvl_reward_claim.confirm_pending_lvl_up_reward(claim_id, user)
-        return jsonable_encoder(re)
-
-    async def planet_resources_convert_preview(self, planet_id: str, user=Depends(jwt_bearer)):
-        re = await self.planet_resource_conversion.preview_conversion(planet_id, user)
-        return jsonable_encoder(re)
-
-    async def planet_resources_convert_pending(self, planet_id: str, user=Depends(jwt_bearer)):
-        re = await self.planet_resource_conversion.pending_conversions(planet_id, user)
-        return jsonable_encoder(re)
-
-    async def planet_resources_convert_sign(self, request: ResourceConvertRequest, user=Depends(jwt_bearer)):
-        re = await self.planet_resource_conversion.convert_conversion(request, user)
-        return jsonable_encoder(re)
-
-    async def planet_resources_convert_confirm(self, request: ConfirmConversionRequest, user=Depends(jwt_bearer)):
-        re = await self.planet_resource_conversion.confirm_conversion(request, user)
-        return jsonable_encoder(re)
-
-    async def planet_resources_convert_retry(self, request: RetryConversionRequest, user=Depends(jwt_bearer)):
-        re = await self.planet_resource_conversion.retry_conversion(request, user)
         return jsonable_encoder(re)
 
     async def currency_market_fetch_open_orders(self, market_code: str, planet_id: str) -> list[MyOpenOrdersResponse]:

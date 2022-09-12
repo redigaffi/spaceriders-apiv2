@@ -6,77 +6,18 @@ from beanie import PydanticObjectId, WriteRules, DeleteRules
 from pydantic import BaseModel
 
 from adapters.shared.beanie_models_adapter import EnergyDepositDocument, PlanetDocument, UserDocument, EmailDocument, \
-    ResourceExchangeDocument, TokenConversionsDocument, CurrencyMarketTradeDocument, \
+    CurrencyMarketTradeDocument, \
     CurrencyMarketOrderDocument
 from core.shared.models import OpenOrdersGroupedByPrice, PriceCandleDataGroupedByTimeInterval, Volume24Info
 from core.shared.ports import UserRepositoryPort, PlanetRepositoryPort, EnergyDepositRepositoryPort, \
-    EmailRepositoryPort, ResourceExchangeRepositoryPort, \
-    TokenConversionsRepositoryPort, CurrencyMarketTradeRepositoryPort, CurrencyMarketOrderRepositoryPort
+    EmailRepositoryPort, \
+    CurrencyMarketTradeRepositoryPort, CurrencyMarketOrderRepositoryPort
 from core.shared.models import User, PlanetTier, Planet, UserNotFoundException, \
-    EnergyDeposit, Email, ResourceExchange, TokenConversions, CurrencyMarketTrade, \
+    EnergyDeposit, Email, CurrencyMarketTrade, \
     CurrencyMarketOrder
 from datetime import datetime
 from beanie.operators import In
 
-
-class TokenConversionsRepositoryAdapter(TokenConversionsRepositoryPort):
-    async def create(self, token_conversion: TokenConversions) -> TokenConversions:
-        # TokenConversionsDocument.update_forward_refs()
-        token_conversion_doc = TokenConversionsDocument(completed=token_conversion.completed,
-                                                        created_time=token_conversion.created_time,
-                                                        metal=token_conversion.metal,
-                                                        petrol=token_conversion.petrol,
-                                                        crystal=token_conversion.crystal,
-                                                        token=token_conversion.token)
-
-        await token_conversion_doc.save()
-        return token_conversion_doc
-
-    async def get(self, token_conversion: str) -> TokenConversions | None:
-        # TokenConversionsDocument.update_forward_refs()
-
-        return await TokenConversionsDocument.find_one(
-            TokenConversionsDocument.id == PydanticObjectId(token_conversion))
-
-    async def get_latest(self) -> TokenConversions | None:
-        TokenConversionsDocument.update_forward_refs()
-
-        last_conversion = await TokenConversionsDocument.all().sort(-TokenConversionsDocument.created_time).limit(
-            1).to_list()
-
-        if len(last_conversion) > 0:
-            return last_conversion[0]
-
-    async def update(self, token_conversion: TokenConversionsDocument) -> TokenConversions:
-        TokenConversionsDocument.update_forward_refs()
-
-        await token_conversion.save_changes()
-        return token_conversion
-
-
-class ResourceExchangeRepositoryAdapter(ResourceExchangeRepositoryPort):
-    async def create(self, resource_exchange: ResourceExchange) -> ResourceExchange:
-        resource_exchange_doc = ResourceExchangeDocument(created_time=resource_exchange.created_time,
-                                                         metal_usd_price=resource_exchange.metal_usd_price,
-                                                         crystal_usd_price=resource_exchange.crystal_usd_price,
-                                                         petrol_usd_price=resource_exchange.petrol_usd_price)
-
-        await resource_exchange_doc.save()
-        return resource_exchange_doc
-
-    async def get(self, resource_exchange: str) -> ResourceExchange | None:
-        return await ResourceExchangeDocument.get(PydanticObjectId(resource_exchange))
-
-    async def get_latest(self) -> ResourceExchange | None:
-        last_price = await ResourceExchangeDocument.all().sort(-ResourceExchangeDocument.created_time).limit(
-            1).to_list()
-
-        if len(last_price) > 0:
-            return last_price[0]
-
-    async def update(self, resource_exchange: ResourceExchangeDocument) -> ResourceExchange:
-        await resource_exchange.save_changes()
-        return resource_exchange
 
 class EmailRepositoryAdapter(EmailRepositoryPort):
     async def create(self, email: Email) -> Email:
@@ -622,13 +563,11 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
         return planet
 
     async def get(self, planet_id: str, fetch_links=False) -> Planet | None:
-        # TokenConversionsDocument.update_forward_refs()
         planet = await PlanetDocument.find_one(PlanetDocument.id == PydanticObjectId(planet_id),
                                                fetch_links=fetch_links)
         return planet
 
     async def get_by_request_id(self, request_id: str, fetch_links=False) -> Planet | None:
-        # TokenConversionsDocument.update_forward_refs()
         planet = await PlanetDocument.find_one(PlanetDocument.request_id == request_id, fetch_links=fetch_links)
         return planet
 
@@ -678,7 +617,6 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
             claimed=planet_data.claimed,
             tier=planet_tier,
             resources=planet_data.resources,
-            free_tokens=0,
             resources_level=planet_data.resources_level,
             installation_level=planet_data.installation_level,
             research_level=planet_data.research_level,

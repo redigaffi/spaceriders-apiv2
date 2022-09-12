@@ -1,8 +1,7 @@
 from decouple import config
 
 from adapters.shared.beani_repository_adapter import EnergyDepositRepositoryAdapter, EmailRepositoryAdapter, \
-    TokenConversionsRepositoryAdapter, ResourceExchangeRepositoryAdapter, \
-    BeaniCurrencyMarketOrderRepositoryAdapter, BeaniCurrencyMarketTradeRepositoryAdapter
+     BeaniCurrencyMarketOrderRepositoryAdapter, BeaniCurrencyMarketTradeRepositoryAdapter
 from adapters.shared.logging_adapter import LoggingAdapter, get_logger
 from core.currency_market import CurrencyMarket
 from core.nft_metadata import NftData
@@ -23,11 +22,9 @@ from pathlib import Path
 from controllers.http import HttpController
 from core.planet_level import PlanetLevel
 from core.planet_resources import PlanetResources
-from core.planet_resources_conversion import PlanetResourcesConversion
 from core.planet_staking import Staking
-from core.resource_exchange import ResourcesExchange
 from core.shared.ports import ChainServicePort, CacheServicePort, TokenPricePort, UserRepositoryPort, \
-    PlanetRepositoryPort, EmailRepositoryPort, TokenConversionsRepositoryPort
+    PlanetRepositoryPort, EmailRepositoryPort
 
 http_response_port = HttpResponsePort()
 logging_adapter = LoggingAdapter(get_logger("http_app"))
@@ -138,13 +135,6 @@ async def get_staking_use_case(planet_repository_port: PlanetRepositoryPort, tok
 async def get_planet_level_use_case(planet_repository_port: PlanetRepositoryPort,  email_use_case: PlanetEmail, chain_service_adapter: ChainServicePort):
     return PlanetLevel(planet_repository_port, email_use_case, chain_service_adapter, http_response_port)
 
-
-async def get_resource_exchange_use_case(resource_repository: ResourceExchangeRepositoryAdapter):
-    return ResourcesExchange(resource_repository, http_response_port)
-
-
-async def get_planet_resources_conversion_use_case(planet_repository_port: PlanetRepositoryPort, token_conversion_repository_port: TokenConversionsRepositoryPort, resource_exchange: ResourcesExchange, chain_service: ChainServicePort, token_price: TokenPricePort):
-    return PlanetResourcesConversion(planet_repository_port, token_conversion_repository_port, resource_exchange, chain_service, token_price, http_response_port)
 # Controllers
 
 async def get_middleware():
@@ -170,8 +160,6 @@ async def http_controller():
     planet_repository = BeaniPlanetRepositoryAdapter()
     energy_repository = EnergyDepositRepositoryAdapter()
     email_repository = EmailRepositoryAdapter()
-    resource_repository = ResourceExchangeRepositoryAdapter()
-    token_conversions_repository = TokenConversionsRepositoryAdapter()
     currency_market_order_repository = BeaniCurrencyMarketOrderRepositoryAdapter()
     currency_market_trade_repository = BeaniCurrencyMarketTradeRepositoryAdapter()
 
@@ -203,16 +191,11 @@ async def http_controller():
     g = await nft_data_use_case(config('API_ENDPOINT'), config('PLANET_IMAGES_BUCKET_PATH'), config('TESTNET_TICKET_IMAGES_BUCKET_PATH'),
                                 planet_repository, nft_contract_service)
 
-
-
     j = await get_staking_use_case(planet_repository, token_price, contract_service)
-
-    resource_exchange = await get_resource_exchange_use_case(resource_repository)
-    planet_resources_conversion = await get_planet_resources_conversion_use_case(planet_repository, token_conversions_repository, resource_exchange, contract_service, token_price)
 
     trading_use_case = CurrencyMarket(planet_repository,
                                       currency_market_order_repository,
                                       currency_market_trade_repository,
                                       http_response_port)
 
-    return HttpController(a, b, c, d, e, f, g, h, j, k, planet_resources_conversion, trading_use_case)
+    return HttpController(a, b, c, d, e, f, g, h, j, trading_use_case)

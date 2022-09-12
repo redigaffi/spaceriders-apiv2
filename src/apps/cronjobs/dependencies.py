@@ -1,7 +1,6 @@
 from adapters.cronjobs import BlackHoleResponsePort
 from adapters.shared.beani_repository_adapter import BeaniUserRepositoryAdapter, BeaniPlanetRepositoryAdapter, \
-    EnergyDepositRepositoryAdapter, EmailRepositoryAdapter, \
-    ResourceExchangeRepositoryAdapter
+    EnergyDepositRepositoryAdapter, EmailRepositoryAdapter
 from adapters.shared.cache_adapter import MemCacheCacheServiceAdapter
 from adapters.shared.evm_adapter import EvmChainServiceAdapter, TokenPriceAdapter
 from adapters.shared.logging_adapter import LoggingAdapter, get_logger
@@ -77,7 +76,6 @@ user_repository = BeaniUserRepositoryAdapter()
 planet_repository = BeaniPlanetRepositoryAdapter()
 energy_repository = EnergyDepositRepositoryAdapter()
 email_repository = EmailRepositoryAdapter()
-resource_repository = ResourceExchangeRepositoryAdapter()
 
 async def cronjob_controller():
     cache = await cache_dependency()
@@ -89,7 +87,6 @@ async def cronjob_controller():
 
     email_use_case = PlanetEmail(planet_repository, email_repository, response_adapter)
     planet_level = PlanetLevel(planet_repository, lvl_up_repository, email_use_case, contract, response_adapter)
-    resource_exchange = ResourcesExchange(resource_repository, response_adapter)
 
     planet_mint = MintPlanet(token_price_adapter, contract, config('API_ENDPOINT'), config('PLANET_IMAGES_BUCKET_PATH'),
                       planet_repository, response_adapter)

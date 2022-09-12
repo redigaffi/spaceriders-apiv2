@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 
 from core.shared.models import OpenOrdersGroupedByPrice, PriceCandleDataGroupedByTimeInterval, Volume24Info
-from core.shared.models import User, Planet, EnergyDeposit, Email, ResourceExchange, \
-    TokenConversions, CurrencyMarketTrade, CurrencyMarketOrder
+from core.shared.models import User, Planet, EnergyDeposit, Email, \
+     CurrencyMarketTrade, CurrencyMarketOrder
 from typing import TypedDict, Tuple
 
 
@@ -14,42 +14,6 @@ class LoggingPort(ABC):
 
     @abstractmethod
     async def error(self, msg, extra=None):
-        pass
-
-
-class TokenConversionsRepositoryPort(ABC):
-    @abstractmethod
-    async def create(self, token_conversion: TokenConversions) -> TokenConversions:
-        pass
-
-    @abstractmethod
-    async def get(self, token_conversion: str) -> TokenConversions | None:
-        pass
-
-    @abstractmethod
-    async def get_latest(self) -> TokenConversions | None:
-        pass
-
-    @abstractmethod
-    async def update(self, token_conversion: TokenConversions) -> TokenConversions:
-        pass
-
-
-class ResourceExchangeRepositoryPort(ABC):
-    @abstractmethod
-    async def create(self, resource_exchange: ResourceExchange) -> ResourceExchange:
-        pass
-
-    @abstractmethod
-    async def get(self, resource_exchange: str) -> ResourceExchange | None:
-        pass
-
-    @abstractmethod
-    async def get_latest(self) -> ResourceExchange | None:
-        pass
-
-    @abstractmethod
-    async def update(self, resource_exchange: ResourceExchange) -> ResourceExchange:
         pass
 
 class EmailRepositoryPort(ABC):

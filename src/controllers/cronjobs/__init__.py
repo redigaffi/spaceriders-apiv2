@@ -28,9 +28,6 @@ class CronjobController:
     async def recover_staking(self, planet_id: str):
         return await self.staking_use_case.tier_recover(planet_id)
 
-    async def generate_new_resource_price(self):
-        return await self.resources_exchange.new_resource_exchange_price()
-
     async def asteroid_pve(self, planet_id: str):
         return await self.asteroid(planet_id)
 
