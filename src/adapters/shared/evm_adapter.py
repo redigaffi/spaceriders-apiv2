@@ -161,8 +161,8 @@ class TokenPriceAdapter(TokenPricePort):
         if re is not None:
             return re
 
-        spaceriders_address = await self.contract_service.spaceriders_token_call("address")
-        busd_address = await self.contract_service.spaceriders_token_call("busdAddress")
+        spaceriders_address = await self.contract_service.get_contract_address(ChainServicePort.SPACERIDERS_TOKEN_CONTRACT)
+        busd_address = await self.contract_service.get_contract_address(ChainServicePort.BUSD_CONTRACT)
 
         path = [
             spaceriders_address,

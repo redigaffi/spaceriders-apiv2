@@ -93,20 +93,6 @@ class PlanetTier(BaseModel):
     staked: bool = False
 
 
-class LevelUpRewardClaims(BaseModel):
-    id: str = None
-    level: int = None
-    completed: bool = False
-    planet_id: str
-
-    @staticmethod
-    def from_level_up_reward_claims(claim: "LevelUpRewardClaims"):
-        return LevelUpRewardClaims(id=str(claim.id),
-                                   level=claim.level,
-                                   completed=claim.completed,
-                                   planet_id=claim.planet_id)
-
-
 class BuildableItem(BaseModel):
     label: str
     type: str
@@ -203,13 +189,11 @@ class Planet(BaseModel):
     resources: Resources = Resources()
 
     price_paid: int = None
-    free_tokens: float = None
 
     resources_level: List[BuildableItem] = []
     installation_level: List[BuildableItem] = []
     research_level: List[BuildableItem] = []
     defense_items: List[BuildableItem] = []
-    pending_levelup_reward: List[LevelUpRewardClaims] = []
     energy_deposits: List[EnergyDeposit] = []
     resource_conversions: List[TokenConversions] = []
     emails: List[Email] = []
@@ -219,10 +203,6 @@ class Planet(BaseModel):
             BuildableItem] = self.resources_level + self.research_level + self.installation_level + self.defense_items
 
         return list(filter(lambda b: b.building or b.repairing, buildable_item))
-
-
-    def is_free(self):
-        return self.price_paid == 0
 
     def set_image_url(self, url: str):
         self.image_url = f"{url}/{self.image}-{self.rarity}.webp"
@@ -456,7 +436,6 @@ class PlanetResponse(BaseModel):
     installation_level: List[BuildableItem] = []
     research_level: List[BuildableItem] = []
     defense_items: List[BuildableItem] = []
-    pending_levelup_reward: List[LevelUpRewardClaims] = []
     energy_deposits: List[EnergyDeposit] = []
     resource_conversions: List[TokenConversions] = []
     emails: List[Email] = []
@@ -495,7 +474,6 @@ class PlanetResponse(BaseModel):
         re.installation_level = p.installation_level
         re.research_level = p.research_level
         re.defense_items = p.defense_items
-        re.pending_levelup_reward = [LevelUpRewardClaims.from_level_up_reward_claims(x) for x in p.pending_levelup_reward]
         re.energy_deposits = p.energy_deposits
         re.resource_conversions = [TokenConversions.from_token_conversion(x) for x in p.resource_conversions]
         re.emails = p.emails

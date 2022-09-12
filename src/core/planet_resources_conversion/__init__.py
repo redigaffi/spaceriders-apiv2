@@ -219,11 +219,6 @@ class PlanetResourcesConversion:
 
         token_conversion = await self.token_conversion_repository_port.create(token_conversion)
 
-        if planet.is_free():
-            token_conversion.completed = True
-            planet.free_tokens += token_amount
-            return await self.response_port.publish_response({})
-
         planet.resource_conversions.append(token_conversion)
         planet = await self.planet_repository_port.update(planet)
 

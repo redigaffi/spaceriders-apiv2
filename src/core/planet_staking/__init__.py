@@ -53,7 +53,7 @@ class StakeTier0Exception(AppBaseException):
 
 
 class NotEnoughSprBalanceException(AppBaseException):
-    msg = "Not holding enough $SPR (in usd value)"
+    msg = "Not holding enough $BKM (in usd value)"
 
 
 class NotStakedException(AppBaseException):
@@ -96,9 +96,9 @@ class Staking:
             tmp.name = StakingData.TIER_NAMES[stake_code]
             tmp.tokens_time_locked = staking_data.tokens_time_locked
 
-            tmp.benefit_lines.append(f"{staking_data.max_queue} items in queue simultaneously")
-            tmp.benefit_lines.append(f"{staking_data.discount_items}% discount on all in-game purchases")
-            tmp.benefit_lines.append(f"{staking_data.experience_boost}% experience boost")
+            # tmp.benefit_lines.append(f"{staking_data.max_queue} items in queue simultaneously")
+            # tmp.benefit_lines.append(f"{staking_data.discount_items}% discount on all in-game purchases")
+            # tmp.benefit_lines.append(f"{staking_data.experience_boost}% experience boost")
             re[stake_code] = tmp
 
         return await self.response_port.publish_response(re)

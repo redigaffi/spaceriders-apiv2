@@ -1,7 +1,7 @@
 from decouple import config
 
 from adapters.shared.beani_repository_adapter import EnergyDepositRepositoryAdapter, EmailRepositoryAdapter, \
-    LevelUpRewardClaimsRepositoryAdapter, TokenConversionsRepositoryAdapter, ResourceExchangeRepositoryAdapter, \
+    TokenConversionsRepositoryAdapter, ResourceExchangeRepositoryAdapter, \
     BeaniCurrencyMarketOrderRepositoryAdapter, BeaniCurrencyMarketTradeRepositoryAdapter
 from adapters.shared.logging_adapter import LoggingAdapter, get_logger
 from core.currency_market import CurrencyMarket
@@ -27,15 +27,13 @@ from core.planet_resources_conversion import PlanetResourcesConversion
 from core.planet_staking import Staking
 from core.resource_exchange import ResourcesExchange
 from core.shared.ports import ChainServicePort, CacheServicePort, TokenPricePort, UserRepositoryPort, \
-    PlanetRepositoryPort, EmailRepositoryPort, LevelUpRewardClaimsRepositoryPort, TokenConversionsRepositoryPort
+    PlanetRepositoryPort, EmailRepositoryPort, TokenConversionsRepositoryPort
 
 http_response_port = HttpResponsePort()
 logging_adapter = LoggingAdapter(get_logger("http_app"))
 
 
 async def cache_dependency():
-    cache_driver = config('CACHE_DRIVER')
-
     client = await emcache.create_client(
         node_addresses=[emcache.MemcachedHostAddress(config('CACHE_HOST'), int(config('CACHE_PORT')))],
         min_connections=5,
@@ -137,8 +135,8 @@ async def get_staking_use_case(planet_repository_port: PlanetRepositoryPort, tok
     return Staking(planet_repository_port, token_price, chain_service_adapter, http_response_port)
 
 
-async def get_planet_level_use_case(planet_repository_port: PlanetRepositoryPort, lvl_up_repo: LevelUpRewardClaimsRepositoryPort, email_use_case: PlanetEmail, chain_service_adapter: ChainServicePort):
-    return PlanetLevel(planet_repository_port, lvl_up_repo, email_use_case, chain_service_adapter, http_response_port)
+async def get_planet_level_use_case(planet_repository_port: PlanetRepositoryPort,  email_use_case: PlanetEmail, chain_service_adapter: ChainServicePort):
+    return PlanetLevel(planet_repository_port, email_use_case, chain_service_adapter, http_response_port)
 
 
 async def get_resource_exchange_use_case(resource_repository: ResourceExchangeRepositoryAdapter):
@@ -153,13 +151,12 @@ async def get_middleware():
     cache = await cache_dependency()
     contract_service = await contract_dependency(cache, config('RPCS_URL'))
     planet_repository = BeaniPlanetRepositoryAdapter()
-    lvl_up_repository = LevelUpRewardClaimsRepositoryAdapter()
     email_repository = EmailRepositoryAdapter()
 
     token_price = await token_price_dependency(cache, contract_service)
     email_use_case = await get_email_use_case(planet_repository, email_repository)
 
-    lvl_up_use_case = await get_planet_level_use_case(planet_repository, lvl_up_repository, email_use_case, contract_service)
+    lvl_up_use_case = await get_planet_level_use_case(planet_repository, email_use_case, contract_service)
 
     items_use_case = await get_buildable_items_use_case(planet_repository, lvl_up_use_case)
     planet_resources = await get_planet_resources_use_case(planet_repository)
@@ -173,7 +170,6 @@ async def http_controller():
     planet_repository = BeaniPlanetRepositoryAdapter()
     energy_repository = EnergyDepositRepositoryAdapter()
     email_repository = EmailRepositoryAdapter()
-    lvl_up_repository = LevelUpRewardClaimsRepositoryAdapter()
     resource_repository = ResourceExchangeRepositoryAdapter()
     token_conversions_repository = TokenConversionsRepositoryAdapter()
     currency_market_order_repository = BeaniCurrencyMarketOrderRepositoryAdapter()
@@ -186,7 +182,7 @@ async def http_controller():
     token_price = await token_price_dependency(cache, contract_service)
 
     h = await get_email_use_case(planet_repository, email_repository)
-    k = await get_planet_level_use_case(planet_repository, lvl_up_repository, h, contract_service)
+    k = await get_planet_level_use_case(planet_repository, h, contract_service)
 
     auth_contract_service = contract_service
     if config('ENV') == "testnet":

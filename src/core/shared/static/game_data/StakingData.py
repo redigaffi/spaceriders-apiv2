@@ -4,9 +4,7 @@ from dataclasses import dataclass
 @dataclass
 class StakingBenefits:
     usd_cost: float
-    max_queue: int  # max items in queue
-    discount_items: float  # percentage of price discounted 0-100
-    time_discount: int  # percentage of time discounted 0-100
+    trading_fee_discount: float  # trading fee discount
     tokens_time_locked: int  # seconds
     experience_boost: int  # percentage of xp boost 0-100
 
@@ -31,7 +29,7 @@ class StakingData:
     }
 
     DATA: dict[str, StakingBenefits] = {
-        TIER_0: StakingBenefits(0, 1, 0, 0, 0, 0),
-        TIER_1: StakingBenefits(50, 2, 10, 10, 60, 10),
-        TIER_2: StakingBenefits(200, 3, 15, 15, 172800, 15),
+        TIER_0: StakingBenefits(0, 0, 0, 0),
+        TIER_1: StakingBenefits(50, 10, 60, 2),
+        TIER_2: StakingBenefits(50, 10, 172800, 2),
     }

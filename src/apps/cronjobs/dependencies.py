@@ -1,6 +1,6 @@
 from adapters.cronjobs import BlackHoleResponsePort
 from adapters.shared.beani_repository_adapter import BeaniUserRepositoryAdapter, BeaniPlanetRepositoryAdapter, \
-    EnergyDepositRepositoryAdapter, LevelUpRewardClaimsRepositoryAdapter, EmailRepositoryAdapter, \
+    EnergyDepositRepositoryAdapter, EmailRepositoryAdapter, \
     ResourceExchangeRepositoryAdapter
 from adapters.shared.cache_adapter import MemCacheCacheServiceAdapter
 from adapters.shared.evm_adapter import EvmChainServiceAdapter, TokenPriceAdapter
@@ -76,7 +76,6 @@ async def contract_dependency(cache: CacheServicePort):
 user_repository = BeaniUserRepositoryAdapter()
 planet_repository = BeaniPlanetRepositoryAdapter()
 energy_repository = EnergyDepositRepositoryAdapter()
-lvl_up_repository = LevelUpRewardClaimsRepositoryAdapter()
 email_repository = EmailRepositoryAdapter()
 resource_repository = ResourceExchangeRepositoryAdapter()
 

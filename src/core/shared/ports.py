@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 
 from core.shared.models import OpenOrdersGroupedByPrice, PriceCandleDataGroupedByTimeInterval, Volume24Info
-from core.shared.models import User, Planet, EnergyDeposit, Email, LevelUpRewardClaims, ResourceExchange, \
+from core.shared.models import User, Planet, EnergyDeposit, Email, ResourceExchange, \
     TokenConversions, CurrencyMarketTrade, CurrencyMarketOrder
 from typing import TypedDict, Tuple
 
@@ -51,21 +51,6 @@ class ResourceExchangeRepositoryPort(ABC):
     @abstractmethod
     async def update(self, resource_exchange: ResourceExchange) -> ResourceExchange:
         pass
-
-
-class LevelUpRewardClaimsRepositoryPort(ABC):
-    @abstractmethod
-    async def create(self, lvl_up: LevelUpRewardClaims) -> LevelUpRewardClaims:
-        pass
-
-    @abstractmethod
-    async def get(self, lvl_up_id: str) -> LevelUpRewardClaims | None:
-        pass
-
-    @abstractmethod
-    async def update(self, lvl_up: LevelUpRewardClaims) -> LevelUpRewardClaims:
-        pass
-
 
 class EmailRepositoryPort(ABC):
     @abstractmethod

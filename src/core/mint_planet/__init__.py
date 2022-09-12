@@ -186,23 +186,3 @@ class MintPlanet:
         planet = await self.planet_repository.update(planet)
 
         return await self.response_port.publish_response(PlanetResponse.from_planet(planet))
-
-    async def mint_free_planet(self, user: str, req: FreePlanetRequest) -> PlanetResponse:
-        log.info(f"{user} requested a free planet")
-        has_free_planets = await self.planet_repository.has_free_planet(user)
-
-        if not req.name:
-            raise PlanetNameMissingException()
-
-        if not has_free_planets:
-            last_planet = await self.planet_repository.last_created_planet()
-            planet: Planet = get_new_planet(user, req.name, last_planet, 0, self.planet_images_bucket_path, True, False)
-
-            log.info(f"{user} minted a free planet")
-            re = await self.planet_repository.create_planet(planet)
-            return await self.response_port.publish_response(PlanetResponse.from_planet(re))
-
-        log.error(f"{user} already has a free planet")
-        raise CantMintMoreFreePlanets()
-
-

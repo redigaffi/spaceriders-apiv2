@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 # Info, seems like this need to be at the top, also some have src before and others not (maybe due to relationship?)
 from adapters.shared.beanie_models_adapter import UserDocument, EnergyDepositDocument, PlanetDocument, EmailDocument, \
-    LevelUpRewardClaimsDocument, ResourceExchangeDocument, TokenConversionsDocument, CurrencyMarketOrderDocument, \
+    ResourceExchangeDocument, TokenConversionsDocument, CurrencyMarketOrderDocument, \
     CurrencyMarketTradeDocument
 
 from decouple import config
@@ -27,7 +27,6 @@ async def app_init():
                                        EnergyDepositDocument,
                                        PlanetDocument,
                                        EmailDocument,
-                                       LevelUpRewardClaimsDocument,
                                        CurrencyMarketOrderDocument,
                                        CurrencyMarketTradeDocument]
     )

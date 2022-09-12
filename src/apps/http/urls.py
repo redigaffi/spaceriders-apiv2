@@ -6,11 +6,10 @@ from core.fetch_chain_data import FetchChainDataResponse, FetchChainTokenPriceRe
 from core.get_planets import FetchByPlanetIdResponse, PlanetResponse, FetchByPlanetPositionRangeResponse
 from core.mint_planet import FetchPlanetCostResponse, FetchPlanetCostDataResponse
 from core.nft_metadata import OpenseaMetadataNftResponse
-from core.planet_level import ClaimPendingLvlUpRewardResponse
 from core.planet_resources_conversion import PreviewConversionResponse, PendingConversionsResponse, \
     ResourceConvertResponse
 from core.planet_staking import TierInfoResponse, CreateStakingResponse
-from core.shared.models import Planet, BuildableItem, EnergyDeposit, PlanetTier, LevelUpRewardClaims
+from core.shared.models import Planet, BuildableItem, EnergyDeposit, PlanetTier
 
 
 async def register_fastapi_routes(http_controller: HttpController) -> list:
@@ -20,8 +19,6 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
         dict(path="/planet/buy", response_model=PlanetResponse, endpoint=http_controller.buy_planet, methods=["post"]),
 
         dict(path="/planet/claim", response_model=PlanetResponse, endpoint=http_controller.claim_planet, methods=["post"]),
-
-        dict(path="/planet/free", response_model=PlanetResponse, endpoint=http_controller.mint_free_planet, methods=["post"]),
 
         dict(path="/planet/cost", response_model=FetchPlanetCostResponse,
              endpoint=http_controller.planet_cost, methods=["get"]),
@@ -73,12 +70,6 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
 
         dict(path=r"/planet/staking/unstake", response_model=PlanetTier,
              endpoint=http_controller.unstake, methods=["post"]),
-
-        dict(path=r"/planet/level/reward/{claim_id}/sign", response_model=ClaimPendingLvlUpRewardResponse,
-             endpoint=http_controller.claim_planet_level_reward_sign, methods=["get"]),
-
-        dict(path=r"/planet/level/reward/{claim_id}/confirm", response_model=LevelUpRewardClaims,
-             endpoint=http_controller.confirm_planet_level_reward, methods=["get"]),
 
         dict(path=r"/planet/resources/convert/{planet_id}/preview", response_model=PreviewConversionResponse,
              endpoint=http_controller.planet_resources_convert_preview, methods=["get"]),

@@ -64,10 +64,6 @@ class HttpController:
         re = await self.buy_planet_use_case.fetch_planet_cost_data(user, request)
         return jsonable_encoder(re)
 
-    async def mint_free_planet(self, req: FreePlanetRequest, user=Depends(jwt_bearer)) -> Planet:
-        re: Planet = await self.buy_planet_use_case.mint_free_planet(user, req)
-        return jsonable_encoder(re)
-
     async def get_chain_data(self):
         re = await self.fetch_chain_data.get_chain_data()
         return jsonable_encoder(re)

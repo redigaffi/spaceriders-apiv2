@@ -6,14 +6,14 @@ from beanie import PydanticObjectId, WriteRules, DeleteRules
 from pydantic import BaseModel
 
 from adapters.shared.beanie_models_adapter import EnergyDepositDocument, PlanetDocument, UserDocument, EmailDocument, \
-    LevelUpRewardClaimsDocument, ResourceExchangeDocument, TokenConversionsDocument, CurrencyMarketTradeDocument, \
+    ResourceExchangeDocument, TokenConversionsDocument, CurrencyMarketTradeDocument, \
     CurrencyMarketOrderDocument
 from core.shared.models import OpenOrdersGroupedByPrice, PriceCandleDataGroupedByTimeInterval, Volume24Info
 from core.shared.ports import UserRepositoryPort, PlanetRepositoryPort, EnergyDepositRepositoryPort, \
-    EmailRepositoryPort, LevelUpRewardClaimsRepositoryPort, ResourceExchangeRepositoryPort, \
+    EmailRepositoryPort, ResourceExchangeRepositoryPort, \
     TokenConversionsRepositoryPort, CurrencyMarketTradeRepositoryPort, CurrencyMarketOrderRepositoryPort
 from core.shared.models import User, PlanetTier, Planet, UserNotFoundException, \
-    LevelUpRewardClaims, EnergyDeposit, Email, ResourceExchange, TokenConversions, CurrencyMarketTrade, \
+    EnergyDeposit, Email, ResourceExchange, TokenConversions, CurrencyMarketTrade, \
     CurrencyMarketOrder
 from datetime import datetime
 from beanie.operators import In
@@ -77,22 +77,6 @@ class ResourceExchangeRepositoryAdapter(ResourceExchangeRepositoryPort):
     async def update(self, resource_exchange: ResourceExchangeDocument) -> ResourceExchange:
         await resource_exchange.save_changes()
         return resource_exchange
-
-
-class LevelUpRewardClaimsRepositoryAdapter(LevelUpRewardClaimsRepositoryPort):
-    async def create(self, lvl_up: LevelUpRewardClaims) -> LevelUpRewardClaims:
-        lvl_up_document = LevelUpRewardClaimsDocument(level=lvl_up.level, completed=lvl_up.completed,
-                                                      planet_id=lvl_up.planet_id)
-        await lvl_up_document.save()
-        return lvl_up_document
-
-    async def get(self, lvl_up_id: str) -> LevelUpRewardClaims | None:
-        return await LevelUpRewardClaimsDocument.get(PydanticObjectId(lvl_up_id))
-
-    async def update(self, lvl_up: LevelUpRewardClaimsDocument) -> LevelUpRewardClaims:
-        await lvl_up.save_changes()
-        return lvl_up
-
 
 class EmailRepositoryAdapter(EmailRepositoryPort):
     async def create(self, email: Email) -> Email:
@@ -694,7 +678,6 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
             claimed=planet_data.claimed,
             tier=planet_tier,
             resources=planet_data.resources,
-            price_paid=planet_data.price_paid,
             free_tokens=0,
             resources_level=planet_data.resources_level,
             installation_level=planet_data.installation_level,
