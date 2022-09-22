@@ -13,17 +13,17 @@ class MemCacheCacheServiceAdapter(CacheServicePort):
         data = pickle.dumps(value)
 
         try:
-            await self.client.set(
+            re = await self.client.set(
                 key.encode(),
                 data,
                 flags=4,
                 # Expire in one hour
                 exptime=int(time.time()) + expiry,
                 # Do not ask for an explicit reply from Memcached
-                noreply=True
+                noreply=False
             )
-        except:
-            pass
+        except Exception as ex:
+            print("exc")
 
     async def get(self, key: str):
         try:

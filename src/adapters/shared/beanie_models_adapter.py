@@ -1,134 +1,10 @@
 from __future__ import annotations
 from typing import Optional, List
 from beanie import Document, Indexed, Link, PydanticObjectId
-import pymongo
 from datetime import datetime
-from core.shared.models import EnergyDeposit, Email, ResourceExchange, TokenConversions, CurrencyMarketOrder, \
-    CurrencyMarketTrade
-from core.shared.models import User, PlanetTier, Resources, Planet, Reserves, BuildableItem, UserNotFoundException, \
-    LevelUpRewardClaims
-
-# async def to_planet(planet_document: PlanetDocument) -> Planet:
-#     planet = Planet()
-#     planet.id = str(planet_document.id)
-#     planet.created_at = planet_document.created_at
-#     planet.name = planet_document.name
-#     planet.rarity = planet_document.rarity
-#     planet.image = planet_document.image
-#     planet.level = planet_document.level
-#     planet.experience = planet_document.experience
-#     planet.diameter = planet_document.diameter
-#     planet.slots = planet_document.slots
-#     planet.slots_used = planet_document.slots_used
-#     planet.min_temperature = planet_document.min_temperature
-#     planet.max_temperature = planet_document.max_temperature
-#     planet.original_total_metal_amount = planet_document.original_total_metal_amount
-#     planet.original_total_crystal_amount = planet_document.original_total_crystal_amount
-#     planet.original_total_petrol_amount = planet_document.original_total_petrol_amount
-#     planet.galaxy = planet_document.galaxy
-#     planet.solar_system = planet_document.solar_system
-#     planet.position = planet_document.position
-#     planet.user = planet_document.user
-#     planet.claimable = planet_document.claimable
-#     planet.claimed = planet_document.claimed
-#     planet.tier = planet_document.tier
-#     planet.resources = planet_document.resources
-#     planet.price_paid = planet_document.price_paid
-#     planet.free_tokens = planet_document.free_tokens
-#     planet.reserves = planet_document.reserves
-#     planet.resources_level = planet_document.resources_level
-#     planet.installation_level = planet_document.installation_level
-#     planet.research_level = planet_document.research_level
-#     planet.defense_items = planet_document.defense_items
-#     planet.pending_levelup_reward = planet_document.pending_levelup_reward
-#     planet.energy_deposits = [(await x.fetch()).to_energy_deposit() for x in planet_document.energy_deposits if x is not None]
-#     planet.emails = [(await x.fetch()).to_email() for x in planet_document.emails if x is not None]
-#     planet.pending_levelup_reward = [(await x.fetch()).to_lvl_up() for x in planet_document.pending_levelup_reward if x is not None]
-#     planet.resource_conversions = planet_document.resource_conversions
-#     return planet
-
-#
-# def from_planet(planet: Planet):
-#         planet_document = PlanetDocument(user=planet.user, created_at=planet.created_at)
-#         planet_document.id = planet.id
-#         planet_document.name = planet.name
-#         planet_document.rarity = planet.rarity
-#         planet_document.image = planet.image
-#         planet_document.diameter = planet.diameter
-#         planet_document.level = planet.level
-#         planet_document.experience = planet.experience
-#         planet_document.slots = planet.slots
-#         planet_document.slots_used = planet.slots_used
-#         planet_document.min_temperature = planet.min_temperature
-#         planet_document.max_temperature = planet.max_temperature
-#         planet_document.reserves = planet.reserves
-#         # self.original_total_metal_amount=planet_data.original_total_metal_amount
-#         # self.original_total_crystal_amount=planet_data.original_total_crystal_amount
-#         # self.original_total_petrol_amount=planet_data.original_total_petrol_amount
-#         planet_document.galaxy = planet.galaxy
-#         planet_document.solar_system = planet.solar_system
-#         planet_document.position = planet.position
-#         planet_document.claimable = planet.claimable
-#         planet_document.claimed = planet.claimed
-#         planet_document.tier = planet.tier
-#         planet_document.resources = planet.resources
-#         planet_document.price_paid = planet.price_paid
-#         planet_document.free_tokens = planet.free_tokens
-#         planet_document.resources_level = planet.resources_level
-#         planet_document.installation_level = planet.installation_level
-#         planet_document.research_level = planet.research_level
-#         planet_document.defense_items = planet.defense_items
-#         planet_document.pending_levelup_reward = planet.pending_levelup_reward
-#         planet_document.energy_deposits = [EnergyDepositDocument.from_energy_deposit(x) for x in planet.energy_deposits]
-#         planet_document.emails = [EmailDocument.from_email(x) for x in planet.emails]
-#         planet_document.pending_levelup_reward = [LevelUpRewardClaimsDocument.from_lvl_up(x) for x in planet.pending_levelup_reward]
-#         planet_document.resource_conversions = planet.resource_conversions
-#
-#         return planet_document
-
-
-class TokenConversionsDocument(Document, TokenConversions):
-    completed: bool = False
-    created_time: float = None
-    metal: float = None
-    petrol: float = None
-    crystal: float = None
-    token: float = None
-
-    class Settings:
-        name = "token_conversions"
-        use_revision = True
-        use_state_management = True
-
-
-class ResourceExchangeDocument(Document, ResourceExchange):
-    created_time: float | None = 0
-    metal_usd_price: float
-    crystal_usd_price: float
-    petrol_usd_price: float
-
-    class Settings:
-        name = "resource_exchange"
-        use_revision = True
-        use_state_management = True
-
-
-class LevelUpRewardClaimsDocument(Document, LevelUpRewardClaims):
-    level: int = None
-    completed: bool = False
-    planet_id: str
-
-    # def to_lvl_up(self) -> LevelUpRewardClaims:
-    #     return LevelUpRewardClaims(id=str(self.id), level=self.level, completed=self.completed, planet_id=self.planet_id)
-    #
-    # @staticmethod
-    # def from_lvl_up(lvl_up: LevelUpRewardClaims):
-    #     return LevelUpRewardClaimsDocument(id=PydanticObjectId(lvl_up.id), level=lvl_up.level, completed=lvl_up.completed, planet_id=lvl_up.planet_id)
-
-    class Settings:
-        name = "level_up_reward_claims"
-        use_revision = True
-        use_state_management = True
+from core.shared.models import EnergyDeposit, Email, CurrencyMarketOrder, \
+    CurrencyMarketTrade, BKMTransaction
+from core.shared.models import User, PlanetTier, Resources, Planet, Reserves, BuildableItem, UserNotFoundException
 
 
 class EmailDocument(Document, Email):
@@ -166,6 +42,21 @@ class EnergyDepositDocument(Document, EnergyDeposit):
 
     class Settings:
         name = "energy_deposits"
+        use_revision = True
+        use_state_management = True
+
+
+class BKMTransactionDocument(Document, BKMTransaction):
+    request_id: str
+    created_time: float | None = 0
+    token_amount: float | None = 0
+    usd_value: float | None = 0
+    planet_id: str
+    was_recovered: bool = False
+    type: str
+
+    class Settings:
+        name = "bkm_deposits"
         use_revision = True
         use_state_management = True
 
@@ -209,13 +100,11 @@ class PlanetDocument(Document, Planet):
     research_level: List[BuildableItem] = None
     defense_items: List[BuildableItem] = None
 
-    pending_levelup_reward: List[Link[LevelUpRewardClaimsDocument]] = []
     energy_deposits: List[Link[EnergyDepositDocument]] = []
+    bkm_deposits: List[Link[BKMTransactionDocument]] = []
     emails: List[Link[EmailDocument]] = []
-    resource_conversions: List[Link[TokenConversionsDocument]] = []
 
     price_paid: int = 0
-    free_tokens: float | None = 0
 
     class Settings:
         name = "planets"

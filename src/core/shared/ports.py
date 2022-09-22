@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
 
-from core.shared.models import OpenOrdersGroupedByPrice, PriceCandleDataGroupedByTimeInterval, Volume24Info
-from core.shared.models import User, Planet, EnergyDeposit, Email, LevelUpRewardClaims, ResourceExchange, \
-    TokenConversions, CurrencyMarketTrade, CurrencyMarketOrder
+from core.shared.models import OpenOrdersGroupedByPrice, PriceCandleDataGroupedByTimeInterval, Volume24Info, BKMTransaction
+from core.shared.models import User, Planet, EnergyDeposit, Email, \
+     CurrencyMarketTrade, CurrencyMarketOrder
 from typing import TypedDict, Tuple
 
 
@@ -15,57 +15,6 @@ class LoggingPort(ABC):
     @abstractmethod
     async def error(self, msg, extra=None):
         pass
-
-
-class TokenConversionsRepositoryPort(ABC):
-    @abstractmethod
-    async def create(self, token_conversion: TokenConversions) -> TokenConversions:
-        pass
-
-    @abstractmethod
-    async def get(self, token_conversion: str) -> TokenConversions | None:
-        pass
-
-    @abstractmethod
-    async def get_latest(self) -> TokenConversions | None:
-        pass
-
-    @abstractmethod
-    async def update(self, token_conversion: TokenConversions) -> TokenConversions:
-        pass
-
-
-class ResourceExchangeRepositoryPort(ABC):
-    @abstractmethod
-    async def create(self, resource_exchange: ResourceExchange) -> ResourceExchange:
-        pass
-
-    @abstractmethod
-    async def get(self, resource_exchange: str) -> ResourceExchange | None:
-        pass
-
-    @abstractmethod
-    async def get_latest(self) -> ResourceExchange | None:
-        pass
-
-    @abstractmethod
-    async def update(self, resource_exchange: ResourceExchange) -> ResourceExchange:
-        pass
-
-
-class LevelUpRewardClaimsRepositoryPort(ABC):
-    @abstractmethod
-    async def create(self, lvl_up: LevelUpRewardClaims) -> LevelUpRewardClaims:
-        pass
-
-    @abstractmethod
-    async def get(self, lvl_up_id: str) -> LevelUpRewardClaims | None:
-        pass
-
-    @abstractmethod
-    async def update(self, lvl_up: LevelUpRewardClaims) -> LevelUpRewardClaims:
-        pass
-
 
 class EmailRepositoryPort(ABC):
     @abstractmethod
@@ -93,6 +42,16 @@ class EnergyDepositRepositoryPort(ABC):
     @abstractmethod
     async def create_energy_deposit(self, energy_deposit: EnergyDeposit) -> EnergyDeposit:
         pass
+
+class BKMDepositRepositoryPort(ABC):
+    @abstractmethod
+    async def get(self, id: str) -> BKMTransaction | None:
+        pass
+
+    @abstractmethod
+    async def create_bkm_transaction(self, energy_deposit: BKMTransaction) -> BKMTransaction:
+        pass
+
 
 
 class CurrencyMarketOrderRepositoryPort(ABC):
@@ -251,6 +210,9 @@ class ChainServicePort(ABC):
     SPACERIDERS_GAME_CONTRACT = "SPACERIDERS_GAME_CONTRACT"
     SPACERIDERS_NFT_CONTRACT = "SPACERIDERS_NFT_CONTRACT"
     SPACERIDERS_TICKET_NFT_CONTRACT = "SPACERIDERS_TICKET_NFT_CONTRACT"
+    ROUTER_CONTRACT = "ROUTER_CONTRACT"
+    BUSD_CONTRACT = "BUSD_CONTRACT"
+    PAIR_CONTRACT = "PAIR_CONTRACT"
 
     @abstractmethod
     async def to_wei(self, amount: float) -> int:

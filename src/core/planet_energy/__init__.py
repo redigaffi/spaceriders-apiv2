@@ -26,10 +26,6 @@ class EnergyDepositAlreadyExistsException(AppBaseException):
     msg = "Energy deposit with given id already exists"
 
 
-class NotEnoughFreeTokensForEnergyDepositException(AppBaseException):
-    msg = "Not holding enough $SPR tokens for energy deposit"
-
-
 @dataclass
 class PlanetEnergy:
     token_price: TokenPricePort
@@ -81,29 +77,6 @@ class PlanetEnergy:
         energy_deposit = await self.energy_repository_port.get(request.deposit_id)
         if energy_deposit is not None:
             raise EnergyDepositAlreadyExistsException()
-
-        if planet.is_free():
-            if planet.free_tokens < request.amount:
-                raise NotEnoughFreeTokensForEnergyDepositException()
-
-            now = datetime.datetime.timestamp(datetime.datetime.now())
-            usd_value = request.amount * await self.token_price.fetch_token_price_usd()
-
-            energy_deposit = EnergyDeposit(request_id=request.deposit_id,
-                                           created_time=now,
-                                           token_amount=request.amount,
-                                           usd_value=usd_value,
-                                           planet_id=request.planet_id,
-                                           was_recovered=False)
-
-            await self.energy_repository_port.create_energy_deposit(energy_deposit)
-
-            planet.free_tokens -= request.amount
-            planet.resources.energy += usd_value
-            planet.energy_deposits.append(energy_deposit)
-            await self.planet_repository_port.update(planet)
-
-            return await self.response_port.publish_response(energy_deposit)
 
         energy_deposit_info = await self.contract_service.spaceriders_game_call("energyDeposits", request.deposit_id)
         planet_id_sm = energy_deposit_info[1]

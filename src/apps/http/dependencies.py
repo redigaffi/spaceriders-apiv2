@@ -1,11 +1,11 @@
 from decouple import config
 
 from adapters.shared.beani_repository_adapter import EnergyDepositRepositoryAdapter, EmailRepositoryAdapter, \
-    LevelUpRewardClaimsRepositoryAdapter, TokenConversionsRepositoryAdapter, ResourceExchangeRepositoryAdapter, \
-    BeaniCurrencyMarketOrderRepositoryAdapter, BeaniCurrencyMarketTradeRepositoryAdapter
+    BeaniCurrencyMarketOrderRepositoryAdapter, BeaniCurrencyMarketTradeRepositoryAdapter, BKMDepositRepositoryAdapter
 from adapters.shared.logging_adapter import LoggingAdapter, get_logger
 from core.currency_market import CurrencyMarket
 from core.nft_metadata import NftData
+from core.planet_bkm import PlanetBKM
 from core.planet_email import PlanetEmail
 from core.planet_energy import PlanetEnergy
 from core.authenticate import Authenticate
@@ -23,19 +23,15 @@ from pathlib import Path
 from controllers.http import HttpController
 from core.planet_level import PlanetLevel
 from core.planet_resources import PlanetResources
-from core.planet_resources_conversion import PlanetResourcesConversion
 from core.planet_staking import Staking
-from core.resource_exchange import ResourcesExchange
 from core.shared.ports import ChainServicePort, CacheServicePort, TokenPricePort, UserRepositoryPort, \
-    PlanetRepositoryPort, EmailRepositoryPort, LevelUpRewardClaimsRepositoryPort, TokenConversionsRepositoryPort
+    PlanetRepositoryPort, EmailRepositoryPort
 
 http_response_port = HttpResponsePort()
 logging_adapter = LoggingAdapter(get_logger("http_app"))
 
 
 async def cache_dependency():
-    cache_driver = config('CACHE_DRIVER')
-
     client = await emcache.create_client(
         node_addresses=[emcache.MemcachedHostAddress(config('CACHE_HOST'), int(config('CACHE_PORT')))],
         min_connections=5,
@@ -56,6 +52,9 @@ async def contract_dependency(cache: CacheServicePort, rpc_urls: str):
         spaceriders_game_address: str = contract_addresses[ChainServicePort.SPACERIDERS_GAME_CONTRACT]
         spaceriders_nft_address: str = contract_addresses[ChainServicePort.SPACERIDERS_NFT_CONTRACT]
         spaceriders_ticket_nft_address: str = contract_addresses[ChainServicePort.SPACERIDERS_TICKET_NFT_CONTRACT]
+        router_address: str = contract_addresses[ChainServicePort.ROUTER_CONTRACT]
+        busd_address: str = contract_addresses[ChainServicePort.BUSD_CONTRACT]
+        pair_address: str = contract_addresses[ChainServicePort.PAIR_CONTRACT]
 
     abi_base_path = str(root) + f"/static/abi"
 
@@ -76,7 +75,7 @@ async def contract_dependency(cache: CacheServicePort, rpc_urls: str):
 
     return EvmChainServiceAdapter(cache, rpc_urls, config('PRIVATE_KEY'), spaceriders_token_address,
                                   spaceriders_game_address, spaceriders_nft_address,
-                                  spaceriders_ticket_nft_address, spaceriders_token_abi, spaceriders_game_abi,
+                                  spaceriders_ticket_nft_address, router_address, busd_address, pair_address, spaceriders_token_abi, spaceriders_game_abi,
                                   spaceriders_nft_abi, spaceriders_ticket_nft_abi, router_abi)
 
 
@@ -121,6 +120,12 @@ async def get_planet_energy_use_case(token_price_adapter: TokenPricePort,
                         http_response_port)
 
 
+async def get_planet_bkm_use_case(bkm_repository: BKMDepositRepositoryAdapter,
+                                     planet_repository: PlanetRepositoryPort,
+                                     logging_adapter: LoggingAdapter,
+                                     contract: ChainServicePort):
+    return PlanetBKM(bkm_repository, planet_repository, logging_adapter, contract, http_response_port)
+
 async def nft_data_use_case(api_endpoint: str, planet_images_base_url: str, testnet_ticket_images_base_url: str,
                             planet_repository_port: PlanetRepositoryPort, contract_testnet: ChainServicePort):
     return NftData(api_endpoint, planet_images_base_url, testnet_ticket_images_base_url, planet_repository_port, contract_testnet, http_response_port)
@@ -134,29 +139,21 @@ async def get_staking_use_case(planet_repository_port: PlanetRepositoryPort, tok
     return Staking(planet_repository_port, token_price, chain_service_adapter, http_response_port)
 
 
-async def get_planet_level_use_case(planet_repository_port: PlanetRepositoryPort, lvl_up_repo: LevelUpRewardClaimsRepositoryPort, email_use_case: PlanetEmail, chain_service_adapter: ChainServicePort):
-    return PlanetLevel(planet_repository_port, lvl_up_repo, email_use_case, chain_service_adapter, http_response_port)
+async def get_planet_level_use_case(planet_repository_port: PlanetRepositoryPort,  email_use_case: PlanetEmail, chain_service_adapter: ChainServicePort):
+    return PlanetLevel(planet_repository_port, email_use_case, chain_service_adapter, http_response_port)
 
-
-async def get_resource_exchange_use_case(resource_repository: ResourceExchangeRepositoryAdapter):
-    return ResourcesExchange(resource_repository, http_response_port)
-
-
-async def get_planet_resources_conversion_use_case(planet_repository_port: PlanetRepositoryPort, token_conversion_repository_port: TokenConversionsRepositoryPort, resource_exchange: ResourcesExchange, chain_service: ChainServicePort, token_price: TokenPricePort):
-    return PlanetResourcesConversion(planet_repository_port, token_conversion_repository_port, resource_exchange, chain_service, token_price, http_response_port)
 # Controllers
 
 async def get_middleware():
     cache = await cache_dependency()
     contract_service = await contract_dependency(cache, config('RPCS_URL'))
     planet_repository = BeaniPlanetRepositoryAdapter()
-    lvl_up_repository = LevelUpRewardClaimsRepositoryAdapter()
     email_repository = EmailRepositoryAdapter()
 
     token_price = await token_price_dependency(cache, contract_service)
     email_use_case = await get_email_use_case(planet_repository, email_repository)
 
-    lvl_up_use_case = await get_planet_level_use_case(planet_repository, lvl_up_repository, email_use_case, contract_service)
+    lvl_up_use_case = await get_planet_level_use_case(planet_repository, email_use_case, contract_service)
 
     items_use_case = await get_buildable_items_use_case(planet_repository, lvl_up_use_case)
     planet_resources = await get_planet_resources_use_case(planet_repository)
@@ -169,10 +166,8 @@ async def http_controller():
     user_repository = BeaniUserRepositoryAdapter()
     planet_repository = BeaniPlanetRepositoryAdapter()
     energy_repository = EnergyDepositRepositoryAdapter()
+    bkm_repository = BKMDepositRepositoryAdapter()
     email_repository = EmailRepositoryAdapter()
-    lvl_up_repository = LevelUpRewardClaimsRepositoryAdapter()
-    resource_repository = ResourceExchangeRepositoryAdapter()
-    token_conversions_repository = TokenConversionsRepositoryAdapter()
     currency_market_order_repository = BeaniCurrencyMarketOrderRepositoryAdapter()
     currency_market_trade_repository = BeaniCurrencyMarketTradeRepositoryAdapter()
 
@@ -183,7 +178,7 @@ async def http_controller():
     token_price = await token_price_dependency(cache, contract_service)
 
     h = await get_email_use_case(planet_repository, email_repository)
-    k = await get_planet_level_use_case(planet_repository, lvl_up_repository, h, contract_service)
+    k = await get_planet_level_use_case(planet_repository, h, contract_service)
 
     auth_contract_service = contract_service
     if config('ENV') == "testnet":
@@ -204,16 +199,13 @@ async def http_controller():
     g = await nft_data_use_case(config('API_ENDPOINT'), config('PLANET_IMAGES_BUCKET_PATH'), config('TESTNET_TICKET_IMAGES_BUCKET_PATH'),
                                 planet_repository, nft_contract_service)
 
-
-
     j = await get_staking_use_case(planet_repository, token_price, contract_service)
-
-    resource_exchange = await get_resource_exchange_use_case(resource_repository)
-    planet_resources_conversion = await get_planet_resources_conversion_use_case(planet_repository, token_conversions_repository, resource_exchange, contract_service, token_price)
 
     trading_use_case = CurrencyMarket(planet_repository,
                                       currency_market_order_repository,
                                       currency_market_trade_repository,
                                       http_response_port)
 
-    return HttpController(a, b, c, d, e, f, g, h, j, k, planet_resources_conversion, trading_use_case)
+    planet_bkm_use_case = await get_planet_bkm_use_case(bkm_repository, planet_repository, logging_adapter, contract_service)
+
+    return HttpController(a, b, c, d, e, f, g, h, j, trading_use_case, planet_bkm_use_case)

@@ -100,7 +100,7 @@ tests = ["mypy", "PyHamcrest (>=2.0.2)", "pytest (>=4.6)", "pytest-benchmark", "
 
 [[package]]
 name = "beanie"
-version = "1.11.1"
+version = "1.11.10"
 description = "Asynchronous Python ODM for MongoDB"
 category = "main"
 optional = false
@@ -109,7 +109,7 @@ develop = false
 
 [package.dependencies]
 click = ">=7"
-motor = "^2.5"
+motor = ">=2.5,<4.0"
 pydantic = ">=1.9.0"
 toml = "*"
 yarl = ">=1.6"
@@ -117,8 +117,8 @@ yarl = ">=1.6"
 [package.source]
 type = "git"
 url = "https://github.com/roman-right/beanie.git"
-reference = "1.11.1"
-resolved_reference = "76f201b17bf911a5b77edc72fe652882838bdcf2"
+reference = "1.11.10"
+resolved_reference = "2634bb79c0ebe8b4afa709945b4fe56b8ea59d28"
 
 [[package]]
 name = "bitarray"
@@ -858,7 +858,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.10,<3.11"
-content-hash = "d7c70b0585b1b61c7c3cb4785212eb6e066270161525bfe19be82ef3147c158c"
+content-hash = "7fd68944af074f8e4aa23c53e494a467ad1235840c72c93edcb5babd8b2638ac"
 
 [metadata.files]
 aiohttp = [

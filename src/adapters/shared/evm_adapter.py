@@ -17,6 +17,9 @@ class EvmChainServiceAdapter(ChainServicePort):
     spaceriders_game_address: str
     spaceriders_nft_address: str
     spaceriders_ticket_nft_address: str
+    router_address: str
+    busd_address: str
+    pair_address: str
 
     spaceriders_token_abi: str
     spaceriders_game_abi: str
@@ -39,6 +42,15 @@ class EvmChainServiceAdapter(ChainServicePort):
 
         if contract_name == ChainServicePort.SPACERIDERS_TICKET_NFT_CONTRACT:
             return self.spaceriders_ticket_nft_address
+
+        if contract_name == ChainServicePort.ROUTER_CONTRACT:
+            return self.router_address
+
+        if contract_name == ChainServicePort.BUSD_CONTRACT:
+            return self.busd_address
+
+        if contract_name == ChainServicePort.PAIR_CONTRACT:
+            return self.pair_address
 
     async def get_rpc_url(self):
         faster_rpc = await self.cache.get(CacheServicePort.FASTEST_RPC)
@@ -127,8 +139,7 @@ class EvmChainServiceAdapter(ChainServicePort):
         return await self.__contract_multi_rpc_call(self.spaceriders_token_address, self.spaceriders_token_abi, func_name, args)
 
     async def router_call(self, func_name, *args):
-        router_address = await self.spaceriders_token_call("dexAddresses", (0))
-        return await self.__contract_multi_rpc_call(router_address, self.router_abi, func_name, args)
+        return await self.__contract_multi_rpc_call(self.router_address, self.router_abi, func_name, args)
 
     async def spaceriders_nft_call(self, func_name, *args):
         return await self.__contract_multi_rpc_call(self.spaceriders_nft_address, self.spaceriders_nft_abi, func_name, args)
@@ -150,8 +161,8 @@ class TokenPriceAdapter(TokenPricePort):
         if re is not None:
             return re
 
-        spaceriders_address = await self.contract_service.spaceriders_token_call("address")
-        busd_address = await self.contract_service.spaceriders_token_call("busdAddress")
+        spaceriders_address = await self.contract_service.get_contract_address(ChainServicePort.SPACERIDERS_TOKEN_CONTRACT)
+        busd_address = await self.contract_service.get_contract_address(ChainServicePort.BUSD_CONTRACT)
 
         path = [
             spaceriders_address,

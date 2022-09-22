@@ -47,34 +47,6 @@ class QueueIsFullException(AppBaseException):
     msg = "Can't upgrade, queue is full..."
 
 
-class TokenConversions(BaseModel):
-    id: str = None
-    completed: bool = False
-    created_time: float = None
-    metal: float = None
-    petrol: float = None
-    crystal: float = None
-    token: float = None
-
-    @staticmethod
-    def from_token_conversion(token_conversion: "TokenConversions"):
-        return TokenConversions(id=str(token_conversion.id),
-                                completed=token_conversion.completed,
-                                created_time=token_conversion.created_time,
-                                metal=token_conversion.metal,
-                                petrol=token_conversion.petrol,
-                                crystal=token_conversion.crystal,
-                                token=token_conversion.token)
-
-
-@dataclass
-class ResourceExchange:
-    created_time: float = None
-    metal_usd_price: float = None
-    crystal_usd_price: float = None
-    petrol_usd_price: float = None
-
-
 class User(BaseModel):
     id: str = None
     wallet: str = None
@@ -91,20 +63,6 @@ class PlanetTier(BaseModel):
     token_amount: float = 0
     time_release: float | None = None
     staked: bool = False
-
-
-class LevelUpRewardClaims(BaseModel):
-    id: str = None
-    level: int = None
-    completed: bool = False
-    planet_id: str
-
-    @staticmethod
-    def from_level_up_reward_claims(claim: "LevelUpRewardClaims"):
-        return LevelUpRewardClaims(id=str(claim.id),
-                                   level=claim.level,
-                                   completed=claim.completed,
-                                   planet_id=claim.planet_id)
 
 
 class BuildableItem(BaseModel):
@@ -126,6 +84,7 @@ class Resources(BaseModel):
     crystal: float = None
     petrol: float = None
     energy: float = None
+    bkm: float = None
 
     metal_last_updated: float = None
     crystal_last_updated: float = None
@@ -154,6 +113,15 @@ class EnergyDeposit(BaseModel):
     usd_value: float = None
     planet_id: str
     was_recovered = False
+
+
+class BKMTransaction(BaseModel):
+    request_id: str
+    created_time: float = None
+    token_amount: float = None
+    planet_id: str
+    was_recovered = False
+    type: str
 
 
 class Email(BaseModel):
@@ -203,15 +171,13 @@ class Planet(BaseModel):
     resources: Resources = Resources()
 
     price_paid: int = None
-    free_tokens: float = None
 
     resources_level: List[BuildableItem] = []
     installation_level: List[BuildableItem] = []
     research_level: List[BuildableItem] = []
     defense_items: List[BuildableItem] = []
-    pending_levelup_reward: List[LevelUpRewardClaims] = []
     energy_deposits: List[EnergyDeposit] = []
-    resource_conversions: List[TokenConversions] = []
+    bkm_deposits: List[BKMTransaction] = []
     emails: List[Email] = []
 
     def building_queue(self) -> list[BuildableItem]:
@@ -219,10 +185,6 @@ class Planet(BaseModel):
             BuildableItem] = self.resources_level + self.research_level + self.installation_level + self.defense_items
 
         return list(filter(lambda b: b.building or b.repairing, buildable_item))
-
-
-    def is_free(self):
-        return self.price_paid == 0
 
     def set_image_url(self, url: str):
         self.image_url = f"{url}/{self.image}-{self.rarity}.webp"
@@ -450,15 +412,12 @@ class PlanetResponse(BaseModel):
     resources: Resources = None
 
     price_paid: int = None
-    free_tokens: float = None
 
     resources_level: List[BuildableItem] = []
     installation_level: List[BuildableItem] = []
     research_level: List[BuildableItem] = []
     defense_items: List[BuildableItem] = []
-    pending_levelup_reward: List[LevelUpRewardClaims] = []
     energy_deposits: List[EnergyDeposit] = []
-    resource_conversions: List[TokenConversions] = []
     emails: List[Email] = []
 
     @staticmethod
@@ -490,14 +449,11 @@ class PlanetResponse(BaseModel):
         re.tier = p.tier
         re.resources = p.resources
         re.price_paid = p.price_paid
-        re.free_tokens = p.free_tokens
         re.resources_level = p.resources_level
         re.installation_level = p.installation_level
         re.research_level = p.research_level
         re.defense_items = p.defense_items
-        re.pending_levelup_reward = [LevelUpRewardClaims.from_level_up_reward_claims(x) for x in p.pending_levelup_reward]
         re.energy_deposits = p.energy_deposits
-        re.resource_conversions = [TokenConversions.from_token_conversion(x) for x in p.resource_conversions]
         re.emails = p.emails
         return re
 
