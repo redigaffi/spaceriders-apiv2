@@ -6,6 +6,7 @@ from bson import ObjectId
 from core import planet_email
 from core.currency_market import CurrencyMarket, MyOpenOrdersResponse
 from core.nft_metadata import NftData
+from core.planet_bkm import PlanetBKM, BKMTransactionRequest
 from core.planet_email import PlanetEmail
 from core.planet_energy import PlanetEnergy, EnergyDepositRequest
 from core.planet_staking import Staking, CreateStakingRequest, ConfirmStakingRequest, UnStakeRequest
@@ -38,6 +39,7 @@ class HttpController:
     planet_emails: PlanetEmail
     staking: Staking
     currency_market: CurrencyMarket
+    planet_bkm: PlanetBKM
 
     async def jwt(self, req: AuthenticationDetailsRequest):
         return await self.authenticate_use_case(req)
@@ -132,6 +134,10 @@ class HttpController:
 
     async def fetch_all_market_info(self):
         re = await self.currency_market.get_all_market_info()
+        return jsonable_encoder(re)
+
+    async def bkm_deposit(self, request: BKMTransactionRequest, user=Depends(jwt_bearer)):
+        re = await self.planet_bkm.create_transaction(user, request)
         return jsonable_encoder(re)
 
     async def health(self):

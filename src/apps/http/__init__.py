@@ -6,7 +6,7 @@ from starlette.background import BackgroundTask
 # Info, seems like this need to be at the top, also some have src before and others not (maybe due to relationship?)
 from adapters.shared.beanie_models_adapter import UserDocument, EnergyDepositDocument, PlanetDocument, EmailDocument, \
     CurrencyMarketOrderDocument, \
-    CurrencyMarketTradeDocument
+    CurrencyMarketTradeDocument, BKMTransactionDocument
 from apps.http.dependencies import get_middleware
 from decouple import config
 from beanie import init_beanie
@@ -137,6 +137,7 @@ async def app_init():
     await init_beanie(database=db,
                       document_models=[UserDocument,
                                        EnergyDepositDocument,
+                                       BKMTransactionDocument,
                                        PlanetDocument,
                                        EmailDocument,
                                        CurrencyMarketOrderDocument,

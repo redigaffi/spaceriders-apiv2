@@ -3,7 +3,7 @@ from typing import Optional, List
 from beanie import Document, Indexed, Link, PydanticObjectId
 from datetime import datetime
 from core.shared.models import EnergyDeposit, Email, CurrencyMarketOrder, \
-    CurrencyMarketTrade
+    CurrencyMarketTrade, BKMTransaction
 from core.shared.models import User, PlanetTier, Resources, Planet, Reserves, BuildableItem, UserNotFoundException
 
 
@@ -42,6 +42,21 @@ class EnergyDepositDocument(Document, EnergyDeposit):
 
     class Settings:
         name = "energy_deposits"
+        use_revision = True
+        use_state_management = True
+
+
+class BKMTransactionDocument(Document, BKMTransaction):
+    request_id: str
+    created_time: float | None = 0
+    token_amount: float | None = 0
+    usd_value: float | None = 0
+    planet_id: str
+    was_recovered: bool = False
+    type: str
+
+    class Settings:
+        name = "bkm_deposits"
         use_revision = True
         use_state_management = True
 
@@ -86,6 +101,7 @@ class PlanetDocument(Document, Planet):
     defense_items: List[BuildableItem] = None
 
     energy_deposits: List[Link[EnergyDepositDocument]] = []
+    bkm_deposits: List[Link[BKMTransactionDocument]] = []
     emails: List[Link[EmailDocument]] = []
 
     price_paid: int = 0

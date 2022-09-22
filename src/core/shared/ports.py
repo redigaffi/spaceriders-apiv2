@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
 
-from core.shared.models import OpenOrdersGroupedByPrice, PriceCandleDataGroupedByTimeInterval, Volume24Info
+from core.shared.models import OpenOrdersGroupedByPrice, PriceCandleDataGroupedByTimeInterval, Volume24Info, BKMTransaction
 from core.shared.models import User, Planet, EnergyDeposit, Email, \
      CurrencyMarketTrade, CurrencyMarketOrder
 from typing import TypedDict, Tuple
@@ -42,6 +42,16 @@ class EnergyDepositRepositoryPort(ABC):
     @abstractmethod
     async def create_energy_deposit(self, energy_deposit: EnergyDeposit) -> EnergyDeposit:
         pass
+
+class BKMDepositRepositoryPort(ABC):
+    @abstractmethod
+    async def get(self, id: str) -> BKMTransaction | None:
+        pass
+
+    @abstractmethod
+    async def create_bkm_transaction(self, energy_deposit: BKMTransaction) -> BKMTransaction:
+        pass
+
 
 
 class CurrencyMarketOrderRepositoryPort(ABC):

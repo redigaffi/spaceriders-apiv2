@@ -26,10 +26,6 @@ class EnergyDepositAlreadyExistsException(AppBaseException):
     msg = "Energy deposit with given id already exists"
 
 
-class NotEnoughFreeTokensForEnergyDepositException(AppBaseException):
-    msg = "Not holding enough $SPR tokens for energy deposit"
-
-
 @dataclass
 class PlanetEnergy:
     token_price: TokenPricePort

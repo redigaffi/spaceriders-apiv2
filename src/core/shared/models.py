@@ -46,6 +46,7 @@ class NoPlanetFoundException(AppBaseException):
 class QueueIsFullException(AppBaseException):
     msg = "Can't upgrade, queue is full..."
 
+
 class User(BaseModel):
     id: str = None
     wallet: str = None
@@ -83,6 +84,7 @@ class Resources(BaseModel):
     crystal: float = None
     petrol: float = None
     energy: float = None
+    bkm: float = None
 
     metal_last_updated: float = None
     crystal_last_updated: float = None
@@ -111,6 +113,15 @@ class EnergyDeposit(BaseModel):
     usd_value: float = None
     planet_id: str
     was_recovered = False
+
+
+class BKMTransaction(BaseModel):
+    request_id: str
+    created_time: float = None
+    token_amount: float = None
+    planet_id: str
+    was_recovered = False
+    type: str
 
 
 class Email(BaseModel):
@@ -166,6 +177,7 @@ class Planet(BaseModel):
     research_level: List[BuildableItem] = []
     defense_items: List[BuildableItem] = []
     energy_deposits: List[EnergyDeposit] = []
+    bkm_deposits: List[BKMTransaction] = []
     emails: List[Email] = []
 
     def building_queue(self) -> list[BuildableItem]:

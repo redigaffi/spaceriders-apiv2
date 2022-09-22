@@ -7,11 +7,11 @@ from pydantic import BaseModel
 
 from adapters.shared.beanie_models_adapter import EnergyDepositDocument, PlanetDocument, UserDocument, EmailDocument, \
     CurrencyMarketTradeDocument, \
-    CurrencyMarketOrderDocument
-from core.shared.models import OpenOrdersGroupedByPrice, PriceCandleDataGroupedByTimeInterval, Volume24Info
+    CurrencyMarketOrderDocument, BKMTransactionDocument
+from core.shared.models import OpenOrdersGroupedByPrice, PriceCandleDataGroupedByTimeInterval, Volume24Info, BKMTransaction
 from core.shared.ports import UserRepositoryPort, PlanetRepositoryPort, EnergyDepositRepositoryPort, \
     EmailRepositoryPort, \
-    CurrencyMarketTradeRepositoryPort, CurrencyMarketOrderRepositoryPort
+    CurrencyMarketTradeRepositoryPort, CurrencyMarketOrderRepositoryPort, BKMDepositRepositoryPort
 from core.shared.models import User, PlanetTier, Planet, UserNotFoundException, \
     EnergyDeposit, Email, CurrencyMarketTrade, \
     CurrencyMarketOrder
@@ -59,6 +59,22 @@ class EnergyDepositRepositoryAdapter(EnergyDepositRepositoryPort):
                                                 usd_value=energy_deposit.usd_value)
         await energy_document.save()
         return energy_document
+
+
+class BKMDepositRepositoryAdapter(BKMDepositRepositoryPort):
+
+    async def get(self, id: str) -> BKMTransaction | None:
+        return await BKMTransactionDocument.find_one(BKMTransactionDocument.request_id == id)
+
+    async def create_bkm_transaction(self, energy_deposit: BKMTransaction) -> BKMTransaction:
+        bkm_document = BKMTransactionDocument(request_id=energy_deposit.request_id,
+                                              planet_id=energy_deposit.planet_id,
+                                              was_recovered=energy_deposit.was_recovered,
+                                              created_time=energy_deposit.created_time,
+                                              token_amount=energy_deposit.token_amount,
+                                              type=energy_deposit.type)
+        await bkm_document.save()
+        return bkm_document
 
 
 class BeaniCurrencyMarketOrderRepositoryAdapter(CurrencyMarketOrderRepositoryPort):
@@ -548,7 +564,7 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
 
     async def update(self, planet: PlanetDocument) -> Planet:
         await planet.save_changes()
-        return planet
+        return await self.get(str(planet.id))
 
     async def get_my_planet(self, user_id: str, planet_id: str, fetch_links=False) -> Planet | None:
         # if fetch_links provided energy_deposits comes null?

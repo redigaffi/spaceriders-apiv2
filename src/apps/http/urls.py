@@ -7,7 +7,7 @@ from core.get_planets import FetchByPlanetIdResponse, PlanetResponse, FetchByPla
 from core.mint_planet import FetchPlanetCostResponse, FetchPlanetCostDataResponse
 from core.nft_metadata import OpenseaMetadataNftResponse
 from core.planet_staking import TierInfoResponse, CreateStakingResponse
-from core.shared.models import Planet, BuildableItem, EnergyDeposit, PlanetTier
+from core.shared.models import Planet, BuildableItem, EnergyDeposit, PlanetTier, BKMTransaction
 
 
 async def register_fastapi_routes(http_controller: HttpController) -> list:
@@ -44,6 +44,9 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
 
         dict(path=r"/planet/energy", response_model=EnergyDeposit,
              endpoint=http_controller.energy_deposit, methods=["post"]),
+
+        dict(path=r"/planet/bkm", response_model=BKMTransaction,
+             endpoint=http_controller.bkm_deposit, methods=["post"]),
 
         dict(path=r"/nft/planet/{planet_id}", response_model=OpenseaMetadataNftResponse,
              endpoint=http_controller.fetch_planet_nft_data, methods=["get"]),

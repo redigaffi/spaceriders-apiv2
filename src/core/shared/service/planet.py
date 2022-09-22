@@ -74,6 +74,7 @@ def get_new_planet(user: str, name: str, last_planet: Planet, price_paid: int, p
     planet.resources.petrol = initial_reserve["petrol"]
     planet.resources.crystal = initial_reserve["crystal"]
     planet.resources.energy = initial_reserve["energy"]
+    planet.resources.bkm = 0
     planet.image = image
     planet.set_image_url(planet_images_bucket_path)
     planet.diameter = diameter

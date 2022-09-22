@@ -1,11 +1,12 @@
 from adapters.cronjobs import BlackHoleResponsePort
 from adapters.shared.beani_repository_adapter import BeaniUserRepositoryAdapter, BeaniPlanetRepositoryAdapter, \
-    EnergyDepositRepositoryAdapter, EmailRepositoryAdapter
+    EnergyDepositRepositoryAdapter, EmailRepositoryAdapter, BKMDepositRepositoryAdapter
 from adapters.shared.cache_adapter import MemCacheCacheServiceAdapter
 from adapters.shared.evm_adapter import EvmChainServiceAdapter, TokenPriceAdapter
 from adapters.shared.logging_adapter import LoggingAdapter, get_logger
 from controllers.cronjobs import CronjobController
 from core.mint_planet import MintPlanet
+from core.planet_bkm import PlanetBKM
 from core.planet_email import PlanetEmail
 from core.planet_energy import PlanetEnergy
 from decouple import config
@@ -17,7 +18,6 @@ from core.planet_level import PlanetLevel
 from core.planet_staking import Staking
 from core.pve.asteroid import Asteroid
 from core.pve.space_pirates import SpacePirates
-from core.resource_exchange import ResourcesExchange
 from core.shared.ports import CacheServicePort, ChainServicePort, TokenPricePort
 
 response_adapter = BlackHoleResponsePort()
@@ -76,6 +76,8 @@ user_repository = BeaniUserRepositoryAdapter()
 planet_repository = BeaniPlanetRepositoryAdapter()
 energy_repository = EnergyDepositRepositoryAdapter()
 email_repository = EmailRepositoryAdapter()
+bkm_repository = BKMDepositRepositoryAdapter()
+
 
 async def cronjob_controller():
     cache = await cache_dependency()
@@ -86,7 +88,7 @@ async def cronjob_controller():
     staking_use_case = Staking(planet_repository, token_price_adapter, contract, response_adapter)
 
     email_use_case = PlanetEmail(planet_repository, email_repository, response_adapter)
-    planet_level = PlanetLevel(planet_repository, lvl_up_repository, email_use_case, contract, response_adapter)
+    planet_level = PlanetLevel(planet_repository, email_use_case, contract, response_adapter)
 
     planet_mint = MintPlanet(token_price_adapter, contract, config('API_ENDPOINT'), config('PLANET_IMAGES_BUCKET_PATH'),
                       planet_repository, response_adapter)
@@ -94,10 +96,12 @@ async def cronjob_controller():
     asteroid_pve = Asteroid(planet_repository, planet_level, email_use_case, response_adapter)
     space_pirate_pve = SpacePirates(planet_repository, planet_level, email_use_case, response_adapter)
 
+    planet_bkm = PlanetBKM(bkm_repository, planet_repository, logging_adapter, contract, response_adapter)
+
     return CronjobController(energy_planet_use_case,
                              staking_use_case,
                              planet_level,
-                             resource_exchange,
                              planet_mint,
                              asteroid_pve,
-                             space_pirate_pve)
+                             space_pirate_pve,
+                             planet_bkm)
