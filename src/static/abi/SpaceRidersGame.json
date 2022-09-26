@@ -148,6 +148,11 @@
           "internalType": "string",
           "name": "txType",
           "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "fee",
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -169,6 +174,28 @@
           "internalType": "string",
           "name": "planetId",
           "type": "string"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint8",
+              "name": "v",
+              "type": "uint8"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "r",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "s",
+              "type": "bytes32"
+            }
+          ],
+          "internalType": "struct OnlyBackend.signatureData",
+          "name": "sD",
+          "type": "tuple"
         }
       ],
       "name": "bkmWithdraw",
@@ -353,6 +380,11 @@
           "internalType": "string",
           "name": "txType",
           "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "fee",
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -530,6 +562,19 @@
         }
       ],
       "name": "setBenefitStakingPerformanceFeeBP",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_fee",
+          "type": "uint256"
+        }
+      ],
+      "name": "setBkmFee",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

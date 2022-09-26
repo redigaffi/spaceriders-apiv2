@@ -136,7 +136,11 @@ class HttpController:
         re = await self.currency_market.get_all_market_info()
         return jsonable_encoder(re)
 
-    async def bkm_deposit(self, request: BKMTransactionRequest, user=Depends(jwt_bearer)):
+    async def bkm_withdraw(self, request: BKMTransactionRequest, user=Depends(jwt_bearer)):
+        re = await self.planet_bkm.withdraw(user, request)
+        return jsonable_encoder(re)
+
+    async def bkm_transaction(self, request: BKMTransactionRequest, user=Depends(jwt_bearer)):
         re = await self.planet_bkm.create_transaction(user, request)
         return jsonable_encoder(re)
 
