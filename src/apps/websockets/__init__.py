@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 # Info, seems like this need to be at the top, also some have src before and others not (maybe due to relationship?)
 from adapters.shared.beanie_models_adapter import UserDocument, EnergyDepositDocument, PlanetDocument, EmailDocument, \
-    LevelUpRewardClaimsDocument, ResourceExchangeDocument, TokenConversionsDocument, CurrencyMarketOrderDocument, \
+    CurrencyMarketOrderDocument, \
     CurrencyMarketTradeDocument
 
 from decouple import config
@@ -22,12 +22,9 @@ async def app_init():
     db = client[config('DB_NAME')]
     await init_beanie(database=db,
                       document_models=[UserDocument,
-                                       TokenConversionsDocument,
-                                       ResourceExchangeDocument,
                                        EnergyDepositDocument,
                                        PlanetDocument,
                                        EmailDocument,
-                                       LevelUpRewardClaimsDocument,
                                        CurrencyMarketOrderDocument,
                                        CurrencyMarketTradeDocument]
     )

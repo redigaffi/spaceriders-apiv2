@@ -6,13 +6,10 @@ from bson import ObjectId
 from core import planet_email
 from core.currency_market import CurrencyMarket, MyOpenOrdersResponse
 from core.nft_metadata import NftData
+from core.planet_bkm import PlanetBKM, BKMTransactionRequest
 from core.planet_email import PlanetEmail
 from core.planet_energy import PlanetEnergy, EnergyDepositRequest
-from core.planet_level import PlanetLevel
-from core.planet_resources_conversion import PlanetResourcesConversion, ResourceConvertRequest, \
-    ConfirmConversionRequest, RetryConversionRequest
 from core.planet_staking import Staking, CreateStakingRequest, ConfirmStakingRequest, UnStakeRequest
-from core.shared.models import EnergyDeposit
 from adapters.http.security import jwt_bearer
 from core.authenticate import Authenticate
 from core.buildable_items import BuildableItems, BuildableRequest
@@ -41,9 +38,8 @@ class HttpController:
     nft_data: NftData
     planet_emails: PlanetEmail
     staking: Staking
-    lvl_reward_claim: PlanetLevel
-    planet_resource_conversion: PlanetResourcesConversion
     currency_market: CurrencyMarket
+    planet_bkm: PlanetBKM
 
     async def jwt(self, req: AuthenticationDetailsRequest):
         return await self.authenticate_use_case(req)
@@ -62,10 +58,6 @@ class HttpController:
 
     async def planet_sign_cost_data(self, request: FetchPlanetCostDataRequest, user=Depends(jwt_bearer)):
         re = await self.buy_planet_use_case.fetch_planet_cost_data(user, request)
-        return jsonable_encoder(re)
-
-    async def mint_free_planet(self, req: FreePlanetRequest, user=Depends(jwt_bearer)) -> Planet:
-        re: Planet = await self.buy_planet_use_case.mint_free_planet(user, req)
         return jsonable_encoder(re)
 
     async def get_chain_data(self):
@@ -132,34 +124,6 @@ class HttpController:
         re = await self.staking.unstake(request, user)
         return jsonable_encoder(re)
 
-    async def claim_planet_level_reward_sign(self, claim_id: str, user=Depends(jwt_bearer)):
-        re = await self.lvl_reward_claim.claim_pending_lvl_up_reward_sign(claim_id, user)
-        return jsonable_encoder(re)
-
-    async def confirm_planet_level_reward(self, claim_id: str, user=Depends(jwt_bearer)):
-        re = await self.lvl_reward_claim.confirm_pending_lvl_up_reward(claim_id, user)
-        return jsonable_encoder(re)
-
-    async def planet_resources_convert_preview(self, planet_id: str, user=Depends(jwt_bearer)):
-        re = await self.planet_resource_conversion.preview_conversion(planet_id, user)
-        return jsonable_encoder(re)
-
-    async def planet_resources_convert_pending(self, planet_id: str, user=Depends(jwt_bearer)):
-        re = await self.planet_resource_conversion.pending_conversions(planet_id, user)
-        return jsonable_encoder(re)
-
-    async def planet_resources_convert_sign(self, request: ResourceConvertRequest, user=Depends(jwt_bearer)):
-        re = await self.planet_resource_conversion.convert_conversion(request, user)
-        return jsonable_encoder(re)
-
-    async def planet_resources_convert_confirm(self, request: ConfirmConversionRequest, user=Depends(jwt_bearer)):
-        re = await self.planet_resource_conversion.confirm_conversion(request, user)
-        return jsonable_encoder(re)
-
-    async def planet_resources_convert_retry(self, request: RetryConversionRequest, user=Depends(jwt_bearer)):
-        re = await self.planet_resource_conversion.retry_conversion(request, user)
-        return jsonable_encoder(re)
-
     async def currency_market_fetch_open_orders(self, market_code: str, planet_id: str) -> list[MyOpenOrdersResponse]:
         re = await self.currency_market.fetch_my_open_orders(market_code, planet_id)
         return jsonable_encoder(re)
@@ -170,6 +134,14 @@ class HttpController:
 
     async def fetch_all_market_info(self):
         re = await self.currency_market.get_all_market_info()
+        return jsonable_encoder(re)
+
+    async def bkm_withdraw(self, request: BKMTransactionRequest, user=Depends(jwt_bearer)):
+        re = await self.planet_bkm.withdraw(user, request)
+        return jsonable_encoder(re)
+
+    async def bkm_transaction(self, request: BKMTransactionRequest, user=Depends(jwt_bearer)):
+        re = await self.planet_bkm.create_transaction(user, request)
         return jsonable_encoder(re)
 
     async def health(self):

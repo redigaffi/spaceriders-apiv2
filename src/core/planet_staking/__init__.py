@@ -37,6 +37,7 @@ class CreateStakingResponse(BaseModel):
     v: int = None
     r: str = None
     s: str = None
+    router: str = None
 
 
 class PlanetAlreadyStakedException(AppBaseException):
@@ -52,7 +53,7 @@ class StakeTier0Exception(AppBaseException):
 
 
 class NotEnoughSprBalanceException(AppBaseException):
-    msg = "Not holding enough $SPR (in usd value)"
+    msg = "Not holding enough $BKM (in usd value)"
 
 
 class NotStakedException(AppBaseException):
@@ -95,9 +96,9 @@ class Staking:
             tmp.name = StakingData.TIER_NAMES[stake_code]
             tmp.tokens_time_locked = staking_data.tokens_time_locked
 
-            tmp.benefit_lines.append(f"{staking_data.max_queue} items in queue simultaneously")
-            tmp.benefit_lines.append(f"{staking_data.discount_items}% discount on all in-game purchases")
-            tmp.benefit_lines.append(f"{staking_data.experience_boost}% experience boost")
+            # tmp.benefit_lines.append(f"{staking_data.max_queue} items in queue simultaneously")
+            # tmp.benefit_lines.append(f"{staking_data.discount_items}% discount on all in-game purchases")
+            # tmp.benefit_lines.append(f"{staking_data.experience_boost}% experience boost")
             re[stake_code] = tmp
 
         return await self.response_port.publish_response(re)
@@ -114,7 +115,7 @@ class Staking:
         if request.tier_code == StakingData.TIER_0:
             raise StakeTier0Exception()
 
-        user_token_balance_raw = await self.chain_service_port.spaceriders_token_call("totalBalanceOf", user)
+        user_token_balance_raw = await self.chain_service_port.spaceriders_token_call("balanceOf", user)
         user_token_balance = user_token_balance_raw / 10**18
 
         current_token_price = await self.token_price_port.fetch_token_price_usd()
@@ -144,6 +145,7 @@ class Staking:
             v=signed_message['v'],
             r=signed_message['r'],
             s=signed_message['s'],
+            router=await self.chain_service_port.get_contract_address(self.chain_service_port.ROUTER_CONTRACT)
         )
 
         return await self.response_port.publish_response(response)

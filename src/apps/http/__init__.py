@@ -5,8 +5,8 @@ from starlette.background import BackgroundTask
 
 # Info, seems like this need to be at the top, also some have src before and others not (maybe due to relationship?)
 from adapters.shared.beanie_models_adapter import UserDocument, EnergyDepositDocument, PlanetDocument, EmailDocument, \
-    LevelUpRewardClaimsDocument, ResourceExchangeDocument, TokenConversionsDocument, CurrencyMarketOrderDocument, \
-    CurrencyMarketTradeDocument
+    CurrencyMarketOrderDocument, \
+    CurrencyMarketTradeDocument, BKMTransactionDocument
 from apps.http.dependencies import get_middleware
 from decouple import config
 from beanie import init_beanie
@@ -136,12 +136,10 @@ async def app_init():
     db = client[config('DB_NAME')]
     await init_beanie(database=db,
                       document_models=[UserDocument,
-                                       TokenConversionsDocument,
-                                       ResourceExchangeDocument,
                                        EnergyDepositDocument,
+                                       BKMTransactionDocument,
                                        PlanetDocument,
                                        EmailDocument,
-                                       LevelUpRewardClaimsDocument,
                                        CurrencyMarketOrderDocument,
                                        CurrencyMarketTradeDocument]
     )
@@ -152,5 +150,5 @@ async def app_init():
         app.router.add_api_route(**url)
 
 
-# if __name__ == "__main__":
-#     uvicorn.run("__main__:app", port=8010, host='0.0.0.0', reload=True, workers=1, debug=True)
+ #if __name__ == "__main__":
+ #    uvicorn.run("__main__:app", port=8010, host='0.0.0.0', reload=True, workers=1, debug=True)

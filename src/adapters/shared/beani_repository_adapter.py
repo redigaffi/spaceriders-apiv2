@@ -6,92 +6,17 @@ from beanie import PydanticObjectId, WriteRules, DeleteRules
 from pydantic import BaseModel
 
 from adapters.shared.beanie_models_adapter import EnergyDepositDocument, PlanetDocument, UserDocument, EmailDocument, \
-    LevelUpRewardClaimsDocument, ResourceExchangeDocument, TokenConversionsDocument, CurrencyMarketTradeDocument, \
-    CurrencyMarketOrderDocument
-from core.shared.models import OpenOrdersGroupedByPrice, PriceCandleDataGroupedByTimeInterval, Volume24Info
+    CurrencyMarketTradeDocument, \
+    CurrencyMarketOrderDocument, BKMTransactionDocument
+from core.shared.models import OpenOrdersGroupedByPrice, PriceCandleDataGroupedByTimeInterval, Volume24Info, BKMTransaction
 from core.shared.ports import UserRepositoryPort, PlanetRepositoryPort, EnergyDepositRepositoryPort, \
-    EmailRepositoryPort, LevelUpRewardClaimsRepositoryPort, ResourceExchangeRepositoryPort, \
-    TokenConversionsRepositoryPort, CurrencyMarketTradeRepositoryPort, CurrencyMarketOrderRepositoryPort
+    EmailRepositoryPort, \
+    CurrencyMarketTradeRepositoryPort, CurrencyMarketOrderRepositoryPort, BKMDepositRepositoryPort
 from core.shared.models import User, PlanetTier, Planet, UserNotFoundException, \
-    LevelUpRewardClaims, EnergyDeposit, Email, ResourceExchange, TokenConversions, CurrencyMarketTrade, \
+    EnergyDeposit, Email, CurrencyMarketTrade, \
     CurrencyMarketOrder
 from datetime import datetime
 from beanie.operators import In
-
-
-class TokenConversionsRepositoryAdapter(TokenConversionsRepositoryPort):
-    async def create(self, token_conversion: TokenConversions) -> TokenConversions:
-        # TokenConversionsDocument.update_forward_refs()
-        token_conversion_doc = TokenConversionsDocument(completed=token_conversion.completed,
-                                                        created_time=token_conversion.created_time,
-                                                        metal=token_conversion.metal,
-                                                        petrol=token_conversion.petrol,
-                                                        crystal=token_conversion.crystal,
-                                                        token=token_conversion.token)
-
-        await token_conversion_doc.save()
-        return token_conversion_doc
-
-    async def get(self, token_conversion: str) -> TokenConversions | None:
-        # TokenConversionsDocument.update_forward_refs()
-
-        return await TokenConversionsDocument.find_one(
-            TokenConversionsDocument.id == PydanticObjectId(token_conversion))
-
-    async def get_latest(self) -> TokenConversions | None:
-        TokenConversionsDocument.update_forward_refs()
-
-        last_conversion = await TokenConversionsDocument.all().sort(-TokenConversionsDocument.created_time).limit(
-            1).to_list()
-
-        if len(last_conversion) > 0:
-            return last_conversion[0]
-
-    async def update(self, token_conversion: TokenConversionsDocument) -> TokenConversions:
-        TokenConversionsDocument.update_forward_refs()
-
-        await token_conversion.save_changes()
-        return token_conversion
-
-
-class ResourceExchangeRepositoryAdapter(ResourceExchangeRepositoryPort):
-    async def create(self, resource_exchange: ResourceExchange) -> ResourceExchange:
-        resource_exchange_doc = ResourceExchangeDocument(created_time=resource_exchange.created_time,
-                                                         metal_usd_price=resource_exchange.metal_usd_price,
-                                                         crystal_usd_price=resource_exchange.crystal_usd_price,
-                                                         petrol_usd_price=resource_exchange.petrol_usd_price)
-
-        await resource_exchange_doc.save()
-        return resource_exchange_doc
-
-    async def get(self, resource_exchange: str) -> ResourceExchange | None:
-        return await ResourceExchangeDocument.get(PydanticObjectId(resource_exchange))
-
-    async def get_latest(self) -> ResourceExchange | None:
-        last_price = await ResourceExchangeDocument.all().sort(-ResourceExchangeDocument.created_time).limit(
-            1).to_list()
-
-        if len(last_price) > 0:
-            return last_price[0]
-
-    async def update(self, resource_exchange: ResourceExchangeDocument) -> ResourceExchange:
-        await resource_exchange.save_changes()
-        return resource_exchange
-
-
-class LevelUpRewardClaimsRepositoryAdapter(LevelUpRewardClaimsRepositoryPort):
-    async def create(self, lvl_up: LevelUpRewardClaims) -> LevelUpRewardClaims:
-        lvl_up_document = LevelUpRewardClaimsDocument(level=lvl_up.level, completed=lvl_up.completed,
-                                                      planet_id=lvl_up.planet_id)
-        await lvl_up_document.save()
-        return lvl_up_document
-
-    async def get(self, lvl_up_id: str) -> LevelUpRewardClaims | None:
-        return await LevelUpRewardClaimsDocument.get(PydanticObjectId(lvl_up_id))
-
-    async def update(self, lvl_up: LevelUpRewardClaimsDocument) -> LevelUpRewardClaims:
-        await lvl_up.save_changes()
-        return lvl_up
 
 
 class EmailRepositoryAdapter(EmailRepositoryPort):
@@ -134,6 +59,22 @@ class EnergyDepositRepositoryAdapter(EnergyDepositRepositoryPort):
                                                 usd_value=energy_deposit.usd_value)
         await energy_document.save()
         return energy_document
+
+
+class BKMDepositRepositoryAdapter(BKMDepositRepositoryPort):
+
+    async def get(self, id: str) -> BKMTransaction | None:
+        return await BKMTransactionDocument.find_one(BKMTransactionDocument.request_id == id)
+
+    async def create_bkm_transaction(self, energy_deposit: BKMTransaction) -> BKMTransaction:
+        bkm_document = BKMTransactionDocument(request_id=energy_deposit.request_id,
+                                              planet_id=energy_deposit.planet_id,
+                                              was_recovered=energy_deposit.was_recovered,
+                                              created_time=energy_deposit.created_time,
+                                              token_amount=energy_deposit.token_amount,
+                                              type=energy_deposit.type)
+        await bkm_document.save()
+        return bkm_document
 
 
 class BeaniCurrencyMarketOrderRepositoryAdapter(CurrencyMarketOrderRepositoryPort):
@@ -623,7 +564,7 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
 
     async def update(self, planet: PlanetDocument) -> Planet:
         await planet.save_changes()
-        return planet
+        return await self.get(str(planet.id))
 
     async def get_my_planet(self, user_id: str, planet_id: str, fetch_links=False) -> Planet | None:
         # if fetch_links provided energy_deposits comes null?
@@ -638,13 +579,11 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
         return planet
 
     async def get(self, planet_id: str, fetch_links=False) -> Planet | None:
-        # TokenConversionsDocument.update_forward_refs()
         planet = await PlanetDocument.find_one(PlanetDocument.id == PydanticObjectId(planet_id),
                                                fetch_links=fetch_links)
         return planet
 
     async def get_by_request_id(self, request_id: str, fetch_links=False) -> Planet | None:
-        # TokenConversionsDocument.update_forward_refs()
         planet = await PlanetDocument.find_one(PlanetDocument.request_id == request_id, fetch_links=fetch_links)
         return planet
 
@@ -694,8 +633,6 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
             claimed=planet_data.claimed,
             tier=planet_tier,
             resources=planet_data.resources,
-            price_paid=planet_data.price_paid,
-            free_tokens=0,
             resources_level=planet_data.resources_level,
             installation_level=planet_data.installation_level,
             research_level=planet_data.research_level,
