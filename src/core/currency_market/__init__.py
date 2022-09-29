@@ -72,10 +72,10 @@ class CurrencyMarket:
         markets = [
             "METAL_CRYSTAL",
             "METAL_PETROL",
-            "PETROL_METAL",
-            "PETROL_CRYSTAL",
-            "CRYSTAL_METAL",
+            "METAL_BKM",
             "CRYSTAL_PETROL",
+            "CRYSTAL_BKM",
+            "PETROL_BKM"
         ]
 
         for market in markets:
