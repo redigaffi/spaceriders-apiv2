@@ -63,6 +63,9 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
 
         dict(path=r"/planet/email/{email_id}/delete",
              endpoint=http_controller.email_delete, methods=["post"]),
+        
+        dict(path=r"/planet/{planet_id}/email",
+             endpoint=http_controller.email_delete_all, methods=["delete"]),
 
         dict(path=r"/planet/staking/info", response_model=dict[str, TierInfoResponse],
              endpoint=http_controller.staking_info, methods=["get"]),

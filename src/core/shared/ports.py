@@ -30,6 +30,10 @@ class EmailRepositoryPort(ABC):
         pass
 
     @abstractmethod
+    async def delete_all_by_user(self, planet_id) -> None:
+        pass
+
+    @abstractmethod
     async def get(self, email_id) -> Email:
         pass
 

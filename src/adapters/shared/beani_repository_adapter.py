@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Tuple
+from typing import Any, List, Tuple
 
 from beanie import PydanticObjectId, WriteRules, DeleteRules
 from pydantic import BaseModel
@@ -39,6 +39,17 @@ class EmailRepositoryAdapter(EmailRepositoryPort):
 
         await planet.save_changes()
         await email_document.delete(link_rule=DeleteRules.DELETE_LINKS)
+
+    async def delete_all_by_user(self, planet_id) -> None:
+        email_documents: List[EmailDocument] = await EmailDocument.find(EmailDocument.planet == planet_id).to_list()
+        for email in email_documents:
+            await email.delete(link_rule=DeleteRules.DELETE_LINKS)
+        
+        planet = await PlanetDocument.get(PydanticObjectId(planet_id))
+        await planet.fetch_link(PlanetDocument.emails)
+        planet.emails = []
+
+        await planet.save_changes()
 
     async def get(self, email_id) -> Email:
         email = await EmailDocument.get(PydanticObjectId(email_id))
