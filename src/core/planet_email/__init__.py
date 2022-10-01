@@ -58,3 +58,6 @@ class PlanetEmail:
         await self.email_repository_port.delete(email)
         return await self.response_port.publish_response({})
 
+    async def delete_all(self, planet_id):
+        await self.email_repository_port.delete_all_by_user(planet_id)
+        return await self.response_port.publish_response({})

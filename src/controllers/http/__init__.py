@@ -107,6 +107,10 @@ class HttpController:
     async def email_delete(self, email_id: str, user=Depends(jwt_bearer)):
         re = await self.planet_emails.delete(email_id)
         return jsonable_encoder(re)
+    
+    async def email_delete_all(self, planet_id, user=Depends(jwt_bearer)):
+        re = await self.planet_emails.delete_all(planet_id)
+        return jsonable_encoder(re)
 
     async def staking_info(self):
         re = await self.staking.tier_info()
