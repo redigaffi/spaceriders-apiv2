@@ -43,6 +43,9 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
         dict(path=r"/planet/build", response_model=BuildableResponse,
              endpoint=http_controller.build, methods=["post"]),
 
+        dict(path=r"/planet/repair", response_model=BuildableResponse,
+             endpoint=http_controller.repair, methods=["post"]),
+
         dict(path=r"/planet/energy", response_model=EnergyDeposit,
              endpoint=http_controller.energy_deposit, methods=["post"]),
 

@@ -88,6 +88,10 @@ class HttpController:
         re = await self.buildable_items.build(user, request)
         return jsonable_encoder(re)
 
+    async def repair(self, request: BuildableRequest, user=Depends(jwt_bearer)):
+        re = await self.buildable_items.repair(user, request)
+        return jsonable_encoder(re)
+
     async def energy_deposit(self, request: EnergyDepositRequest, user=Depends(jwt_bearer)):
         re = await self.planet_energy.create_deposit(user, request)
         return jsonable_encoder(re)

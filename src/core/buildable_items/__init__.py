@@ -1,4 +1,5 @@
 import datetime
+import math
 from dataclasses import dataclass
 from pydantic import BaseModel
 
@@ -66,13 +67,16 @@ class CantUpgradeIfHealthIsNotFullException(AppBaseException):
     msg = "Cant upgrade if health is not 100%, please repair before."
 
 
+class CantRepairIfHealthIsFullException(AppBaseException):
+    msg = "Cant upgrade if health full."
+
 @dataclass
 class BuildableItems:
     planet_repository_port: PlanetRepositoryPort
     planet_level_use_case: PlanetLevel
     response_port: ResponsePort
 
-    async def finish_build(self, finish_request: FinishBuildRequest) -> Planet:
+    async def finish_item(self, finish_request: FinishBuildRequest) -> Planet:
         """
         Transition from building state to finished state
         :param finish_request:
@@ -151,10 +155,7 @@ class BuildableItems:
         if request.type not in [ResourceData.TYPE, DefenseData.TYPE, InstallationData.TYPE, ResearchData.TYPE]:
             raise WrongBuildableException()
 
-        if request.label not in (ResourceData.TYPES +
-                                 DefenseData.TYPES +
-                                 InstallationData.TYPES +
-                                 ResearchData.TYPES):
+        if request.label not in (ResourceData.TYPES):
             raise WrongBuildableException()
 
         planet: Planet = await self.planet_repository_port.get_my_planet(user, request.planet_id)
@@ -219,5 +220,67 @@ class BuildableItems:
         response.metal_paid = next_lvl.cost_metal
         response.crystal_paid = next_lvl.cost_crystal
         response.petrol_paid = next_lvl.cost_petrol
+
+        return await self.response_port.publish_response(response)
+
+    async def repair(self, user: str, request: BuildableRequest) -> BuildableResponse:
+        if request.type != ResourceData.TYPE or request.label not in ResourceData.TYPES:
+            raise WrongBuildableException()
+
+        planet: Planet = await self.planet_repository_port.get_my_planet(user, request.planet_id)
+
+        if planet is None:
+            raise NoPlanetFoundException()
+
+        if is_queue_full(planet):
+            raise QueueIsFullException()
+
+        mapping = {
+            ResourceData.TYPE: "resources_level",
+        }
+
+        buildable_items = getattr(planet, mapping[request.type])
+        buildable: BuildableItem = list(filter(lambda x: x.label == request.label, buildable_items))[0]
+
+        if buildable.building or buildable.repairing:
+            raise CantBuildOrRepairException()
+
+        game_data: GameData = game_data_factory[request.type]
+        label_info: BuildableItemBaseType = game_data.get_item(request.label)
+        current_level_info: BuildableItemLevelInfo = label_info.get_level_info(buildable.current_level)
+
+        current_health = buildable.health
+        full_health = current_level_info.health
+
+        if current_health == full_health:
+            raise CantRepairIfHealthIsFullException()
+
+        percentage = 1 - (current_health / full_health)
+        cost_metal = math.ceil(current_level_info.cost_metal * percentage)
+        cost_crystal = math.ceil(current_level_info.cost_crystal * percentage)
+        cost_petrol = math.ceil(current_level_info.cost_petrol * percentage)
+        time = math.ceil(current_level_info.time * percentage)
+        experience = math.ceil(current_level_info.experience * percentage)
+
+        if planet.resources.metal < cost_metal or planet.resources.crystal < cost_crystal or planet.resources.petrol < cost_petrol:
+            raise NotEnoughFundsForBuildException()
+
+        planet.resources.metal -= cost_metal
+        planet.resources.crystal -= cost_crystal
+        planet.resources.petrol -= cost_petrol
+        buildable.repairing = True
+
+        now = datetime.datetime.timestamp(datetime.datetime.now())
+        buildable.finish = now + datetime.timedelta(seconds=time).total_seconds()
+
+        planet = await self.planet_repository_port.update(planet)
+
+        await self.planet_level_use_case.give_planet_experience(
+            GivePlanetExperienceRequest(planet_id=str(planet.id), experience_amount=experience))
+
+        response = BuildableResponse.from_buildable_item(buildable)
+        response.metal_paid = cost_metal
+        response.crystal_paid = cost_crystal
+        response.petrol_paid = cost_petrol
 
         return await self.response_port.publish_response(response)
