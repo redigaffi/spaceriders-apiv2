@@ -44,7 +44,7 @@ class NoPlanetFoundException(AppBaseException):
 
 
 class QueueIsFullException(AppBaseException):
-    msg = "Can't upgrade, queue is full..."
+    msg = "Can't upgrade/repair, queue is full..."
 
 
 class User(BaseModel):

@@ -112,7 +112,7 @@ class UpdateDataMiddleWare(MyBaseHTTPMiddleware):
             active_planet = request.headers.get("x-active-planet")
             if active_planet is not None:
                 await planet_staking.tier_expired_reset(planet_id=active_planet)
-                await items_use_case.finish_build(FinishBuildRequest(planet_id=active_planet))
+                await items_use_case.finish_item(FinishBuildRequest(planet_id=active_planet))
                 await planet_resources_use_case(PlanetResourcesUpdateRequest(planet_id=active_planet))
         except:
             pass
