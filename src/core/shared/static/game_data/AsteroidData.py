@@ -5,11 +5,10 @@ import random
 @dataclass
 class AsteroidData:
     """
-     Data class representing in game items
+    Data class representing in game items
     """
-    LEVELS = [
-        "1-9"
-    ]
+
+    LEVELS = ["1-9"]
 
     ASTEROIDS = {
         "1-9": {
@@ -20,7 +19,7 @@ class AsteroidData:
             # Expressed in meters/s
             "speed": (400, 1200),
             # Health is asteroid health and also asteroid attack points
-            "health_per_diameter": (30, 80)
+            "health_per_diameter": (30, 80),
         }
     }
 
@@ -30,11 +29,19 @@ class AsteroidData:
             lvl_info = level.split("-")
             if int(lvl_info[0]) <= planet_level <= int(lvl_info[1]):
                 asteroid_lvl_info = AsteroidData.ASTEROIDS[level]
-                diameter = random.randint(asteroid_lvl_info['diameter'][0], asteroid_lvl_info['diameter'][1])
-                distance = random.randint(asteroid_lvl_info['distance'][0], asteroid_lvl_info['distance'][1])
-                speed = random.randint(asteroid_lvl_info['speed'][0], asteroid_lvl_info['speed'][1])
-                health = random.randint(asteroid_lvl_info['health_per_diameter'][0], asteroid_lvl_info['health_per_diameter'][1])
+                diameter = random.randint(
+                    asteroid_lvl_info["diameter"][0], asteroid_lvl_info["diameter"][1]
+                )
+                distance = random.randint(
+                    asteroid_lvl_info["distance"][0], asteroid_lvl_info["distance"][1]
+                )
+                speed = random.randint(
+                    asteroid_lvl_info["speed"][0], asteroid_lvl_info["speed"][1]
+                )
+                health = random.randint(
+                    asteroid_lvl_info["health_per_diameter"][0],
+                    asteroid_lvl_info["health_per_diameter"][1],
+                )
                 return diameter, distance, speed, health
 
         raise ValueError(f"No asteroid info for level {planet_level}")
-

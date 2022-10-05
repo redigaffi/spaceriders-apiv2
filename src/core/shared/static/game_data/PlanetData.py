@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 from .Common import CommonKeys as CK
 
 
@@ -35,8 +36,8 @@ class PlanetData:
             CK.RESOURCE_EXTRACTION_MULTIPLIER: {
                 CK.METAL: 1,
                 CK.PETROL: 1,
-                CK.CRYSTAL: 1
-            }
+                CK.CRYSTAL: 1,
+            },
         },
         COMMON: {
             CK.ENERGY_DEPOSIT_MAX_ONCE: 50,
@@ -55,8 +56,8 @@ class PlanetData:
             CK.RESOURCE_EXTRACTION_MULTIPLIER: {
                 CK.METAL: 1,
                 CK.PETROL: 1,
-                CK.CRYSTAL: 1
-            }
+                CK.CRYSTAL: 1,
+            },
         },
         RARE: {
             CK.ENERGY_DEPOSIT_MAX_ONCE: 50,
@@ -75,8 +76,8 @@ class PlanetData:
             CK.RESOURCE_EXTRACTION_MULTIPLIER: {
                 CK.METAL: 1,
                 CK.PETROL: 1,
-                CK.CRYSTAL: 1
-            }
+                CK.CRYSTAL: 1,
+            },
         },
         EPIC: {
             CK.ENERGY_DEPOSIT_MAX_ONCE: 500,
@@ -95,8 +96,8 @@ class PlanetData:
             CK.RESOURCE_EXTRACTION_MULTIPLIER: {
                 CK.METAL: 1.1,
                 CK.PETROL: 1.1,
-                CK.CRYSTAL: 1.1
-            }
+                CK.CRYSTAL: 1.1,
+            },
         },
         LEGENDARY: {
             CK.ENERGY_DEPOSIT_MAX_ONCE: 1500,
@@ -115,7 +116,7 @@ class PlanetData:
             CK.RESOURCE_EXTRACTION_MULTIPLIER: {
                 CK.METAL: 1.2,
                 CK.PETROL: 1.2,
-                CK.CRYSTAL: 1.2
-            }
+                CK.CRYSTAL: 1.2,
+            },
         },
     }

@@ -1,12 +1,18 @@
-import math
 from dataclasses import dataclass
 from datetime import datetime
+import math
 
 from pydantic import BaseModel
 
-from core.shared.models import Email, AppBaseException, PlanetTier, PlanetResponse
-from core.shared.ports import ResponsePort, EmailRepositoryPort, PlanetRepositoryPort, TokenPricePort, ChainServicePort
-from core.shared.static.game_data.StakingData import StakingData, StakingBenefits
+from core.shared.models import AppBaseException, Email, PlanetResponse, PlanetTier
+from core.shared.ports import (
+    ChainServicePort,
+    EmailRepositoryPort,
+    PlanetRepositoryPort,
+    ResponsePort,
+    TokenPricePort,
+)
+from core.shared.static.game_data.StakingData import StakingBenefits, StakingData
 
 
 class TierInfoResponse(BaseModel):
@@ -90,9 +96,9 @@ class Staking:
             staking_data: StakingBenefits = StakingData.DATA[stake_code]
 
             tier_cost_usd = staking_data.usd_cost
-            token_price = tier_cost_usd/current_token_price
+            token_price = tier_cost_usd / current_token_price
 
-            tmp.token_cost = "{:.2f}".format(round(token_price, 2))
+            tmp.token_cost = f"{round(token_price, 2):.2f}"
             tmp.name = StakingData.TIER_NAMES[stake_code]
             tmp.tokens_time_locked = staking_data.tokens_time_locked
 
@@ -103,8 +109,12 @@ class Staking:
 
         return await self.response_port.publish_response(re)
 
-    async def create_staking(self, request: CreateStakingRequest, user: str) -> CreateStakingResponse:
-        planet = await self.planet_repository_port.get_my_planet(user, request.planet_id)
+    async def create_staking(
+        self, request: CreateStakingRequest, user: str
+    ) -> CreateStakingResponse:
+        planet = await self.planet_repository_port.get_my_planet(
+            user, request.planet_id
+        )
 
         if planet.tier.staked:
             raise PlanetAlreadyStakedException()
@@ -115,26 +125,33 @@ class Staking:
         if request.tier_code == StakingData.TIER_0:
             raise StakeTier0Exception()
 
-        user_token_balance_raw = await self.chain_service_port.spaceriders_token_call("balanceOf", user)
+        user_token_balance_raw = await self.chain_service_port.spaceriders_token_call(
+            "balanceOf", user
+        )
         user_token_balance = user_token_balance_raw / 10**18
 
         current_token_price = await self.token_price_port.fetch_token_price_usd()
         total_usd_amount = user_token_balance * current_token_price
 
         tier_data = StakingData.DATA[request.tier_code]
-        
+
         if total_usd_amount < tier_data.usd_cost:
             raise NotEnoughSprBalanceException()
-        
+
         token_amount_cost = math.floor(tier_data.usd_cost / current_token_price)
-        token_amount_cost_crypto = token_amount_cost * 10 ** 18
+        token_amount_cost_crypto = token_amount_cost * 10**18
 
         now = int(datetime.timestamp(datetime.now()))
         time_release = now + tier_data.tokens_time_locked
 
         signed_message = await self.chain_service_port.sign_message(
-            ['string', 'uint256', 'string', 'uint256'],
-            [request.planet_id, token_amount_cost_crypto, request.tier_code, time_release]
+            ["string", "uint256", "string", "uint256"],
+            [
+                request.planet_id,
+                token_amount_cost_crypto,
+                request.tier_code,
+                time_release,
+            ],
         )
 
         response = CreateStakingResponse(
@@ -142,21 +159,29 @@ class Staking:
             amount=token_amount_cost_crypto,
             tier=request.tier_code,
             time_release=time_release,
-            v=signed_message['v'],
-            r=signed_message['r'],
-            s=signed_message['s'],
-            router=await self.chain_service_port.get_contract_address(self.chain_service_port.ROUTER_CONTRACT)
+            v=signed_message["v"],
+            r=signed_message["r"],
+            s=signed_message["s"],
+            router=await self.chain_service_port.get_contract_address(
+                self.chain_service_port.ROUTER_CONTRACT
+            ),
         )
 
         return await self.response_port.publish_response(response)
 
-    async def confirm_staking(self, request: ConfirmStakingRequest, user: str) -> PlanetTier:
-        planet = await self.planet_repository_port.get_my_planet(user, request.planet_id)
+    async def confirm_staking(
+        self, request: ConfirmStakingRequest, user: str
+    ) -> PlanetTier:
+        planet = await self.planet_repository_port.get_my_planet(
+            user, request.planet_id
+        )
 
         if planet.tier.staked:
             raise PlanetAlreadyStakedException()
 
-        info = await self.chain_service_port.spaceriders_game_call("userStaking", request.planet_id)
+        info = await self.chain_service_port.spaceriders_game_call(
+            "userStaking", request.planet_id
+        )
         staked = info[6]
 
         if not staked:
@@ -182,7 +207,7 @@ class Staking:
         if tier not in StakingData.TIERS:
             raise TierNotFoundException()
 
-        tokens = int(amount) / 10 ** 18
+        tokens = int(amount) / 10**18
         current_token_price = await self.token_price_port.fetch_token_price_usd()
         usd_value = tokens * current_token_price
 
@@ -196,7 +221,9 @@ class Staking:
         return await self.response_port.publish_response(planet.tier)
 
     async def unstake(self, request: UnStakeRequest, user: str):
-        planet = await self.planet_repository_port.get_my_planet(user, request.planet_id)
+        planet = await self.planet_repository_port.get_my_planet(
+            user, request.planet_id
+        )
 
         if not planet.tier.staked:
             raise NotStakedException()
@@ -211,7 +238,9 @@ class Staking:
         planet.tier.time_release = None
         planet.tier.staked = False
         planet = await self.planet_repository_port.update(planet)
-        planet = await self.planet_repository_port.get_my_planet(user, request.planet_id, True)
+        planet = await self.planet_repository_port.get_my_planet(
+            user, request.planet_id, True
+        )
         re = PlanetResponse.from_planet(planet)
         return await self.response_port.publish_response(re)
 
@@ -237,7 +266,9 @@ class Staking:
         :return:
         """
         planet = await self.planet_repository_port.get(planet_id)
-        staking_data = await self.chain_service_port.spaceriders_game_call("userStaking", planet_id)
+        staking_data = await self.chain_service_port.spaceriders_game_call(
+            "userStaking", planet_id
+        )
 
         owner = staking_data[0]
         planet_id = staking_data[1]
@@ -255,7 +286,7 @@ class Staking:
             planet.tier.tier_code = tier_code_sm
             planet.tier.tier_name = StakingData.TIER_NAMES[tier_code_sm]
             planet.tier.time_release = time_release
-            planet.tier.token_amount = amount / 10 ** 18
+            planet.tier.token_amount = amount / 10**18
             await self.planet_repository_port.update(planet)
 
         return await self.response_port.publish_response(planet.tier)

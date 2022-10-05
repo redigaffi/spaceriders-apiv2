@@ -15,8 +15,8 @@ class CommonKeys:
 
     METAL = "metal"
     PETROL = "petrol"
-    CRYSTAL  = "crystal"
-    ENERGY  = "energy"
+    CRYSTAL = "crystal"
+    ENERGY = "energy"
 
     # For upgrades data
     PRODUCTION = "production"
@@ -35,7 +35,7 @@ class CommonKeys:
 
     ENERGY_DEPOSIT_MAX_ONCE = "energy_deposit_max_once"
     RESOURCE_EXTRACTION_MULTIPLIER = "resource_extraction_multiplier"
-    INITIAL_RESERVE =  "initial_resources"
+    INITIAL_RESERVE = "initial_resources"
 
 
 @dataclass
@@ -51,7 +51,7 @@ class BuildableItemLevelInfo:
     cost_metal: float = 0
     cost_petrol: float = 0
     cost_crystal: float = 0
-    energy_usage: float = 0 # Minute
+    energy_usage: float = 0  # Minute
     production: float = 0
     capacity: float = 0
     time: float = 0
@@ -63,14 +63,12 @@ class BuildableItemLevelInfo:
     has_discount: bool = False
 
 
-
-
-
 @dataclass
 class BuildableItemBaseType:
     """
     Represents example metal mine with its upgrade/build info
     """
+
     name: str = None  # Nice readable name
     label: str = None  # Code name
     type: str = None  # subtype
@@ -87,4 +85,3 @@ class BuildableItemBaseType:
             level_info = self.builds[0]
 
         return level_info
-

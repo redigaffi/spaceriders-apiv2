@@ -1,33 +1,39 @@
+import asyncio
+import logging as log
+
+from beanie import init_beanie
 import beanie.exceptions
 from beanie.exceptions import RevisionIdWasChanged
-from fastapi import FastAPI, Request, Query
-from starlette.background import BackgroundTask
-
-# Info, seems like this need to be at the top, also some have src before and others not (maybe due to relationship?)
-from adapters.shared.beanie_models_adapter import UserDocument, EnergyDepositDocument, PlanetDocument, EmailDocument, \
-    CurrencyMarketOrderDocument, \
-    CurrencyMarketTradeDocument, BKMTransactionDocument
-from apps.http.dependencies import get_middleware
 from decouple import config
-from beanie import init_beanie
-import motor.motor_asyncio
+from fastapi import FastAPI, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-import apps.http.dependencies as dependencies
-import apps.http.settings
-import logging as log
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
-import asyncio
+import motor.motor_asyncio
+from starlette.background import BackgroundTask
+from starlette.middleware.base import BaseHTTPMiddleware
+
+# Info, seems like this need to be at the top, also some have src before and others not (maybe due to relationship?)
+from adapters.shared.beanie_models_adapter import (
+    BKMTransactionDocument,
+    CurrencyMarketOrderDocument,
+    CurrencyMarketTradeDocument,
+    EmailDocument,
+    EnergyDepositDocument,
+    PlanetDocument,
+    UserDocument,
+)
+import apps.http.dependencies as dependencies
+from apps.http.dependencies import get_middleware
+import apps.http.settings
+from apps.http.urls import register_fastapi_routes
 from core.buildable_items import BuildableItems, FinishBuildRequest
 from core.planet_resources import PlanetResourcesUpdateRequest
 from core.shared.models import AppBaseException
-from apps.http.urls import register_fastapi_routes
-from starlette.middleware.base import BaseHTTPMiddleware
 
-
-#@TODO: Add logger port
-#@TODO: Websockets: https://github.com/tiangolo/fastapi/issues/685 --- https://fastapi.tiangolo.com/advanced/websockets/
+# @TODO: Add logger port
+# @TODO: Websockets: https://github.com/tiangolo/fastapi/issues/685 --- https://fastapi.tiangolo.com/advanced/websockets/
 
 app = FastAPI()
 
@@ -44,7 +50,9 @@ def custom_openapi():
     # openapi_schema["info"]["x-logo"] = {
     #     "url": "https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png"
     # }
-    openapi_schema['paths']['/jwt']['post']['description'] = "Get a JWT token to access protected resources"
+    openapi_schema["paths"]["/jwt"]["post"][
+        "description"
+    ] = "Get a JWT token to access protected resources"
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 
@@ -58,7 +66,6 @@ async def exception_handler(request: Request, call_next):
     except Exception as exc:
         if isinstance(exc, AppBaseException):
             return JSONResponse(
-
                 status_code=exc.code,
                 content={"message": exc.msg},
             )
@@ -74,12 +81,13 @@ async def exception_handler(request: Request, call_next):
             content={"message": "Error, something went wrong..."},
         )
 
+
 # FastAPI hack to send back cors headers on exceptions. https://github.com/tiangolo/fastapi/issues/775
-app.middleware('http')(exception_handler)
+app.middleware("http")(exception_handler)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['*'],
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -87,12 +95,11 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 
 class MyBaseHTTPMiddleware(BaseHTTPMiddleware):
-
     async def __call__(self, scope, receive, send):
         try:
             await super().__call__(scope, receive, send)
         except RuntimeError as exc:
-            if str(exc) == 'No response returned.':
+            if str(exc) == "No response returned.":
                 request = Request(scope, receive=receive)
                 if await request.is_disconnected():
                     return
@@ -105,15 +112,23 @@ class MyBaseHTTPMiddleware(BaseHTTPMiddleware):
 class UpdateDataMiddleWare(MyBaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         try:
-            if request.method == 'OPTIONS':
+            if request.method == "OPTIONS":
                 return await call_next(request)
 
-            items_use_case, planet_resources_use_case, planet_staking = await get_middleware()
+            (
+                items_use_case,
+                planet_resources_use_case,
+                planet_staking,
+            ) = await get_middleware()
             active_planet = request.headers.get("x-active-planet")
             if active_planet is not None:
                 await planet_staking.tier_expired_reset(planet_id=active_planet)
-                await items_use_case.finish_item(FinishBuildRequest(planet_id=active_planet))
-                await planet_resources_use_case(PlanetResourcesUpdateRequest(planet_id=active_planet))
+                await items_use_case.finish_item(
+                    FinishBuildRequest(planet_id=active_planet)
+                )
+                await planet_resources_use_case(
+                    PlanetResourcesUpdateRequest(planet_id=active_planet)
+                )
         except:
             pass
 
@@ -128,20 +143,23 @@ async def app_init():
     await dependencies.logging_adapter.info("App started v2")
 
     client = motor.motor_asyncio.AsyncIOMotorClient(
-        host=config('DB_URL'),
-       # username="root",
-       # password="example"
+        host=config("DB_URL"),
+        # username="root",
+        # password="example"
     )
 
-    db = client[config('DB_NAME')]
-    await init_beanie(database=db,
-                      document_models=[UserDocument,
-                                       EnergyDepositDocument,
-                                       BKMTransactionDocument,
-                                       PlanetDocument,
-                                       EmailDocument,
-                                       CurrencyMarketOrderDocument,
-                                       CurrencyMarketTradeDocument]
+    db = client[config("DB_NAME")]
+    await init_beanie(
+        database=db,
+        document_models=[
+            UserDocument,
+            EnergyDepositDocument,
+            BKMTransactionDocument,
+            PlanetDocument,
+            EmailDocument,
+            CurrencyMarketOrderDocument,
+            CurrencyMarketTradeDocument,
+        ],
     )
 
     http_controller = await dependencies.http_controller()
@@ -150,5 +168,5 @@ async def app_init():
         app.router.add_api_route(**url)
 
 
- #if __name__ == "__main__":
- #    uvicorn.run("__main__:app", port=8010, host='0.0.0.0', reload=True, workers=1, debug=True)
+# if __name__ == "__main__":
+#    uvicorn.run("__main__:app", port=8010, host='0.0.0.0', reload=True, workers=1, debug=True)

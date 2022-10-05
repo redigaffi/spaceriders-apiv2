@@ -1,0 +1,64 @@
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
+repos:
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v2.32.1
+    hooks:
+      - id: pyupgrade
+        alias: format
+        args:
+          - --py39-plus
+  - repo: https://github.com/psf/black
+    rev: 22.3.0
+    hooks:
+      - id: black
+        alias: format
+  - repo: https://github.com/PyCQA/flake8
+    rev: 4.0.1
+    hooks:
+      - id: flake8
+        alias: lint
+        additional_dependencies:
+          - pyflakes==2.4.0
+          - pycodestyle==2.8.0
+          - mccabe==0.6.1
+          - flake8-builtins==1.5.3
+          - flake8-bugbear==22.4.25
+          - flake8-comprehensions==3.8.0
+          - flake8-docstrings==1.6.0
+          - pydocstyle==6.1.1
+          - flake8-noqa==1.2.1
+          - pep8-naming==0.12.1
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.2.0
+    hooks:
+      - id: check-json
+        alias: lint
+      - id: check-yaml
+        alias: lint
+        exclude: ^ci/helm/
+      - id: check-toml
+        alias: lint
+      - id: end-of-file-fixer
+        alias: lint
+      - id: no-commit-to-branch
+        alias: lint
+        args:
+          - --branch=master
+  - repo: https://github.com/wemake-services/dotenv-linter
+    rev: 0.3.0
+    hooks:
+      - id: dotenv-linter
+        alias: lint
+        files: ^.env(\.?.*)$
+  - repo: local
+    hooks:
+      - id: validate-commit-msg
+        name: Commit message is prefixed by Jira ticket number
+        entry: ^BLOC-\d*:.+
+        language: pygrep
+        stages:
+          - commit-msg
+        args:
+          - --negate

@@ -1,14 +1,14 @@
+from dataclasses import dataclass
 import json
 import math
-from dataclasses import dataclass
 import random
+
+from pydantic import BaseModel
 
 from core.planet_email import PlanetEmail, PlanetSendEmailRequest
 from core.planet_level import PlanetLevel
 from core.shared.models import BuildableItem
-from core.shared.ports import ResponsePort, PlanetRepositoryPort
-from pydantic import BaseModel
-
+from core.shared.ports import PlanetRepositoryPort, ResponsePort
 from core.shared.static.game_data.DefenseData import DefenseData
 from core.shared.static.game_data.ResearchData import ResearchData
 from core.shared.static.game_data.SpacePiratesData import SpacePiratesData
@@ -31,10 +31,17 @@ class SpacePirates:
         planet = await self.planet_repository_port.get(request.planet_id)
 
         try:
-            amount, distance, speed, health, steal_per_space_ship = SpacePiratesData.get_space_pirate_data_level(
-                planet.level)
+            (
+                amount,
+                distance,
+                speed,
+                health,
+                steal_per_space_ship,
+            ) = SpacePiratesData.get_space_pirate_data_level(planet.level)
         except:
-            print("error retrieving space pirate information, planet outside of space pirate level range")
+            print(
+                "error retrieving space pirate information, planet outside of space pirate level range"
+            )
             return
 
         total_health = amount * health
@@ -48,7 +55,7 @@ class SpacePirates:
             "distance": distance,
             "speed": speed,
             "health_per_ship": health,
-            "total_health": total_health
+            "total_health": total_health,
         }
 
         report["defense"] = {}
@@ -61,7 +68,7 @@ class SpacePirates:
                 "label": defense_item.label,
                 "type": defense_item.type,
                 "quantity": defense_item.quantity,
-                "attack_points": attack
+                "attack_points": attack,
             }
 
             attack_points += attack
@@ -79,8 +86,11 @@ class SpacePirates:
         # Actual attacking the asteroid
         # Shooting missing chance
         percentage_miss = 80
-        asteroid_precision_info: BuildableItem = [x for x in planet.research_level if x.label ==
-                                                  ResearchData.ASTEROID_PRECISION][0]
+        asteroid_precision_info: BuildableItem = [
+            x
+            for x in planet.research_level
+            if x.label == ResearchData.ASTEROID_PRECISION
+        ][0]
 
         percentage_miss -= asteroid_precision_info.current_level * 3
 
@@ -104,10 +114,18 @@ class SpacePirates:
                 else:
                     report["defense"]["general"]["missed_shots"] += 100
 
-            report["defense"]["general"]["accuracy"] = round((report["defense"]["general"]["hit_shots"] /
-                                                              report["defense"]["general"]["total_shots"]) * 100, 2)
+            report["defense"]["general"]["accuracy"] = round(
+                (
+                    report["defense"]["general"]["hit_shots"]
+                    / report["defense"]["general"]["total_shots"]
+                )
+                * 100,
+                2,
+            )
 
-            report["defense"]["general"]["fail_rate"] = round(100 - report["defense"]["general"]["accuracy"], 2)
+            report["defense"]["general"]["fail_rate"] = round(
+                100 - report["defense"]["general"]["accuracy"], 2
+            )
 
         space_pirates_left = math.ceil(total_health / health)
         total_to_steal = round(steal_per_space_ship * space_pirates_left, 2)
@@ -180,11 +198,13 @@ class SpacePirates:
             report["result"]["loss"]["crystal"] = resources_to_steal[1]
             report["result"]["loss"]["petrol"] = resources_to_steal[2]
 
-        await self.planet_email.create(PlanetSendEmailRequest(
-            planet_id_receiver=str(planet.id),
-            title="Space Pirates invasion",
-            sub_title="Howdy Rider! unfortunate news...",
-            template="space_pirates",
-            body=json.dumps(report),
-            sender="Universe"
-        ))
+        await self.planet_email.create(
+            PlanetSendEmailRequest(
+                planet_id_receiver=str(planet.id),
+                title="Space Pirates invasion",
+                sub_title="Howdy Rider! unfortunate news...",
+                template="space_pirates",
+                body=json.dumps(report),
+                sender="Universe",
+            )
+        )

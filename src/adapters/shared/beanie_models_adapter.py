@@ -1,10 +1,24 @@
 from __future__ import annotations
-from typing import Optional, List
-from beanie import Document, Indexed, Link, PydanticObjectId
+
 from datetime import datetime
-from core.shared.models import EnergyDeposit, Email, CurrencyMarketOrder, \
-    CurrencyMarketTrade, BKMTransaction
-from core.shared.models import User, PlanetTier, Resources, Planet, Reserves, BuildableItem, UserNotFoundException
+from typing import List, Optional
+
+from beanie import Document, Indexed, Link, PydanticObjectId
+
+from core.shared.models import (
+    BKMTransaction,
+    BuildableItem,
+    CurrencyMarketOrder,
+    CurrencyMarketTrade,
+    Email,
+    EnergyDeposit,
+    Planet,
+    PlanetTier,
+    Reserves,
+    Resources,
+    User,
+    UserNotFoundException,
+)
 
 
 class EmailDocument(Document, Email):
@@ -95,14 +109,14 @@ class PlanetDocument(Document, Planet):
     resources: Resources = None
 
     reserves: Reserves = None
-    resources_level: List[BuildableItem] = None
-    installation_level: List[BuildableItem] = None
-    research_level: List[BuildableItem] = None
-    defense_items: List[BuildableItem] = None
+    resources_level: list[BuildableItem] = None
+    installation_level: list[BuildableItem] = None
+    research_level: list[BuildableItem] = None
+    defense_items: list[BuildableItem] = None
 
-    energy_deposits: List[Link[EnergyDepositDocument]] = []
-    bkm_deposits: List[Link[BKMTransactionDocument]] = []
-    emails: List[Link[EmailDocument]] = []
+    energy_deposits: list[Link[EnergyDepositDocument]] = []
+    bkm_deposits: list[Link[BKMTransactionDocument]] = []
+    emails: list[Link[EmailDocument]] = []
 
     price_paid: int = 0
 
@@ -114,9 +128,9 @@ class PlanetDocument(Document, Planet):
 
 class UserDocument(Document, User):
     wallet: str
-    username: Optional[str] = None
+    username: str | None = None
 
-    planets: List[Link[PlanetDocument]] = []
+    planets: list[Link[PlanetDocument]] = []
 
     class Settings:
         name = "user"

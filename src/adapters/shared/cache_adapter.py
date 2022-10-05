@@ -1,8 +1,10 @@
-from core.shared.ports import CacheServicePort
 from dataclasses import dataclass
-from emcache import Client
-import time
 import pickle
+import time
+
+from emcache import Client
+
+from core.shared.ports import CacheServicePort
 
 
 @dataclass
@@ -20,7 +22,7 @@ class MemCacheCacheServiceAdapter(CacheServicePort):
                 # Expire in one hour
                 exptime=int(time.time()) + expiry,
                 # Do not ask for an explicit reply from Memcached
-                noreply=False
+                noreply=False,
             )
         except Exception as ex:
             print("exc")

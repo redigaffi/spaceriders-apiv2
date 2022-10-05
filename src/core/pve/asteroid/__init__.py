@@ -1,18 +1,17 @@
 from dataclasses import dataclass
-
-from core.planet_email import PlanetEmail, PlanetSendEmailRequest
-from core.planet_level import PlanetLevel, GivePlanetExperienceRequest
-from core.shared.models import BuildableItem
-from core.shared.ports import ResponsePort, PlanetRepositoryPort
-from core.shared.static.game_data.AsteroidData import AsteroidData
+import json
+import math
+import random
 from random import shuffle
 
+from core.planet_email import PlanetEmail, PlanetSendEmailRequest
+from core.planet_level import GivePlanetExperienceRequest, PlanetLevel
+from core.shared.models import BuildableItem
+from core.shared.ports import PlanetRepositoryPort, ResponsePort
+from core.shared.static.game_data.AsteroidData import AsteroidData
 from core.shared.static.game_data.DefenseData import DefenseData
-import random
-import math
 from core.shared.static.game_data.ResearchData import ResearchData
 from core.shared.static.game_data.StakingData import StakingData
-import json
 
 
 @dataclass
@@ -28,18 +27,22 @@ class Asteroid:
         planet = await self.planet_repository_port.get(planet_id)
 
         try:
-            diameter, distance, speed, health = AsteroidData.get_asteroid_data_level(planet.level)
+            diameter, distance, speed, health = AsteroidData.get_asteroid_data_level(
+                planet.level
+            )
         except:
-            print("error retrieving asteroid information, planet outside of asteroid level range")
+            print(
+                "error retrieving asteroid information, planet outside of asteroid level range"
+            )
             return
 
         asteroid_attack = diameter * health
 
-        report['asteroid'] = {
+        report["asteroid"] = {
             "size": diameter,
             "distance": distance,
             "speed": speed,
-            "attack_points": asteroid_attack
+            "attack_points": asteroid_attack,
         }
 
         attack_points = 0
@@ -56,7 +59,7 @@ class Asteroid:
                 "label": defense_item.label,
                 "type": defense_item.type,
                 "quantity": defense_item.quantity,
-                "attack_points": attack
+                "attack_points": attack,
             }
 
             attack_points += attack
@@ -74,10 +77,13 @@ class Asteroid:
         # Actual attacking the asteroid
         # Shooting missing chance
         percentage_miss = 80
-        asteroid_precision_info: BuildableItem = [x for x in planet.research_level if x.label ==
-                                                  ResearchData.ASTEROID_PRECISION][0]
+        asteroid_precision_info: BuildableItem = [
+            x
+            for x in planet.research_level
+            if x.label == ResearchData.ASTEROID_PRECISION
+        ][0]
 
-        percentage_miss -= asteroid_precision_info.current_level*3
+        percentage_miss -= asteroid_precision_info.current_level * 3
 
         # Rounds
         rounds = math.floor(distance / speed)
@@ -101,8 +107,16 @@ class Asteroid:
                     report["defense"]["general"]["missed_shots"] += 100
 
             report["defense"]["general"]["accuracy"] = round(
-                (report["defense"]["general"]["hit_shots"] / report["defense"]["general"]["total_shots"]) * 100, 2)
-            report["defense"]["general"]["fail_rate"] = round(100 - report["defense"]["general"]["accuracy"], 2)
+                (
+                    report["defense"]["general"]["hit_shots"]
+                    / report["defense"]["general"]["total_shots"]
+                )
+                * 100,
+                2,
+            )
+            report["defense"]["general"]["fail_rate"] = round(
+                100 - report["defense"]["general"]["accuracy"], 2
+            )
 
         # Damage defense structures
         report["result"] = {}
@@ -134,7 +148,7 @@ class Asteroid:
                     "damage_taken": damage,
                     "damage_taken_percentage": (100 - qty),
                     "label": defense_item.label,
-                    "type": defense_item.type
+                    "type": defense_item.type,
                 }
 
         # Damage resource buildings
@@ -167,7 +181,7 @@ class Asteroid:
                     "damage_taken": damage,
                     "damage_taken_percentage": round((100 - health_percentage), 2),
                     "label": resource_level.label,
-                    "type": resource_level.type
+                    "type": resource_level.type,
                 }
 
                 asteroid_attack -= damage
@@ -179,21 +193,25 @@ class Asteroid:
             planet_tier = planet.tier.tier_code
             xp_boost = StakingData.DATA[planet_tier].experience_boost / 100
 
-            experience = math.ceil((report["defense"]["general"]["total_damage"] / 10))
+            experience = math.ceil(report["defense"]["general"]["total_damage"] / 10)
             experience = math.ceil(experience + (experience * xp_boost))
 
-            await self.planet_level.give_planet_experience(GivePlanetExperienceRequest(planet_id=str(planet.id), experience_amount=experience))
-            report["experience"] = {
-                "experience": experience
-            }
+            await self.planet_level.give_planet_experience(
+                GivePlanetExperienceRequest(
+                    planet_id=str(planet.id), experience_amount=experience
+                )
+            )
+            report["experience"] = {"experience": experience}
 
-        await self.planet_email.create(PlanetSendEmailRequest(
-            planet_id_receiver=str(planet.id),
-            title="Asteroid Collision",
-            sub_title="Howdy Rider! unfortunate news...",
-            template="asteroid_collision",
-            body=json.dumps(report),
-            sender="Universe"
-        ))
+        await self.planet_email.create(
+            PlanetSendEmailRequest(
+                planet_id_receiver=str(planet.id),
+                title="Asteroid Collision",
+                sub_title="Howdy Rider! unfortunate news...",
+                template="asteroid_collision",
+                body=json.dumps(report),
+                sender="Universe",
+            )
+        )
 
         return await self.response_port.publish_response(report)
