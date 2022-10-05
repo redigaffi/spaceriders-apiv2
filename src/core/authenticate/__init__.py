@@ -1,16 +1,16 @@
+from dataclasses import dataclass
+from datetime import datetime, timezone
+import logging
+import time
 from time import timezone
 
-from web3.auto import w3
 from eth_account.messages import encode_defunct
-from dataclasses import dataclass
+import jwt
+from pydantic import BaseModel
+from web3.auto import w3
 
 from core.shared.models import AppBaseException
-from core.shared.ports import UserRepositoryPort, ResponsePort, ChainServicePort
-from pydantic import BaseModel
-import jwt
-from datetime import datetime, timezone
-import time
-import logging
+from core.shared.ports import ChainServicePort, ResponsePort, UserRepositoryPort
 
 
 class AuthenticationDetailsRequest(BaseModel):
@@ -37,7 +37,7 @@ class Authenticate:
 
     async def __ticket_testnet_access(self, address: str):
 
-        if self.env in ['mainnet']:
+        if self.env in ["mainnet"]:
             whitelisted_addr = [
                 "0x8eA8ba4386FB9f1569eAe8b863f6f8f99687F163",
                 "0x4A67f4cACb27f57467F428EE469bfc69B58b9bCf",
@@ -47,7 +47,7 @@ class Authenticate:
                 "0xc6411B7F27Bf98Bdee0100E48427ee2e91aE50Fc",
                 "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
                 "0x03545A3A834A0837aac22eDAE92c0Ed1435F144b",
-                "0x92A8269f914930F1E1C228c64CB8371F08982c5d"
+                "0x92A8269f914930F1E1C228c64CB8371F08982c5d",
             ]
 
             if address not in whitelisted_addr:
@@ -56,15 +56,21 @@ class Authenticate:
             return True
 
         has_access = False
-        ticket_amount = await self.chain_service.spaceriders_ticket_nft_call("balanceOf", address)
+        ticket_amount = await self.chain_service.spaceriders_ticket_nft_call(
+            "balanceOf", address
+        )
         if ticket_amount <= 0:
             return False
         elif ticket_amount > 0:
             nft_info = []
             for i in range(ticket_amount):
-                token_id = await self.chain_service.spaceriders_ticket_nft_call("walletTokenIds", address, i)
+                token_id = await self.chain_service.spaceriders_ticket_nft_call(
+                    "walletTokenIds", address, i
+                )
                 nft_info.append(
-                    await self.chain_service.spaceriders_ticket_nft_call("byTokenIdIdData", token_id)
+                    await self.chain_service.spaceriders_ticket_nft_call(
+                        "byTokenIdIdData", token_id
+                    )
                 )
 
             for ticket in nft_info:
@@ -85,7 +91,9 @@ class Authenticate:
 
     async def __call__(self, auth_details_request: AuthenticationDetailsRequest) -> str:
         message = encode_defunct(text="its me:" + auth_details_request.address)
-        recovered_address = w3.eth.account.recover_message(message, signature=auth_details_request.signature)
+        recovered_address = w3.eth.account.recover_message(
+            message, signature=auth_details_request.signature
+        )
 
         # if not await self.__ticket_testnet_access(recovered_address):
         #     raise NotWhiteListedException()
@@ -98,7 +106,7 @@ class Authenticate:
 
             payload = {
                 "user_id": user.wallet,
-                "exp": datetime.timestamp(datetime.now())+43200,
+                "exp": datetime.timestamp(datetime.now()) + 43200,
                 "token_type": "access",
             }
 

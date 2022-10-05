@@ -1,8 +1,14 @@
 from dataclasses import dataclass
 
-from core.shared.models import NoPlanetFoundException, Planet, PlanetResponse, AppBaseException
-from core.shared.ports import PlanetRepositoryPort, ResponsePort
 from pydantic import BaseModel
+
+from core.shared.models import (
+    AppBaseException,
+    NoPlanetFoundException,
+    Planet,
+    PlanetResponse,
+)
+from core.shared.ports import PlanetRepositoryPort, ResponsePort
 
 
 class FetchByPlanetIdResponse(BaseModel):
@@ -65,7 +71,9 @@ class GetPlanets:
     response_port: ResponsePort
 
     async def fetch_by_planet_id(self, user: str, planet_id: str):
-        planet: Planet = await self.planet_repository.get_my_planet(user, planet_id, True)
+        planet: Planet = await self.planet_repository.get_my_planet(
+            user, planet_id, True
+        )
 
         if planet is None:
             raise NoPlanetFoundException()
@@ -84,7 +92,7 @@ class GetPlanets:
             research=re,
             installation=ii,
             defense=di,
-            emails=em
+            emails=em,
         )
 
         return await self.response_port.publish_response(response)
@@ -101,20 +109,25 @@ class GetPlanets:
 
     async def fetch_by_position_range(self, request: FetchByPlanetPositionRangeRequest):
 
-        if request.galaxy < 0 or request.from_solar_system < 0 or request.to_solar_system > 100:
+        if (
+            request.galaxy < 0
+            or request.from_solar_system < 0
+            or request.to_solar_system > 100
+        ):
             raise WrongPlanetPositionRangeException()
 
-        planets = await self.planet_repository.by_position_range(request.galaxy,
-                                                                 request.from_solar_system,
-                                                                 request.to_solar_system,
-                                                                 True)
+        planets = await self.planet_repository.by_position_range(
+            request.galaxy, request.from_solar_system, request.to_solar_system, True
+        )
 
         planets_by_position = {}
         for planet in planets:
             planet.set_image_url(self.planet_images_bucket_path)
             planet_position = f"{planet.galaxy}:{planet.solar_system}:{planet.position}"
             planet_response_raw = PlanetResponse.from_planet(planet)
-            planets_by_position[planet_position] = PlanetInformationResponse.from_planet_response(planet_response_raw)
+            planets_by_position[
+                planet_position
+            ] = PlanetInformationResponse.from_planet_response(planet_response_raw)
 
         re = FetchByPlanetPositionRangeResponse()
         for a in range(7):
@@ -127,12 +140,14 @@ class GetPlanets:
                     re.planets[a][b] = planets_by_position[pos]
 
                     re.planets[a][b].image_url = planets_by_position[pos].image_url
-                    re.planets[a][b].image_url_bg = planets_by_position[pos].image_url_bg
+                    re.planets[a][b].image_url_bg = planets_by_position[
+                        pos
+                    ].image_url_bg
 
                 except KeyError:
                     empty_planet = PlanetInformationResponse()
                     empty_planet.galaxy = request.galaxy
-                    empty_planet.solar_system = request.from_solar_system+a
+                    empty_planet.solar_system = request.from_solar_system + a
                     empty_planet.position = b
                     re.planets[a][b] = empty_planet
 

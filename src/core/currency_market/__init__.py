@@ -1,11 +1,23 @@
-from datetime import datetime
-from datetime import timedelta
-from pydantic import BaseModel
-from core.shared.models import CurrencyMarketOrder, CurrencyMarketTrade, OpenOrdersGroupedByPrice, \
-    PriceCandleDataGroupedByTimeInterval, Volume24Info, AppBaseException, Planet
-from core.shared.ports import ResponsePort, CurrencyMarketOrderRepositoryPort, CurrencyMarketTradeRepositoryPort, \
-    PlanetRepositoryPort
 from dataclasses import dataclass
+from datetime import datetime, timedelta
+
+from pydantic import BaseModel
+
+from core.shared.models import (
+    AppBaseException,
+    CurrencyMarketOrder,
+    CurrencyMarketTrade,
+    OpenOrdersGroupedByPrice,
+    Planet,
+    PriceCandleDataGroupedByTimeInterval,
+    Volume24Info,
+)
+from core.shared.ports import (
+    CurrencyMarketOrderRepositoryPort,
+    CurrencyMarketTradeRepositoryPort,
+    PlanetRepositoryPort,
+    ResponsePort,
+)
 
 
 class TradeRequest(BaseModel):
@@ -29,7 +41,7 @@ class FetchHistoricalData(BaseModel):
     last_trades: list[CurrencyMarketTrade]
     open_buy_orders: list[OpenOrdersGroupedByPrice]
     open_sell_orders: list[OpenOrdersGroupedByPrice]
-    price_candle_data: dict[str, PriceCandleDataGroupedByTimeInterval|None]
+    price_candle_data: dict[str, PriceCandleDataGroupedByTimeInterval | None]
     last_24_info: Volume24Info | None
 
 
@@ -75,11 +87,13 @@ class CurrencyMarket:
             "METAL_BKM",
             "CRYSTAL_PETROL",
             "CRYSTAL_BKM",
-            "PETROL_BKM"
+            "PETROL_BKM",
         ]
 
         for market in markets:
-            last_trade_arr = await self.currency_market_trade_repository.last(market_code=market)
+            last_trade_arr = await self.currency_market_trade_repository.last(
+                market_code=market
+            )
 
             last_price = -1
             if len(last_trade_arr) > 0:
@@ -87,10 +101,9 @@ class CurrencyMarket:
 
             pairs = market.split("_")
             market_front_code = f"{pairs[0]}/{pairs[1]}"
-            re.append(MarketInfoResponse(
-                market=market_front_code,
-                last_price=last_price
-            ))
+            re.append(
+                MarketInfoResponse(market=market_front_code, last_price=last_price)
+            )
 
         return re
 
@@ -109,26 +122,35 @@ class CurrencyMarket:
             "1h": dict(hours=1),
         }
 
-        price_candle_data = await self.currency_market_trade_repository.price_candle_data_grouped_time(market_code,
-                                                                                                       day1ago,
-                                                                                                       candle_time_frame)
+        price_candle_data = (
+            await self.currency_market_trade_repository.price_candle_data_grouped_time(
+                market_code, day1ago, candle_time_frame
+            )
+        )
 
         price_candle_tmp = {}
         for p in price_candle_data:
-            price_candle_tmp[p.id['date_formatted']] = p
+            price_candle_tmp[p.id["date_formatted"]] = p
 
         current_price = None
         if not len(price_candle_data):
-            last_trade_arr = await self.currency_market_trade_repository.last(market_code)
+            last_trade_arr = await self.currency_market_trade_repository.last(
+                market_code
+            )
             if len(last_trade_arr) > 0:
                 last_trade = last_trade_arr[0]
                 minute = day1ago.strftime("%M")
-                current_price = PriceCandleDataGroupedByTimeInterval(_id={
-                    "minute": minute,
-                    "date_formatted": now.strftime("%Y-%m-%dT%H:%M:00.000000Z"),
-                    "interval": minute
-                }, open=last_trade.price, close=last_trade.price, high=last_trade.price,
-                    low=last_trade.price)
+                current_price = PriceCandleDataGroupedByTimeInterval(
+                    _id={
+                        "minute": minute,
+                        "date_formatted": now.strftime("%Y-%m-%dT%H:%M:00.000000Z"),
+                        "interval": minute,
+                    },
+                    open=last_trade.price,
+                    close=last_trade.price,
+                    high=last_trade.price,
+                    low=last_trade.price,
+                )
 
         prices = {}
         while day1ago <= now:
@@ -138,12 +160,17 @@ class CurrencyMarket:
             if date_formatted in price_candle_tmp:
                 current_price = price_candle_tmp[date_formatted]
             elif current_price is not None:
-                current_price = PriceCandleDataGroupedByTimeInterval(_id={
-                    "minute": minute,
-                    "date_formatted": date_formatted,
-                    "interval": minute
-                }, open=current_price.close, close=current_price.close, high=current_price.close,
-                    low=current_price.close)
+                current_price = PriceCandleDataGroupedByTimeInterval(
+                    _id={
+                        "minute": minute,
+                        "date_formatted": date_formatted,
+                        "interval": minute,
+                    },
+                    open=current_price.close,
+                    close=current_price.close,
+                    high=current_price.close,
+                    low=current_price.close,
+                )
 
             if current_price is not None:
                 prices[date_formatted] = current_price
@@ -177,7 +204,7 @@ class CurrencyMarket:
         candle_time_frame_func_mapping = {
             "1m": min_date_parser,
             "15m": min_date_parser,
-            "1h": hour_date_parser
+            "1h": hour_date_parser,
         }
 
         start = datetime.utcnow()
@@ -185,52 +212,76 @@ class CurrencyMarket:
         start_str = candle_time_frame_func_mapping[candle_time_frame](start)
         start_dt = datetime.strptime(start_str, "%Y-%m-%dT%H:%M:%S.000000Z")
 
-        price_candle_data = await self.currency_market_trade_repository.price_candle_data_grouped_time_range(market_code,
-                                                                                                             candle_time_frame,
-                                                                                                             start_dt)
+        price_candle_data = await self.currency_market_trade_repository.price_candle_data_grouped_time_range(
+            market_code, candle_time_frame, start_dt
+        )
 
         tmp = None
         if len(price_candle_data) == 1:
             tmp = price_candle_data[0]
 
-        price_candle_data_formatted = {
-            start_str: tmp
-        }
+        price_candle_data_formatted = {start_str: tmp}
 
-        last_24_info = await self.currency_market_trade_repository.last_24_info(market_code)
+        last_24_info = await self.currency_market_trade_repository.last_24_info(
+            market_code
+        )
         last_24_info = last_24_info[0] if len(last_24_info) > 0 else None
 
-        return FetchHistoricalData(last_trades=[],
-                                   open_buy_orders=[],
-                                   open_sell_orders=[],
-                                   price_candle_data=price_candle_data_formatted,
-                                   last_24_info=last_24_info)
+        return FetchHistoricalData(
+            last_trades=[],
+            open_buy_orders=[],
+            open_sell_orders=[],
+            price_candle_data=price_candle_data_formatted,
+            last_24_info=last_24_info,
+        )
 
     async def fetch_historical_data(self, market_code: str, candle_time_frame: str):
-        buy_group, sell_group = await self.currency_market_order_repository.open_orders_grouped_price(market_code)
-        last_trades = await self.currency_market_trade_repository.all_descending_limit_by_day(market_code)
-        #price_candle_data = await self.currency_market_trade_repository.price_candle_data_grouped_time(market_code, 1)
+        (
+            buy_group,
+            sell_group,
+        ) = await self.currency_market_order_repository.open_orders_grouped_price(
+            market_code
+        )
+        last_trades = (
+            await self.currency_market_trade_repository.all_descending_limit_by_day(
+                market_code
+            )
+        )
+        # price_candle_data = await self.currency_market_trade_repository.price_candle_data_grouped_time(market_code, 1)
         prices = await self._price_candle_data(market_code, candle_time_frame)
-        last_24_info = await self.currency_market_trade_repository.last_24_info(market_code)
+        last_24_info = await self.currency_market_trade_repository.last_24_info(
+            market_code
+        )
         last_24_info = last_24_info[0] if len(last_24_info) > 0 else None
 
         # a = await self.fetch_last_candle_data(market_code)
 
-        return FetchHistoricalData(last_trades=last_trades,
-                                   open_buy_orders=buy_group,
-                                   open_sell_orders=sell_group[::-1],
-                                   price_candle_data=prices,
-                                   last_24_info=last_24_info)
+        return FetchHistoricalData(
+            last_trades=last_trades,
+            open_buy_orders=buy_group,
+            open_sell_orders=sell_group[::-1],
+            price_candle_data=prices,
+            last_24_info=last_24_info,
+        )
 
     async def fetch_order_book_data(self, market_code: str):
-        buy_group, sell_group = await self.currency_market_order_repository.open_orders_grouped_price(market_code)
-        return FetchHistoricalData(last_trades=[],
-                                   open_buy_orders=buy_group,
-                                   open_sell_orders=sell_group[::-1],
-                                   price_candle_data=[],
-                                   last_24_info=None)
+        (
+            buy_group,
+            sell_group,
+        ) = await self.currency_market_order_repository.open_orders_grouped_price(
+            market_code
+        )
+        return FetchHistoricalData(
+            last_trades=[],
+            open_buy_orders=buy_group,
+            open_sell_orders=sell_group[::-1],
+            price_candle_data=[],
+            last_24_info=None,
+        )
 
-    async def _order_complete_transfer_balance(self, pair1: str, pair2: str, planet: Planet, order: CurrencyMarketOrder) -> Planet:
+    async def _order_complete_transfer_balance(
+        self, pair1: str, pair2: str, planet: Planet, order: CurrencyMarketOrder
+    ) -> Planet:
         if order.order_type == "buy":
             pair1_qty_available = getattr(planet.resources, pair1)
             pair1_qty_available += order.amount
@@ -238,26 +289,40 @@ class CurrencyMarket:
 
         elif order.order_type == "sell":
             pair2_qty_available = getattr(planet.resources, pair2)
-            pair2_qty_available += order.amount*order.price
+            pair2_qty_available += order.amount * order.price
             setattr(planet.resources, pair2, pair2_qty_available)
         return planet
 
     async def _transfer_balance(self, matching_order, planet, amount_traded, req):
-        matching_order_planet = await self.planet_repository.get(matching_order.planet_id, False)
+        matching_order_planet = await self.planet_repository.get(
+            matching_order.planet_id, False
+        )
 
         if matching_order.order_type == "buy":
-            pair1_amt_matching_planet = getattr(matching_order_planet.resources, req.pair1.lower())
+            pair1_amt_matching_planet = getattr(
+                matching_order_planet.resources, req.pair1.lower()
+            )
             pair1_amt_matching_planet += amount_traded
-            setattr(matching_order_planet.resources, req.pair1.lower(), pair1_amt_matching_planet)
+            setattr(
+                matching_order_planet.resources,
+                req.pair1.lower(),
+                pair1_amt_matching_planet,
+            )
 
             pair2_amt_planet = getattr(planet.resources, req.pair2.lower())
             pair2_amt_planet += amount_traded * matching_order.price
             setattr(planet.resources, req.pair2.lower(), pair2_amt_planet)
 
         elif matching_order.order_type == "sell":
-            pair2_amt_matching_planet = getattr(matching_order_planet.resources, req.pair2.lower())
+            pair2_amt_matching_planet = getattr(
+                matching_order_planet.resources, req.pair2.lower()
+            )
             pair2_amt_matching_planet += amount_traded * matching_order.price
-            setattr(matching_order_planet.resources, req.pair2.lower(), pair2_amt_matching_planet)
+            setattr(
+                matching_order_planet.resources,
+                req.pair2.lower(),
+                pair2_amt_matching_planet,
+            )
 
             pair1_amt_planet = getattr(planet.resources, req.pair1.lower())
             pair1_amt_planet += amount_traded
@@ -267,14 +332,19 @@ class CurrencyMarket:
         await self.planet_repository.update(matching_order_planet)
         return await self.planet_repository.get_my_planet(req.user_id, req.planet_id)
 
-    async def _limit_order_trade(self, req: TradeRequest, market_code: str, matching_orders: list[CurrencyMarketOrder]):
+    async def _limit_order_trade(
+        self,
+        req: TradeRequest,
+        market_code: str,
+        matching_orders: list[CurrencyMarketOrder],
+    ):
         amount_left = req.amount
         completed_trades = []
 
         planet = await self.planet_repository.get_my_planet(req.user_id, req.planet_id)
 
         if req.order_type == "buy":
-            total_price = req.amount*req.price_unit
+            total_price = req.amount * req.price_unit
             pair2_qty_available = getattr(planet.resources, req.pair2.lower())
             if total_price > pair2_qty_available:
                 raise NotEnoughFundsException.from_resource_name(req.pair2)
@@ -312,13 +382,15 @@ class CurrencyMarket:
                 amount_traded = amount_left
                 amount_left = 0
 
-            planet = await self._transfer_balance(matching_order, planet, amount_traded, req)
+            planet = await self._transfer_balance(
+                matching_order, planet, amount_traded, req
+            )
 
             completed_trade = CurrencyMarketTrade(
                 market_code=market_code,
                 price=matching_order.price,
                 amount=amount_traded,
-                created_time=dt
+                created_time=dt,
             )
 
             matching_order.update_state()
@@ -348,13 +420,18 @@ class CurrencyMarket:
             price=req.price_unit,
             amount=req.amount,
             amount_filled=req.amount - amount_left,
-            state=state
+            state=state,
         )
 
         await self.planet_repository.update(planet)
         return order, completed_trades
 
-    async def _market_order_trade(self, req: TradeRequest, market_code: str, matching_orders: list[CurrencyMarketOrder]):
+    async def _market_order_trade(
+        self,
+        req: TradeRequest,
+        market_code: str,
+        matching_orders: list[CurrencyMarketOrder],
+    ):
         # Weighted average calculation
         # ((quantity 1 * price 1) + (quantity 2 * price 2)) / (quantity 1 + quantity 2)
         planet = await self.planet_repository.get_my_planet(req.user_id, req.planet_id)
@@ -390,39 +467,47 @@ class CurrencyMarket:
                 amount_traded = to_be_filled
                 total_left -= to_be_filled_price
 
-                total_cost += to_be_filled*matching_order.price
+                total_cost += to_be_filled * matching_order.price
                 total_amount += to_be_filled
 
             elif total_left < to_be_filled_price:
-                amount = total_left/matching_order.price
+                amount = total_left / matching_order.price
                 matching_order.amount_filled += amount
                 amount_traded = amount
                 total_left = 0
 
-                total_cost += amount*matching_order.price
+                total_cost += amount * matching_order.price
                 total_amount += amount
 
             # user sold
             if matching_order.order_type == "buy":
                 to_withdraw = amount_traded
                 current_balance = getattr(planet.resources, req.pair1.lower())
-                setattr(planet.resources, req.pair1.lower(), current_balance-to_withdraw)
+                setattr(
+                    planet.resources, req.pair1.lower(), current_balance - to_withdraw
+                )
 
             # user bought
             elif matching_order.order_type == "sell":
-                to_withdraw = amount_traded*matching_order.price
+                to_withdraw = amount_traded * matching_order.price
                 current_balance = getattr(planet.resources, req.pair2.lower())
-                setattr(planet.resources, req.pair2.lower(), current_balance - to_withdraw)
+                setattr(
+                    planet.resources, req.pair2.lower(), current_balance - to_withdraw
+                )
 
             await self.planet_repository.update(planet)
-            planet = await self.planet_repository.get_my_planet(req.user_id, req.planet_id)
-            planet = await self._transfer_balance(matching_order, planet, amount_traded, req)
+            planet = await self.planet_repository.get_my_planet(
+                req.user_id, req.planet_id
+            )
+            planet = await self._transfer_balance(
+                matching_order, planet, amount_traded, req
+            )
 
             completed_trade = CurrencyMarketTrade(
                 market_code=market_code,
                 price=matching_order.price,
                 amount=amount_traded,
-                created_time=dt
+                created_time=dt,
             )
 
             matching_order.update_state()
@@ -445,10 +530,10 @@ class CurrencyMarket:
                 created_time=now,
                 updated_time=now,
                 market_code=market_code,
-                price=round(total_cost/total_amount, 2),
+                price=round(total_cost / total_amount, 2),
                 amount=total_amount,
                 amount_filled=total_amount,
-                state="fully_filled"
+                state="fully_filled",
             )
 
             await self.planet_repository.update(planet)
@@ -458,24 +543,36 @@ class CurrencyMarket:
     async def trade(self, req: TradeRequest):
         market_code = f"{req.pair1.upper()}_{req.pair2.upper()}"
 
-        matching_orders = await self.currency_market_order_repository.find_matching_orders(market_code,
-                                                                                           req.trade_type,
-                                                                                           req.order_type,
-                                                                                           req.price_unit)
+        matching_orders = (
+            await self.currency_market_order_repository.find_matching_orders(
+                market_code, req.trade_type, req.order_type, req.price_unit
+            )
+        )
         order, completed_trades = None, None
         if req.trade_type == "limit":
-            order, completed_trades = await self._limit_order_trade(req, market_code, matching_orders)
+            order, completed_trades = await self._limit_order_trade(
+                req, market_code, matching_orders
+            )
         elif req.trade_type == "market":
-            order, completed_trades = await self._market_order_trade(req, market_code, matching_orders)
+            order, completed_trades = await self._market_order_trade(
+                req, market_code, matching_orders
+            )
 
         if order:
             order = await self.currency_market_order_repository.create_order(order)
 
-        return await self.response_port.publish_response(TradeResponse(order=order,
-                                                                       executed_trades=completed_trades))
-    
-    async def fetch_my_open_orders(self, market_code: str, planet_id: str) -> list[MyOpenOrdersResponse]:
-        my_open_orders_arr = await self.currency_market_order_repository.my_open_orders_by_planet(market_code, planet_id)
+        return await self.response_port.publish_response(
+            TradeResponse(order=order, executed_trades=completed_trades)
+        )
+
+    async def fetch_my_open_orders(
+        self, market_code: str, planet_id: str
+    ) -> list[MyOpenOrdersResponse]:
+        my_open_orders_arr = (
+            await self.currency_market_order_repository.my_open_orders_by_planet(
+                market_code, planet_id
+            )
+        )
 
         re = []
         for my_open_order in my_open_orders_arr:
@@ -483,12 +580,13 @@ class CurrencyMarket:
             created_time = date.strftime("%d/%m %H:%M")
             re.append(
                 MyOpenOrdersResponse(
-                                     id=str(my_open_order.id),
-                                     created_date=created_time,
-                                     type=my_open_order.order_type,
-                                     amount=my_open_order.amount,
-                                     price=my_open_order.price,
-                                     amount_filled=my_open_order.amount_filled)
+                    id=str(my_open_order.id),
+                    created_date=created_time,
+                    type=my_open_order.order_type,
+                    amount=my_open_order.amount,
+                    price=my_open_order.price,
+                    amount_filled=my_open_order.amount_filled,
+                )
             )
 
         return re
@@ -505,7 +603,7 @@ class CurrencyMarket:
             return
 
         if order.state == "fully_filled":
-            #do nothing
+            # do nothing
             return
 
         order.state = "cancelled"
@@ -515,7 +613,7 @@ class CurrencyMarket:
         pair2_amt = getattr(planet.resources, pair2)
 
         if order.order_type == "buy":
-            pair2_amt += order.to_be_filled()*order.price
+            pair2_amt += order.to_be_filled() * order.price
 
         elif order.order_type == "sell":
             pair1_amt += order.to_be_filled()

@@ -35,7 +35,3 @@ services:
       - 11211:11211
     environment:
       MEMCACHED_MAX_CONNECTIONS: 5000
-
-
-
-

@@ -1,7 +1,9 @@
 from dataclasses import dataclass
-from core.shared.models import Email, AppBaseException
-from core.shared.ports import ResponsePort, EmailRepositoryPort, PlanetRepositoryPort
+
 from pydantic import BaseModel
+
+from core.shared.models import AppBaseException, Email
+from core.shared.ports import EmailRepositoryPort, PlanetRepositoryPort, ResponsePort
 
 
 class EmailNotFoundException(AppBaseException):
@@ -25,13 +27,15 @@ class PlanetEmail:
 
     async def create(self, email_request: PlanetSendEmailRequest):
         planet = await self.planet_repository_port.get(email_request.planet_id_receiver)
-        email = Email(title=email_request.title,
-                      sub_title=email_request.sub_title,
-                      template=email_request.template,
-                      body=email_request.body,
-                      sender=email_request.sender,
-                      read=False,
-                      planet=email_request.planet_id_receiver)
+        email = Email(
+            title=email_request.title,
+            sub_title=email_request.sub_title,
+            template=email_request.template,
+            body=email_request.body,
+            sender=email_request.sender,
+            read=False,
+            planet=email_request.planet_id_receiver,
+        )
 
         email = await self.email_repository_port.create(email)
         planet.emails.append(email)

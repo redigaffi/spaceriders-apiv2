@@ -38,5 +38,3 @@ artifacts:
     websockets:
       files: imagedefinitions3.json
       name: websockets
-
-

@@ -1,15 +1,22 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional, Any
-from pydantic import BaseModel, root_validator, Field
-from core.shared.static.game_data.Common import BuildableItemBaseType, CommonKeys, BuildableItemLevelInfo
-from core.shared.static.game_data.PlanetData import PlanetData
-from core.shared.static.game_data.ResourceData import ResourceData as RD, ResourceData
-from core.shared.static.game_data.InstallationData import InstallationData as ID
-from core.shared.static.game_data.ResearchData import ResearchData as RE
-from core.shared.static.game_data.DefenseData import DefenseData as DD
-from core.shared.static.game_data.StakingData import StakingData as SD
+from typing import Any, List, Optional
+
+from pydantic import BaseModel, Field, root_validator
+
 from core.shared.service.tier_benefit import tier_benefit_service
+from core.shared.static.game_data.Common import (
+    BuildableItemBaseType,
+    BuildableItemLevelInfo,
+    CommonKeys,
+)
+from core.shared.static.game_data.DefenseData import DefenseData as DD
+from core.shared.static.game_data.InstallationData import InstallationData as ID
+from core.shared.static.game_data.PlanetData import PlanetData
+from core.shared.static.game_data.ResearchData import ResearchData as RE
+from core.shared.static.game_data.ResourceData import ResourceData
+from core.shared.static.game_data.ResourceData import ResourceData as RD
+from core.shared.static.game_data.StakingData import StakingData as SD
 
 
 class AppBaseException(Exception):
@@ -51,7 +58,7 @@ class User(BaseModel):
     id: str = None
     wallet: str = None
     username: str = None
-    planets: List["Planet"] = []
+    planets: list["Planet"] = []
 
     def exists(self):
         return self.id is not None
@@ -172,17 +179,21 @@ class Planet(BaseModel):
 
     price_paid: int = None
 
-    resources_level: List[BuildableItem] = []
-    installation_level: List[BuildableItem] = []
-    research_level: List[BuildableItem] = []
-    defense_items: List[BuildableItem] = []
-    energy_deposits: List[EnergyDeposit] = []
-    bkm_deposits: List[BKMTransaction] = []
-    emails: List[Email] = []
+    resources_level: list[BuildableItem] = []
+    installation_level: list[BuildableItem] = []
+    research_level: list[BuildableItem] = []
+    defense_items: list[BuildableItem] = []
+    energy_deposits: list[EnergyDeposit] = []
+    bkm_deposits: list[BKMTransaction] = []
+    emails: list[Email] = []
 
     def building_queue(self) -> list[BuildableItem]:
-        buildable_item: list[
-            BuildableItem] = self.resources_level + self.research_level + self.installation_level + self.defense_items
+        buildable_item: list[BuildableItem] = (
+            self.resources_level
+            + self.research_level
+            + self.installation_level
+            + self.defense_items
+        )
 
         return list(filter(lambda b: b.building or b.repairing, buildable_item))
 
@@ -190,12 +201,11 @@ class Planet(BaseModel):
         self.image_url = f"{url}/{self.image}-{self.rarity}.webp"
         self.image_url_bg = f"{url}/{self.image}-{self.rarity}-bg.webp"
 
-
     # @TODO: Pydantic bug dont serialize properties, using root_validator is a workaround
     # @SEE: https://github.com/samuelcolvin/pydantic/pull/2625
     @root_validator
     def compute_energy_usage(cls, values):
-        mines: List[BuildableItem] = values["resources_level"]
+        mines: list[BuildableItem] = values["resources_level"]
         energy_usage = 0
         mine: BuildableItem
 
@@ -222,7 +232,9 @@ class Planet(BaseModel):
         values["resources"].energy_usage = energy_usage
         # @TODO: Should be a property on resources just like this method once PR is merged
         if values["rarity"] is not None:
-            values["resources"].energy_max_deposit = PlanetData.DATA[values["rarity"]][CommonKeys.ENERGY_DEPOSIT_MAX_ONCE]
+            values["resources"].energy_max_deposit = PlanetData.DATA[values["rarity"]][
+                CommonKeys.ENERGY_DEPOSIT_MAX_ONCE
+            ]
 
         return values
 
@@ -237,33 +249,37 @@ class Planet(BaseModel):
             repairing = resource_level.repairing
             current_level = resource_level.current_level
 
-            current_level_info: BuildableItemLevelInfo = ResourceData.get_item(label).get_level_info(current_level)
+            current_level_info: BuildableItemLevelInfo = ResourceData.get_item(
+                label
+            ).get_level_info(current_level)
 
-            tmp = {'building': upgrading, 'repairing': repairing}
+            tmp = {"building": upgrading, "repairing": repairing}
 
             if upgrading or repairing:
-                tmp['finish'] = resource_level.finish
+                tmp["finish"] = resource_level.finish
 
-            tmp['level'] = current_level
-            tmp['type'] = RD.TYPE
+            tmp["level"] = current_level
+            tmp["type"] = RD.TYPE
 
             resources_data: BuildableItemBaseType = RD.get_item(label)
-            tmp['name'] = resources_data.name
-            tmp['label'] = resources_data.label
-            tmp['description'] = resources_data.description
-            tmp['health'] = resource_level.health
-            tmp['upgrades'] = {}
+            tmp["name"] = resources_data.name
+            tmp["label"] = resources_data.label
+            tmp["description"] = resources_data.description
+            tmp["health"] = resource_level.health
+            tmp["upgrades"] = {}
 
             if resources_data.category == RD.MINE_CATEGORY:
-                tmp['production'] = current_level_info.production
+                tmp["production"] = current_level_info.production
 
             if resources_data.category == RD.WAREHOUSE_CATEGORY:
-                tmp['capacity'] = current_level_info.capacity
+                tmp["capacity"] = current_level_info.capacity
 
             for upgrade in resources_data.builds:
                 upgrade_data: BuildableItemLevelInfo = resources_data.builds[upgrade]
                 # upgrade_data = resources_data.builds[upgrade]
-                tmp['upgrades'][upgrade_data.level] = tier_benefit_service(self.tier.tier_code, upgrade_data)
+                tmp["upgrades"][upgrade_data.level] = tier_benefit_service(
+                    self.tier.tier_code, upgrade_data
+                )
 
             re[label] = tmp
 
@@ -281,21 +297,23 @@ class Planet(BaseModel):
 
             research_data: BuildableItemBaseType = RE.get_item(label)
 
-            tmp = {'building': upgrading}
+            tmp = {"building": upgrading}
 
             if upgrading:
-                tmp['finish'] = research_level.finish
+                tmp["finish"] = research_level.finish
 
-            tmp['level'] = current_level
-            tmp['type'] = RE.TYPE
-            tmp['name'] = research_data.name
-            tmp['label'] = research_data.label
-            tmp['description'] = research_data.description
+            tmp["level"] = current_level
+            tmp["type"] = RE.TYPE
+            tmp["name"] = research_data.name
+            tmp["label"] = research_data.label
+            tmp["description"] = research_data.description
 
-            tmp['upgrades'] = {}
+            tmp["upgrades"] = {}
             for upgrade in research_data.builds:
                 upgrade_data: BuildableItemLevelInfo = research_data.builds[upgrade]
-                tmp['upgrades'][upgrade_data.level] = tier_benefit_service(self.tier.tier_code, upgrade_data)
+                tmp["upgrades"][upgrade_data.level] = tier_benefit_service(
+                    self.tier.tier_code, upgrade_data
+                )
 
             re[label] = tmp
 
@@ -313,21 +331,23 @@ class Planet(BaseModel):
 
             installation_data: BuildableItemBaseType = ID.get_item(label)
 
-            tmp = {'building': upgrading}
+            tmp = {"building": upgrading}
 
             if upgrading:
-                tmp['finish'] = installation_level.finish
+                tmp["finish"] = installation_level.finish
 
-            tmp['level'] = current_level
-            tmp['type'] = ID.TYPE
-            tmp['name'] = installation_data.name
-            tmp['label'] = installation_data.label
-            tmp['description'] = installation_data.description
+            tmp["level"] = current_level
+            tmp["type"] = ID.TYPE
+            tmp["name"] = installation_data.name
+            tmp["label"] = installation_data.label
+            tmp["description"] = installation_data.description
 
-            tmp['upgrades'] = {}
+            tmp["upgrades"] = {}
             for upgrade in installation_data.builds:
                 upgrade_data: BuildableItemLevelInfo = installation_data.builds[upgrade]
-                tmp['upgrades'][upgrade_data.level] = tier_benefit_service(self.tier.tier_code, upgrade_data)
+                tmp["upgrades"][upgrade_data.level] = tier_benefit_service(
+                    self.tier.tier_code, upgrade_data
+                )
 
             re[label] = tmp
 
@@ -343,20 +363,22 @@ class Planet(BaseModel):
             defense_data: BuildableItemBaseType = DD.get_item(label)
 
             tmp = {}
-            tmp['type'] = DD.TYPE
-            tmp['name'] = defense_data.name
-            tmp['label'] = label
-            tmp['description'] = defense_data.description
-            tmp['available'] = defense_item.quantity
-            tmp['data'] = tier_benefit_service(self.tier.tier_code, defense_data.get_level_info())
+            tmp["type"] = DD.TYPE
+            tmp["name"] = defense_data.name
+            tmp["label"] = label
+            tmp["description"] = defense_data.description
+            tmp["available"] = defense_item.quantity
+            tmp["data"] = tier_benefit_service(
+                self.tier.tier_code, defense_data.get_level_info()
+            )
 
-            tmp['building'] = False
-            tmp['finish'] = False
+            tmp["building"] = False
+            tmp["finish"] = False
 
             if defense_item.building:
-                tmp['building'] = defense_item.building
-                tmp['quantity_building'] = defense_item.quantity_building
-                tmp['finish'] = defense_item.finish
+                tmp["building"] = defense_item.building
+                tmp["quantity_building"] = defense_item.quantity_building
+                tmp["finish"] = defense_item.finish
 
             re[label] = tmp
 
@@ -365,15 +387,17 @@ class Planet(BaseModel):
     def get_emails(self):
         re = []
         for email in self.emails:
-            re.append({
-                'id': email.id,
-                'sender': email.sender,
-                'title': email.title,
-                'subTitle': email.sub_title,
-                'template': email.template,
-                'body': email.body,
-                'read': email.read,
-            })
+            re.append(
+                {
+                    "id": email.id,
+                    "sender": email.sender,
+                    "title": email.title,
+                    "subTitle": email.sub_title,
+                    "template": email.template,
+                    "body": email.body,
+                    "read": email.read,
+                }
+            )
         return re
 
 
@@ -413,12 +437,12 @@ class PlanetResponse(BaseModel):
 
     price_paid: int = None
 
-    resources_level: List[BuildableItem] = []
-    installation_level: List[BuildableItem] = []
-    research_level: List[BuildableItem] = []
-    defense_items: List[BuildableItem] = []
-    energy_deposits: List[EnergyDeposit] = []
-    emails: List[Email] = []
+    resources_level: list[BuildableItem] = []
+    installation_level: list[BuildableItem] = []
+    research_level: list[BuildableItem] = []
+    defense_items: list[BuildableItem] = []
+    energy_deposits: list[EnergyDeposit] = []
+    emails: list[Email] = []
 
     @staticmethod
     def from_planet(p: Planet) -> "PlanetResponse":
@@ -456,6 +480,7 @@ class PlanetResponse(BaseModel):
         re.energy_deposits = p.energy_deposits
         re.emails = p.emails
         return re
+
 
 # Open/Partially Filled/ Completed Orders
 class CurrencyMarketOrder(BaseModel):
@@ -519,4 +544,3 @@ class Volume24Info(BaseModel):
     min_24: float = None
     pair1_volume: float = None
     pair2_volume: float = None
-

@@ -5,11 +5,10 @@ import random
 @dataclass
 class SpacePiratesData:
     """
-     Data class representing in game items
+    Data class representing in game items
     """
-    LEVELS = [
-        "0-9"
-    ]
+
+    LEVELS = ["0-9"]
 
     SPACE_PIRATES = {
         "0-9": {
@@ -20,7 +19,7 @@ class SpacePiratesData:
             "distance": (3500, 8000),
             # Expressed in meters/s
             "speed": (400, 1000),
-            "health_per_space_ship": (30, 80)
+            "health_per_space_ship": (30, 80),
         }
     }
 
@@ -31,15 +30,27 @@ class SpacePiratesData:
             if int(lvl_info[0]) <= planet_level <= int(lvl_info[1]):
                 space_pirate_lvl_info = SpacePiratesData.SPACE_PIRATES[level]
 
-                amount = random.randint(space_pirate_lvl_info['amount'][0], space_pirate_lvl_info['amount'][1])
-                distance = random.randint(space_pirate_lvl_info['distance'][0], space_pirate_lvl_info['distance'][1])
-                speed = random.randint(space_pirate_lvl_info['speed'][0], space_pirate_lvl_info['speed'][1])
+                amount = random.randint(
+                    space_pirate_lvl_info["amount"][0],
+                    space_pirate_lvl_info["amount"][1],
+                )
+                distance = random.randint(
+                    space_pirate_lvl_info["distance"][0],
+                    space_pirate_lvl_info["distance"][1],
+                )
+                speed = random.randint(
+                    space_pirate_lvl_info["speed"][0], space_pirate_lvl_info["speed"][1]
+                )
 
-                health = random.randint(space_pirate_lvl_info['health_per_space_ship'][0],
-                                        space_pirate_lvl_info['health_per_space_ship'][1])
+                health = random.randint(
+                    space_pirate_lvl_info["health_per_space_ship"][0],
+                    space_pirate_lvl_info["health_per_space_ship"][1],
+                )
 
-                steal_per_space_ship = random.randint(space_pirate_lvl_info['amount_steal_per_surviving_pirate'][0],
-                                        space_pirate_lvl_info['amount_steal_per_surviving_pirate'][1])
+                steal_per_space_ship = random.randint(
+                    space_pirate_lvl_info["amount_steal_per_surviving_pirate"][0],
+                    space_pirate_lvl_info["amount_steal_per_surviving_pirate"][1],
+                )
 
                 return amount, distance, speed, health, steal_per_space_ship
 

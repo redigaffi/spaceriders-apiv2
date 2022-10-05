@@ -10,17 +10,13 @@ class StakingBenefits:
 
 
 class StakingData:
-    """ Data representing TIER costs """
+    """Data representing TIER costs"""
 
     TIER_0: str = "TIER_0"
     TIER_1: str = "TIER_1"
     TIER_2: str = "TIER_2"
 
-    TIERS: list[str] = [
-        TIER_0,
-        TIER_1,
-        TIER_2
-    ]
+    TIERS: list[str] = [TIER_0, TIER_1, TIER_2]
 
     TIER_NAMES: dict[str, str] = {
         TIER_0: "Tier 0",

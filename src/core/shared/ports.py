@@ -1,10 +1,19 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
+from typing import Tuple, TypedDict
 
-from core.shared.models import OpenOrdersGroupedByPrice, PriceCandleDataGroupedByTimeInterval, Volume24Info, BKMTransaction
-from core.shared.models import User, Planet, EnergyDeposit, Email, \
-     CurrencyMarketTrade, CurrencyMarketOrder
-from typing import TypedDict, Tuple
+from core.shared.models import (
+    BKMTransaction,
+    CurrencyMarketOrder,
+    CurrencyMarketTrade,
+    Email,
+    EnergyDeposit,
+    OpenOrdersGroupedByPrice,
+    Planet,
+    PriceCandleDataGroupedByTimeInterval,
+    User,
+    Volume24Info,
+)
 
 
 class LoggingPort(ABC):
@@ -15,6 +24,7 @@ class LoggingPort(ABC):
     @abstractmethod
     async def error(self, msg, extra=None):
         pass
+
 
 class EmailRepositoryPort(ABC):
     @abstractmethod
@@ -44,8 +54,11 @@ class EnergyDepositRepositoryPort(ABC):
         pass
 
     @abstractmethod
-    async def create_energy_deposit(self, energy_deposit: EnergyDeposit) -> EnergyDeposit:
+    async def create_energy_deposit(
+        self, energy_deposit: EnergyDeposit
+    ) -> EnergyDeposit:
         pass
+
 
 class BKMDepositRepositoryPort(ABC):
     @abstractmethod
@@ -53,9 +66,10 @@ class BKMDepositRepositoryPort(ABC):
         pass
 
     @abstractmethod
-    async def create_bkm_transaction(self, energy_deposit: BKMTransaction) -> BKMTransaction:
+    async def create_bkm_transaction(
+        self, energy_deposit: BKMTransaction
+    ) -> BKMTransaction:
         pass
-
 
 
 class CurrencyMarketOrderRepositoryPort(ABC):
@@ -64,19 +78,27 @@ class CurrencyMarketOrderRepositoryPort(ABC):
         pass
 
     @abstractmethod
-    async def open_orders_grouped_price(self, market_code: str) -> Tuple[list[OpenOrdersGroupedByPrice], list[OpenOrdersGroupedByPrice]]:
+    async def open_orders_grouped_price(
+        self, market_code: str
+    ) -> tuple[list[OpenOrdersGroupedByPrice], list[OpenOrdersGroupedByPrice]]:
         pass
 
     @abstractmethod
-    async def create_order(self, order: CurrencyMarketOrder) -> CurrencyMarketOrder | None:
+    async def create_order(
+        self, order: CurrencyMarketOrder
+    ) -> CurrencyMarketOrder | None:
         pass
 
     @abstractmethod
-    async def find_matching_orders(self, market_code: str, trade_type: str, order_type: str, price: float) -> list[CurrencyMarketOrder]:
+    async def find_matching_orders(
+        self, market_code: str, trade_type: str, order_type: str, price: float
+    ) -> list[CurrencyMarketOrder]:
         pass
 
     @abstractmethod
-    async def my_open_orders_by_planet(self, market_code: str, planet_id: str) -> list[CurrencyMarketOrder]:
+    async def my_open_orders_by_planet(
+        self, market_code: str, planet_id: str
+    ) -> list[CurrencyMarketOrder]:
         pass
 
     @abstractmethod
@@ -94,7 +116,9 @@ class CurrencyMarketTradeRepositoryPort(ABC):
         pass
 
     @abstractmethod
-    async def price_last_candle_data_grouped_time(self, market_code: str, interval: int) -> list[PriceCandleDataGroupedByTimeInterval]:
+    async def price_last_candle_data_grouped_time(
+        self, market_code: str, interval: int
+    ) -> list[PriceCandleDataGroupedByTimeInterval]:
         pass
 
     @abstractmethod
@@ -102,11 +126,15 @@ class CurrencyMarketTradeRepositoryPort(ABC):
         pass
 
     @abstractmethod
-    async def price_candle_data_grouped_time_range(self, market_code: str, interval: str, time_start: datetime) -> list[PriceCandleDataGroupedByTimeInterval]:
+    async def price_candle_data_grouped_time_range(
+        self, market_code: str, interval: str, time_start: datetime
+    ) -> list[PriceCandleDataGroupedByTimeInterval]:
         pass
 
     @abstractmethod
-    async def price_candle_data_grouped_time(self, market_code: str, time_start: datetime, interval: str) -> list[PriceCandleDataGroupedByTimeInterval]:
+    async def price_candle_data_grouped_time(
+        self, market_code: str, time_start: datetime, interval: str
+    ) -> list[PriceCandleDataGroupedByTimeInterval]:
         pass
 
     @abstractmethod
@@ -114,18 +142,19 @@ class CurrencyMarketTradeRepositoryPort(ABC):
         pass
 
     @abstractmethod
-    async def all_descending_limit_by_day(self, market_code: str) -> list[CurrencyMarketTrade] | None:
+    async def all_descending_limit_by_day(
+        self, market_code: str
+    ) -> list[CurrencyMarketTrade] | None:
         pass
 
     @abstractmethod
-    async def create_trade(self, trade: CurrencyMarketTrade) -> CurrencyMarketTrade | None:
+    async def create_trade(
+        self, trade: CurrencyMarketTrade
+    ) -> CurrencyMarketTrade | None:
         pass
 
 
-
-
 class UserRepositoryPort(ABC):
-
     @abstractmethod
     async def all(self) -> list[User] | None:
         pass
@@ -145,7 +174,9 @@ class UserRepositoryPort(ABC):
 
 class PlanetRepositoryPort(ABC):
     @abstractmethod
-    async def get_by_request_id(self, request_id: str, fetch_links=False) -> Planet | None:
+    async def get_by_request_id(
+        self, request_id: str, fetch_links=False
+    ) -> Planet | None:
         pass
 
     @abstractmethod
@@ -161,7 +192,13 @@ class PlanetRepositoryPort(ABC):
         pass
 
     @abstractmethod
-    async def by_position_range(self, galaxy: int, from_solar_system: int, to_solar_system: int, fetch_links=False) -> list[Planet]:
+    async def by_position_range(
+        self,
+        galaxy: int,
+        from_solar_system: int,
+        to_solar_system: int,
+        fetch_links=False,
+    ) -> list[Planet]:
         pass
 
     @abstractmethod
@@ -169,7 +206,9 @@ class PlanetRepositoryPort(ABC):
         pass
 
     @abstractmethod
-    async def get_my_planet(self, user_id: str, planet_id: str, fetch_links=False) -> Planet | None:
+    async def get_my_planet(
+        self, user_id: str, planet_id: str, fetch_links=False
+    ) -> Planet | None:
         pass
 
     @abstractmethod
@@ -181,7 +220,7 @@ class PlanetRepositoryPort(ABC):
         pass
 
     @abstractmethod
-    async def last_created_planet(self, fetch_links=False) -> Planet|bool:
+    async def last_created_planet(self, fetch_links=False) -> Planet | bool:
         pass
 
 

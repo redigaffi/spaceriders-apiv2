@@ -5,19 +5,20 @@ from fastapi import WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 from starlette.websockets import WebSocketState
 
-from adapters.shared.beani_repository_adapter import BeaniCurrencyMarketOrderRepositoryAdapter, \
-    BeaniCurrencyMarketTradeRepositoryAdapter, BeaniPlanetRepositoryAdapter
-from core.shared.models import MetadataResponse, AppBaseException
-from core.shared.ports import ResponsePort
-from core.currency_market import TradeRequest
-from core.currency_market import CurrencyMarket
-
+from adapters.shared.beani_repository_adapter import (
+    BeaniCurrencyMarketOrderRepositoryAdapter,
+    BeaniCurrencyMarketTradeRepositoryAdapter,
+    BeaniPlanetRepositoryAdapter,
+)
 from controllers.websockets import WebsocketController
+from core.currency_market import CurrencyMarket, TradeRequest
+from core.shared.models import AppBaseException, MetadataResponse
+from core.shared.ports import ResponsePort
 
 
 class WebsocketConnectionManager:
     def __init__(self):
-        self.active_connections: List[WebSocket] = []
+        self.active_connections: list[WebSocket] = []
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
@@ -48,7 +49,6 @@ websocket_manager = WebsocketConnectionManager()
 
 @dataclass
 class WebsocketResponsePort(ResponsePort):
-
     async def publish_response(self, response: BaseModel):
         return response
 
@@ -69,37 +69,69 @@ class WebsocketEntryPoint:
         try:
             while True:
                 data = await websocket.receive_json()
-                use_case = data['use_case']
+                use_case = data["use_case"]
 
                 if use_case == "ping":
-                    await self.websocket_manager.send_personal_message('{"response_type": "ping", "data": "pong"}', websocket)
+                    await self.websocket_manager.send_personal_message(
+                        '{"response_type": "ping", "data": "pong"}', websocket
+                    )
 
                 elif use_case == "trade":
                     trade_re = await self.trade(data)
-                    fetch_data_ob = await self.websocket_controller.trade_fetch_order_book_data(data['data']['market_code'])
+                    fetch_data_ob = (
+                        await self.websocket_controller.trade_fetch_order_book_data(
+                            data["data"]["market_code"]
+                        )
+                    )
 
                     re1 = MetadataResponse(response_type="trade", data=trade_re)
-                    re2 = MetadataResponse(response_type="trade_fetch_order_book_data", data=fetch_data_ob)
+                    re2 = MetadataResponse(
+                        response_type="trade_fetch_order_book_data", data=fetch_data_ob
+                    )
 
                     await self.websocket_manager.broadcast(re1.json())
                     await self.websocket_manager.broadcast(re2.json())
 
                 elif use_case == "trade_fetch_order_book_data":
-                    fetch_data_ob = await self.websocket_controller.trade_fetch_order_book_data(data['data']['market_code'])
-                    re = MetadataResponse(response_type="trade_fetch_order_book_data", data=fetch_data_ob)
-                    await self.websocket_manager.send_personal_message(re.json(), websocket)
+                    fetch_data_ob = (
+                        await self.websocket_controller.trade_fetch_order_book_data(
+                            data["data"]["market_code"]
+                        )
+                    )
+                    re = MetadataResponse(
+                        response_type="trade_fetch_order_book_data", data=fetch_data_ob
+                    )
+                    await self.websocket_manager.send_personal_message(
+                        re.json(), websocket
+                    )
 
                 elif use_case == "trade_fetch_current_candle":
-                    fetch_data_cc = await self.websocket_controller.trade_fetch_current_candle(data['data']['market_code'],
-                                                                                               data['data']['candle_time_frame'])
-                    re3 = MetadataResponse(response_type="trade_fetch_current_candle", data=fetch_data_cc)
-                    await self.websocket_manager.send_personal_message(re3.json(), websocket)
+                    fetch_data_cc = (
+                        await self.websocket_controller.trade_fetch_current_candle(
+                            data["data"]["market_code"],
+                            data["data"]["candle_time_frame"],
+                        )
+                    )
+                    re3 = MetadataResponse(
+                        response_type="trade_fetch_current_candle", data=fetch_data_cc
+                    )
+                    await self.websocket_manager.send_personal_message(
+                        re3.json(), websocket
+                    )
 
                 elif use_case == "trade_fetch_historical_data":
-                    fetch_data_re = await self.websocket_controller.trade_fetch_historical_data(data['data']['market_code'],
-                                                                                                data['data']['candle_time_frame'])
-                    re = MetadataResponse(response_type="trade_fetch_historical_data", data=fetch_data_re)
-                    await self.websocket_manager.send_personal_message(re.json(), websocket)
+                    fetch_data_re = (
+                        await self.websocket_controller.trade_fetch_historical_data(
+                            data["data"]["market_code"],
+                            data["data"]["candle_time_frame"],
+                        )
+                    )
+                    re = MetadataResponse(
+                        response_type="trade_fetch_historical_data", data=fetch_data_re
+                    )
+                    await self.websocket_manager.send_personal_message(
+                        re.json(), websocket
+                    )
                 # else:
                 #     # request not found
                 #     await self.websocket_manager.send_personal_message('{}', websocket)
@@ -112,15 +144,17 @@ class WebsocketEntryPoint:
             self.websocket_manager.disconnect(websocket)
 
     async def trade(self, data: dict):
-        req: TradeRequest = TradeRequest(trade_type=data['data']["trade_type"],
-                                         user_id=data['data']["user_id"],
-                                         planet_id=data['data']["planet_id"],
-                                         order_type=data['data']["order_type"],
-                                         pair1=data['data']["pair1"],
-                                         pair2=data['data']["pair2"],
-                                         price_unit=data['data']["price"],
-                                         amount=data['data']["amount"],
-                                         total=data['data']["total"])
+        req: TradeRequest = TradeRequest(
+            trade_type=data["data"]["trade_type"],
+            user_id=data["data"]["user_id"],
+            planet_id=data["data"]["planet_id"],
+            order_type=data["data"]["order_type"],
+            pair1=data["data"]["pair1"],
+            pair2=data["data"]["pair2"],
+            price_unit=data["data"]["price"],
+            amount=data["data"]["amount"],
+            total=data["data"]["total"],
+        )
 
         return await self.websocket_controller.trade(req)
 
@@ -131,10 +165,12 @@ currency_market_trade_repository = BeaniCurrencyMarketTradeRepositoryAdapter()
 
 
 async def ws_controller():
-    trading_use_case = CurrencyMarket(planet_repository,
-                                      currency_market_order_repository,
-                                      currency_market_trade_repository,
-                                      response_port)
+    trading_use_case = CurrencyMarket(
+        planet_repository,
+        currency_market_order_repository,
+        currency_market_trade_repository,
+        response_port,
+    )
 
     return WebsocketController(trading_use_case)
 

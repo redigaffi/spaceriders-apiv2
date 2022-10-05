@@ -1,21 +1,31 @@
+from dataclasses import dataclass
 import datetime
 import math
-from dataclasses import dataclass
+
 from pydantic import BaseModel
 
-from core.planet_level import PlanetLevel, GivePlanetExperienceRequest
-from core.shared.models import AppBaseException, Planet, NoPlanetFoundException, QueueIsFullException, BuildableItem
+from core.planet_level import GivePlanetExperienceRequest, PlanetLevel
+from core.shared.models import (
+    AppBaseException,
+    BuildableItem,
+    NoPlanetFoundException,
+    Planet,
+    QueueIsFullException,
+)
 from core.shared.ports import PlanetRepositoryPort, ResponsePort
 from core.shared.service.buildable_items import is_queue_full
 from core.shared.service.planet import resource_reserve_als
 from core.shared.service.tier_benefit import tier_benefit_service
-from core.shared.static.game_data.Common import BuildableItemBaseType, BuildableItemLevelInfo
+from core.shared.static.game_data.Common import (
+    BuildableItemBaseType,
+    BuildableItemLevelInfo,
+)
+from core.shared.static.game_data.DefenseData import DefenseData
 from core.shared.static.game_data.GameData import GameData
 from core.shared.static.game_data.GameDataFactory import game_data_factory
-from core.shared.static.game_data.ResourceData import ResourceData
-from core.shared.static.game_data.DefenseData import DefenseData
 from core.shared.static.game_data.InstallationData import InstallationData
 from core.shared.static.game_data.ResearchData import ResearchData
+from core.shared.static.game_data.ResourceData import ResourceData
 
 
 class FinishBuildRequest(BaseModel):
@@ -36,15 +46,17 @@ class BuildableResponse(BuildableItem):
 
     @staticmethod
     def from_buildable_item(item: BuildableItem):
-        return BuildableResponse(label=item.label,
-                                 type=item.type,
-                                 current_level=item.current_level,
-                                 building=item.building,
-                                 finish=item.finish,
-                                 repairing=item.repairing,
-                                 health=item.health,
-                                 quantity=item.quantity,
-                                 quantity_building=item.quantity_building)
+        return BuildableResponse(
+            label=item.label,
+            type=item.type,
+            current_level=item.current_level,
+            building=item.building,
+            finish=item.finish,
+            repairing=item.repairing,
+            health=item.health,
+            quantity=item.quantity,
+            quantity_building=item.quantity_building,
+        )
 
 
 class WrongBuildableException(AppBaseException):
@@ -69,6 +81,7 @@ class CantUpgradeIfHealthIsNotFullException(AppBaseException):
 
 class CantRepairIfHealthIsFullException(AppBaseException):
     msg = "Cant upgrade if health full."
+
 
 @dataclass
 class BuildableItems:
@@ -105,14 +118,26 @@ class BuildableItems:
 
             if item.building:
 
-                if item.type in [ResourceData.TYPE, InstallationData.TYPE, ResearchData.TYPE]:
+                if item.type in [
+                    ResourceData.TYPE,
+                    InstallationData.TYPE,
+                    ResearchData.TYPE,
+                ]:
                     item.current_level += 1
 
                 if item.type in [ResourceData.TYPE]:
                     if item.label in last_update_field_names:
-                        setattr(planet.resources, last_update_field_names[item.label], item.finish)
+                        setattr(
+                            planet.resources,
+                            last_update_field_names[item.label],
+                            item.finish,
+                        )
 
-                    item.health = game_data.get_item(item.label).get_level_info(item.current_level).health
+                    item.health = (
+                        game_data.get_item(item.label)
+                        .get_level_info(item.current_level)
+                        .health
+                    )
 
                 if item.type in [InstallationData.TYPE, ResourceData.TYPE]:
                     planet.slots_used += 1
@@ -137,12 +162,16 @@ class BuildableItems:
             elif item.repairing:
                 info = game_data.get_item(item.label).get_level_info(item.current_level)
                 if item.label in last_update_field_names:
-                    setattr(planet.resources, last_update_field_names[item.label], item.finish)
+                    setattr(
+                        planet.resources,
+                        last_update_field_names[item.label],
+                        item.finish,
+                    )
 
                 item.health = info.health
                 item.repairing = False
                 item.finish = None
-            # Dont save without changes it will break
+                # Dont save without changes it will break
                 planet = await self.planet_repository_port.update(planet)
 
         return await self.response_port.publish_response(planet)
@@ -152,13 +181,20 @@ class BuildableItems:
         if request.type in [DefenseData.TYPE] and request.quantity is None:
             raise WrongBuildableException()
 
-        if request.type not in [ResourceData.TYPE, DefenseData.TYPE, InstallationData.TYPE, ResearchData.TYPE]:
+        if request.type not in [
+            ResourceData.TYPE,
+            DefenseData.TYPE,
+            InstallationData.TYPE,
+            ResearchData.TYPE,
+        ]:
             raise WrongBuildableException()
 
         if request.label not in (ResourceData.TYPES):
             raise WrongBuildableException()
 
-        planet: Planet = await self.planet_repository_port.get_my_planet(user, request.planet_id)
+        planet: Planet = await self.planet_repository_port.get_my_planet(
+            user, request.planet_id
+        )
 
         if planet is None:
             raise NoPlanetFoundException()
@@ -170,27 +206,41 @@ class BuildableItems:
             ResourceData.TYPE: "resources_level",
             InstallationData.TYPE: "installation_level",
             ResearchData.TYPE: "research_level",
-            DefenseData.TYPE: "defense_items"
+            DefenseData.TYPE: "defense_items",
         }
 
         buildable_items = getattr(planet, mapping[request.type])
-        buildable: BuildableItem = list(filter(lambda x: x.label == request.label, buildable_items))[0]
+        buildable: BuildableItem = list(
+            filter(lambda x: x.label == request.label, buildable_items)
+        )[0]
 
         if buildable.building or buildable.repairing:
             raise CantBuildOrRepairException()
 
         game_data: GameData = game_data_factory[request.type]
         label_info: BuildableItemBaseType = game_data.get_item(request.label)
-        next_lvl: BuildableItemLevelInfo = label_info.get_level_info(buildable.current_level + 1)
-        next_lvl: BuildableItemLevelInfo = tier_benefit_service(planet.tier.tier_code, next_lvl)
+        next_lvl: BuildableItemLevelInfo = label_info.get_level_info(
+            buildable.current_level + 1
+        )
+        next_lvl: BuildableItemLevelInfo = tier_benefit_service(
+            planet.tier.tier_code, next_lvl
+        )
 
-        if request.type == ResourceData.TYPE and buildable.health < label_info.get_level_info(buildable.current_level).health:
+        if (
+            request.type == ResourceData.TYPE
+            and buildable.health
+            < label_info.get_level_info(buildable.current_level).health
+        ):
             raise CantUpgradeIfHealthIsNotFullException()
 
         if planet.slots_used >= planet.slots:
             raise CantBuildSlotsFullException()
 
-        if planet.resources.metal < next_lvl.cost_metal or planet.resources.crystal < next_lvl.cost_crystal or planet.resources.petrol < next_lvl.cost_petrol:
+        if (
+            planet.resources.metal < next_lvl.cost_metal
+            or planet.resources.crystal < next_lvl.cost_crystal
+            or planet.resources.petrol < next_lvl.cost_petrol
+        ):
             raise NotEnoughFundsForBuildException()
 
         planet.resources.metal -= next_lvl.cost_metal
@@ -214,7 +264,11 @@ class BuildableItems:
 
         planet = resource_reserve_als(request.label, planet, next_lvl)
         planet = await self.planet_repository_port.update(planet)
-        await self.planet_level_use_case.give_planet_experience(GivePlanetExperienceRequest(planet_id=str(planet.id), experience_amount=next_lvl.experience))
+        await self.planet_level_use_case.give_planet_experience(
+            GivePlanetExperienceRequest(
+                planet_id=str(planet.id), experience_amount=next_lvl.experience
+            )
+        )
 
         response = BuildableResponse.from_buildable_item(buildable)
         response.metal_paid = next_lvl.cost_metal
@@ -227,7 +281,9 @@ class BuildableItems:
         if request.type != ResourceData.TYPE or request.label not in ResourceData.TYPES:
             raise WrongBuildableException()
 
-        planet: Planet = await self.planet_repository_port.get_my_planet(user, request.planet_id)
+        planet: Planet = await self.planet_repository_port.get_my_planet(
+            user, request.planet_id
+        )
 
         if planet is None:
             raise NoPlanetFoundException()
@@ -240,14 +296,18 @@ class BuildableItems:
         }
 
         buildable_items = getattr(planet, mapping[request.type])
-        buildable: BuildableItem = list(filter(lambda x: x.label == request.label, buildable_items))[0]
+        buildable: BuildableItem = list(
+            filter(lambda x: x.label == request.label, buildable_items)
+        )[0]
 
         if buildable.building or buildable.repairing:
             raise CantBuildOrRepairException()
 
         game_data: GameData = game_data_factory[request.type]
         label_info: BuildableItemBaseType = game_data.get_item(request.label)
-        current_level_info: BuildableItemLevelInfo = label_info.get_level_info(buildable.current_level)
+        current_level_info: BuildableItemLevelInfo = label_info.get_level_info(
+            buildable.current_level
+        )
 
         current_health = buildable.health
         full_health = current_level_info.health
@@ -262,7 +322,11 @@ class BuildableItems:
         time = math.ceil(current_level_info.time * percentage)
         experience = math.ceil(current_level_info.experience * percentage)
 
-        if planet.resources.metal < cost_metal or planet.resources.crystal < cost_crystal or planet.resources.petrol < cost_petrol:
+        if (
+            planet.resources.metal < cost_metal
+            or planet.resources.crystal < cost_crystal
+            or planet.resources.petrol < cost_petrol
+        ):
             raise NotEnoughFundsForBuildException()
 
         planet.resources.metal -= cost_metal
@@ -276,7 +340,10 @@ class BuildableItems:
         planet = await self.planet_repository_port.update(planet)
 
         await self.planet_level_use_case.give_planet_experience(
-            GivePlanetExperienceRequest(planet_id=str(planet.id), experience_amount=experience))
+            GivePlanetExperienceRequest(
+                planet_id=str(planet.id), experience_amount=experience
+            )
+        )
 
         response = BuildableResponse.from_buildable_item(buildable)
         response.metal_paid = cost_metal

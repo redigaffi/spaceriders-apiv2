@@ -1,28 +1,57 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any, List, Tuple
 
-from beanie import PydanticObjectId, WriteRules, DeleteRules
+from beanie import DeleteRules, PydanticObjectId, WriteRules
+from beanie.operators import In
 from pydantic import BaseModel
 
-from adapters.shared.beanie_models_adapter import EnergyDepositDocument, PlanetDocument, UserDocument, EmailDocument, \
-    CurrencyMarketTradeDocument, \
-    CurrencyMarketOrderDocument, BKMTransactionDocument
-from core.shared.models import OpenOrdersGroupedByPrice, PriceCandleDataGroupedByTimeInterval, Volume24Info, BKMTransaction
-from core.shared.ports import UserRepositoryPort, PlanetRepositoryPort, EnergyDepositRepositoryPort, \
-    EmailRepositoryPort, \
-    CurrencyMarketTradeRepositoryPort, CurrencyMarketOrderRepositoryPort, BKMDepositRepositoryPort
-from core.shared.models import User, PlanetTier, Planet, UserNotFoundException, \
-    EnergyDeposit, Email, CurrencyMarketTrade, \
-    CurrencyMarketOrder
-from datetime import datetime
-from beanie.operators import In
+from adapters.shared.beanie_models_adapter import (
+    BKMTransactionDocument,
+    CurrencyMarketOrderDocument,
+    CurrencyMarketTradeDocument,
+    EmailDocument,
+    EnergyDepositDocument,
+    PlanetDocument,
+    UserDocument,
+)
+from core.shared.models import (
+    BKMTransaction,
+    CurrencyMarketOrder,
+    CurrencyMarketTrade,
+    Email,
+    EnergyDeposit,
+    OpenOrdersGroupedByPrice,
+    Planet,
+    PlanetTier,
+    PriceCandleDataGroupedByTimeInterval,
+    User,
+    UserNotFoundException,
+    Volume24Info,
+)
+from core.shared.ports import (
+    BKMDepositRepositoryPort,
+    CurrencyMarketOrderRepositoryPort,
+    CurrencyMarketTradeRepositoryPort,
+    EmailRepositoryPort,
+    EnergyDepositRepositoryPort,
+    PlanetRepositoryPort,
+    UserRepositoryPort,
+)
 
 
 class EmailRepositoryAdapter(EmailRepositoryPort):
     async def create(self, email: Email) -> Email:
-        email_document = EmailDocument(title=email.title, sub_title=email.sub_title, template=email.template,
-                                       body=email.body, sender=email.sender, read=email.read, planet=email.planet)
+        email_document = EmailDocument(
+            title=email.title,
+            sub_title=email.sub_title,
+            template=email.template,
+            body=email.body,
+            sender=email.sender,
+            read=email.read,
+            planet=email.planet,
+        )
 
         await email_document.save()
         return email_document
@@ -32,7 +61,9 @@ class EmailRepositoryAdapter(EmailRepositoryPort):
         return email
 
     async def delete(self, email: Email):
-        email_document: EmailDocument = await EmailDocument.get(PydanticObjectId(email.id))
+        email_document: EmailDocument = await EmailDocument.get(
+            PydanticObjectId(email.id)
+        )
         planet = await PlanetDocument.get(PydanticObjectId(email.planet))
         await planet.fetch_link(PlanetDocument.emails)
         planet.emails = [x for x in planet.emails if str(x.id) != email.id]
@@ -41,10 +72,12 @@ class EmailRepositoryAdapter(EmailRepositoryPort):
         await email_document.delete(link_rule=DeleteRules.DELETE_LINKS)
 
     async def delete_all_by_user(self, planet_id) -> None:
-        email_documents: List[EmailDocument] = await EmailDocument.find(EmailDocument.planet == planet_id).to_list()
+        email_documents: list[EmailDocument] = await EmailDocument.find(
+            EmailDocument.planet == planet_id
+        ).to_list()
         for email in email_documents:
             await email.delete(link_rule=DeleteRules.DELETE_LINKS)
-        
+
         planet = await PlanetDocument.get(PydanticObjectId(planet_id))
         await planet.fetch_link(PlanetDocument.emails)
         planet.emails = []
@@ -57,33 +90,43 @@ class EmailRepositoryAdapter(EmailRepositoryPort):
 
 
 class EnergyDepositRepositoryAdapter(EnergyDepositRepositoryPort):
-
     async def get(self, id: str) -> EnergyDeposit | None:
-        return await EnergyDepositDocument.find_one(EnergyDepositDocument.request_id == id)
+        return await EnergyDepositDocument.find_one(
+            EnergyDepositDocument.request_id == id
+        )
 
-    async def create_energy_deposit(self, energy_deposit: EnergyDeposit) -> EnergyDeposit:
-        energy_document = EnergyDepositDocument(request_id=energy_deposit.request_id,
-                                                planet_id=energy_deposit.planet_id,
-                                                was_recovered=energy_deposit.was_recovered,
-                                                created_time=energy_deposit.created_time,
-                                                token_amount=energy_deposit.token_amount,
-                                                usd_value=energy_deposit.usd_value)
+    async def create_energy_deposit(
+        self, energy_deposit: EnergyDeposit
+    ) -> EnergyDeposit:
+        energy_document = EnergyDepositDocument(
+            request_id=energy_deposit.request_id,
+            planet_id=energy_deposit.planet_id,
+            was_recovered=energy_deposit.was_recovered,
+            created_time=energy_deposit.created_time,
+            token_amount=energy_deposit.token_amount,
+            usd_value=energy_deposit.usd_value,
+        )
         await energy_document.save()
         return energy_document
 
 
 class BKMDepositRepositoryAdapter(BKMDepositRepositoryPort):
-
     async def get(self, id: str) -> BKMTransaction | None:
-        return await BKMTransactionDocument.find_one(BKMTransactionDocument.request_id == id)
+        return await BKMTransactionDocument.find_one(
+            BKMTransactionDocument.request_id == id
+        )
 
-    async def create_bkm_transaction(self, energy_deposit: BKMTransaction) -> BKMTransaction:
-        bkm_document = BKMTransactionDocument(request_id=energy_deposit.request_id,
-                                              planet_id=energy_deposit.planet_id,
-                                              was_recovered=energy_deposit.was_recovered,
-                                              created_time=energy_deposit.created_time,
-                                              token_amount=energy_deposit.token_amount,
-                                              type=energy_deposit.type)
+    async def create_bkm_transaction(
+        self, energy_deposit: BKMTransaction
+    ) -> BKMTransaction:
+        bkm_document = BKMTransactionDocument(
+            request_id=energy_deposit.request_id,
+            planet_id=energy_deposit.planet_id,
+            was_recovered=energy_deposit.was_recovered,
+            created_time=energy_deposit.created_time,
+            token_amount=energy_deposit.token_amount,
+            type=energy_deposit.type,
+        )
         await bkm_document.save()
         return bkm_document
 
@@ -96,118 +139,173 @@ class BeaniCurrencyMarketOrderRepositoryAdapter(CurrencyMarketOrderRepositoryPor
     async def get_by_id(self, id: str) -> CurrencyMarketOrder:
         return await CurrencyMarketOrderDocument.get(PydanticObjectId(id))
 
-    async def my_open_orders_by_planet(self, market_code: str, planet_id: str) -> list[CurrencyMarketOrder]:
-        return await CurrencyMarketOrderDocument.find(
-            CurrencyMarketOrderDocument.market_code == market_code,
-            CurrencyMarketOrderDocument.planet_id == planet_id,
-            In(CurrencyMarketOrderDocument.state, ["not_filled", "partially_filled"])
-        ).sort(+CurrencyMarketOrderDocument.price, +CurrencyMarketOrderDocument.created_time).to_list()
+    async def my_open_orders_by_planet(
+        self, market_code: str, planet_id: str
+    ) -> list[CurrencyMarketOrder]:
+        return (
+            await CurrencyMarketOrderDocument.find(
+                CurrencyMarketOrderDocument.market_code == market_code,
+                CurrencyMarketOrderDocument.planet_id == planet_id,
+                In(
+                    CurrencyMarketOrderDocument.state,
+                    ["not_filled", "partially_filled"],
+                ),
+            )
+            .sort(
+                +CurrencyMarketOrderDocument.price,
+                +CurrencyMarketOrderDocument.created_time,
+            )
+            .to_list()
+        )
 
     async def update(self, order: CurrencyMarketOrderDocument) -> CurrencyMarketOrder:
         await order.save_changes()
         return order
 
-    async def find_matching_orders(self, market_code: str, trade_type: str, order_type: str, price: float) -> list[
-        CurrencyMarketOrder]:
+    async def find_matching_orders(
+        self, market_code: str, trade_type: str, order_type: str, price: float
+    ) -> list[CurrencyMarketOrder]:
         matching_orders = []
 
         if trade_type == "limit":
             if order_type == "buy":
-                matching_orders = await CurrencyMarketOrderDocument.find(
-                    CurrencyMarketOrderDocument.market_code == market_code,
-                    CurrencyMarketOrderDocument.price <= price,
-                    CurrencyMarketOrderDocument.order_type == "sell",
-                    In(CurrencyMarketOrderDocument.state, ["not_filled", "partially_filled"])
-                ).sort(+CurrencyMarketOrderDocument.price, +CurrencyMarketOrderDocument.created_time).to_list()
+                matching_orders = (
+                    await CurrencyMarketOrderDocument.find(
+                        CurrencyMarketOrderDocument.market_code == market_code,
+                        CurrencyMarketOrderDocument.price <= price,
+                        CurrencyMarketOrderDocument.order_type == "sell",
+                        In(
+                            CurrencyMarketOrderDocument.state,
+                            ["not_filled", "partially_filled"],
+                        ),
+                    )
+                    .sort(
+                        +CurrencyMarketOrderDocument.price,
+                        +CurrencyMarketOrderDocument.created_time,
+                    )
+                    .to_list()
+                )
             elif order_type == "sell":
-                matching_orders = await CurrencyMarketOrderDocument.find(
-                    CurrencyMarketOrderDocument.market_code == market_code,
-                    CurrencyMarketOrderDocument.price >= price,
-                    CurrencyMarketOrderDocument.order_type == "buy",
-                    In(CurrencyMarketOrderDocument.state, ["not_filled", "partially_filled"])
-                ).sort(-CurrencyMarketOrderDocument.price, +CurrencyMarketOrderDocument.created_time).to_list()
+                matching_orders = (
+                    await CurrencyMarketOrderDocument.find(
+                        CurrencyMarketOrderDocument.market_code == market_code,
+                        CurrencyMarketOrderDocument.price >= price,
+                        CurrencyMarketOrderDocument.order_type == "buy",
+                        In(
+                            CurrencyMarketOrderDocument.state,
+                            ["not_filled", "partially_filled"],
+                        ),
+                    )
+                    .sort(
+                        -CurrencyMarketOrderDocument.price,
+                        +CurrencyMarketOrderDocument.created_time,
+                    )
+                    .to_list()
+                )
 
         elif trade_type == "market":
             if order_type == "buy":
-                matching_orders = await CurrencyMarketOrderDocument.find(
-                    CurrencyMarketOrderDocument.market_code == market_code,
-                    CurrencyMarketOrderDocument.order_type == "sell",
-                    In(CurrencyMarketOrderDocument.state, ["not_filled", "partially_filled"])
-                ).sort(+CurrencyMarketOrderDocument.price, +CurrencyMarketOrderDocument.created_time).to_list()
+                matching_orders = (
+                    await CurrencyMarketOrderDocument.find(
+                        CurrencyMarketOrderDocument.market_code == market_code,
+                        CurrencyMarketOrderDocument.order_type == "sell",
+                        In(
+                            CurrencyMarketOrderDocument.state,
+                            ["not_filled", "partially_filled"],
+                        ),
+                    )
+                    .sort(
+                        +CurrencyMarketOrderDocument.price,
+                        +CurrencyMarketOrderDocument.created_time,
+                    )
+                    .to_list()
+                )
             elif order_type == "sell":
-                matching_orders = await CurrencyMarketOrderDocument.find(
-                    CurrencyMarketOrderDocument.market_code == market_code,
-                    CurrencyMarketOrderDocument.order_type == "buy",
-                    In(CurrencyMarketOrderDocument.state, ["not_filled", "partially_filled"])
-                ).sort(-CurrencyMarketOrderDocument.price, +CurrencyMarketOrderDocument.created_time).to_list()
+                matching_orders = (
+                    await CurrencyMarketOrderDocument.find(
+                        CurrencyMarketOrderDocument.market_code == market_code,
+                        CurrencyMarketOrderDocument.order_type == "buy",
+                        In(
+                            CurrencyMarketOrderDocument.state,
+                            ["not_filled", "partially_filled"],
+                        ),
+                    )
+                    .sort(
+                        -CurrencyMarketOrderDocument.price,
+                        +CurrencyMarketOrderDocument.created_time,
+                    )
+                    .to_list()
+                )
 
         return matching_orders
 
-    async def open_orders_grouped_price(self, market_code: str) -> Tuple[
-        list[OpenOrdersGroupedByPrice], list[OpenOrdersGroupedByPrice]]:
+    async def open_orders_grouped_price(
+        self, market_code: str
+    ) -> tuple[list[OpenOrdersGroupedByPrice], list[OpenOrdersGroupedByPrice]]:
         def q(order):
             return [
                 # limit before but in case of huge trading data
                 # {
                 #     "$limit": 500
                 # },
+                {"$sort": {"price": order}},
                 {
-                    "$sort":
-                        {
-                            "price": order
-                        }
+                    "$group": {
+                        "_id": "$price",
+                        "order_type": {"$first": "$order_type"},
+                        "grouped_price": {"$first": "$price"},
+                        "sum_amount": {"$sum": "$amount"},
+                        "sum_amount_filled": {"$sum": "$amount_filled"},
+                    }
                 },
                 {
-                    "$group":
-                        {
-                            "_id": "$price",
-                            "order_type": {"$first": "$order_type"},
-                            "grouped_price": {"$first": "$price"},
-                            "sum_amount": {"$sum": "$amount"},
-                            "sum_amount_filled": {"$sum": "$amount_filled"}
-                        }
+                    "$addFields": {
+                        "sum_to_be_filled": {
+                            "$subtract": ["$sum_amount", "$sum_amount_filled"]
+                        },
+                        "total_price": {
+                            "$multiply": [
+                                "$grouped_price",
+                                {"$subtract": ["$sum_amount", "$sum_amount_filled"]},
+                            ]
+                        },
+                    }
                 },
-
-                {
-                    "$addFields":
-                        {
-                            "sum_to_be_filled": {"$subtract": ["$sum_amount", "$sum_amount_filled"]},
-                            "total_price": {
-                                "$multiply": ["$grouped_price", {"$subtract": ["$sum_amount", "$sum_amount_filled"]}]},
-                        }
-                },
-                {
-                    "$sort":
-                        {
-                            "grouped_price": order
-                        }
-                },
-                {
-                    "$limit": 8
-                },
+                {"$sort": {"grouped_price": order}},
+                {"$limit": 8},
             ]
 
-        buy_group = await CurrencyMarketOrderDocument.find(
-            CurrencyMarketOrderDocument.market_code == market_code,
-            In(CurrencyMarketOrderDocument.state, ["not_filled", "partially_filled"]),
-            CurrencyMarketOrderDocument.order_type == "buy"
-        ).aggregate(
-            q(-1),
-            projection_model=OpenOrdersGroupedByPrice
-        ).to_list()
+        buy_group = (
+            await CurrencyMarketOrderDocument.find(
+                CurrencyMarketOrderDocument.market_code == market_code,
+                In(
+                    CurrencyMarketOrderDocument.state,
+                    ["not_filled", "partially_filled"],
+                ),
+                CurrencyMarketOrderDocument.order_type == "buy",
+            )
+            .aggregate(q(-1), projection_model=OpenOrdersGroupedByPrice)
+            .to_list()
+        )
 
-        sell_group = await CurrencyMarketOrderDocument.find(
-            CurrencyMarketOrderDocument.market_code == market_code,
-            In(CurrencyMarketOrderDocument.state, ["not_filled", "partially_filled"]),
-            CurrencyMarketOrderDocument.order_type == "sell"
-        ).aggregate(
-            q(1),
-            projection_model=OpenOrdersGroupedByPrice
-        ).to_list()
+        sell_group = (
+            await CurrencyMarketOrderDocument.find(
+                CurrencyMarketOrderDocument.market_code == market_code,
+                In(
+                    CurrencyMarketOrderDocument.state,
+                    ["not_filled", "partially_filled"],
+                ),
+                CurrencyMarketOrderDocument.order_type == "sell",
+            )
+            .aggregate(q(1), projection_model=OpenOrdersGroupedByPrice)
+            .to_list()
+        )
 
         return buy_group, sell_group
 
-    async def create_order(self, order: CurrencyMarketOrder) -> CurrencyMarketOrder | None:
+    async def create_order(
+        self, order: CurrencyMarketOrder
+    ) -> CurrencyMarketOrder | None:
         order = CurrencyMarketOrderDocument(
             order_type=order.order_type,
             user_id=order.user_id,
@@ -218,7 +316,7 @@ class BeaniCurrencyMarketOrderRepositoryAdapter(CurrencyMarketOrderRepositoryPor
             price=order.price,
             amount=order.amount,
             amount_filled=order.amount_filled,
-            state=order.state
+            state=order.state,
         )
 
         await order.create()
@@ -255,100 +353,155 @@ class BeaniCurrencyMarketTradeRepositoryAdapter(CurrencyMarketTradeRepositoryPor
         start_str = start.strftime(f"%Y-%m-%dT00:00:00.000000Z")
         start_dt = datetime.strptime(start_str, "%Y-%m-%dT%H:%M:00.000000Z")
 
-        return await CurrencyMarketTradeDocument.find(
-            CurrencyMarketTradeDocument.market_code == market_code
-        ).aggregate(
-            [
-                {
-                    "$match": {
-                        "created_time": {"$gte": start_dt},
-                    },
-                },
-                {
-                    "$group": {
-                        "_id": {
-                            "date_formatted": {"$dateToString": {
-                                "format": "%Y-%m-%d",
-                                "date": "$created_time"
-                            }}
+        return (
+            await CurrencyMarketTradeDocument.find(
+                CurrencyMarketTradeDocument.market_code == market_code
+            )
+            .aggregate(
+                [
+                    {
+                        "$match": {
+                            "created_time": {"$gte": start_dt},
                         },
-                        "max_24": {"$max": "$price"},
-                        "min_24": {"$min": "$price"},
-                        "pair1_volume": {"$sum": "$amount"},
-                        "pair2_volume": {"$sum": {"$multiply": ["$amount", "$price"]}},
                     },
-                },
+                    {
+                        "$group": {
+                            "_id": {
+                                "date_formatted": {
+                                    "$dateToString": {
+                                        "format": "%Y-%m-%d",
+                                        "date": "$created_time",
+                                    }
+                                }
+                            },
+                            "max_24": {"$max": "$price"},
+                            "min_24": {"$min": "$price"},
+                            "pair1_volume": {"$sum": "$amount"},
+                            "pair2_volume": {
+                                "$sum": {"$multiply": ["$amount", "$price"]}
+                            },
+                        },
+                    },
+                ],
+                projection_model=Volume24Info,
+            )
+            .to_list()
+        )
 
-            ],
-            projection_model=Volume24Info
-        ).to_list()
-
-    async def price_candle_data_grouped_time_range(self, market_code: str, interval: str, time_start: datetime) -> list[
-        PriceCandleDataGroupedByTimeInterval]:
+    async def price_candle_data_grouped_time_range(
+        self, market_code: str, interval: str, time_start: datetime
+    ) -> list[PriceCandleDataGroupedByTimeInterval]:
 
         interval_query_info = await self._beani_interval_query(interval)
 
-
         # https://stackoverflow.com/a/26814496
-        return await CurrencyMarketTradeDocument.find(
-            CurrencyMarketTradeDocument.market_code == market_code
-        ).aggregate(
-            [
-                {
-                    "$match": {
-                        "created_time": {"$gte": time_start},
-                    }
-                },
-                {
-                    "$sort":
-                        {
-                            "created_time": 1
+        return (
+            await CurrencyMarketTradeDocument.find(
+                CurrencyMarketTradeDocument.market_code == market_code
+            )
+            .aggregate(
+                [
+                    {
+                        "$match": {
+                            "created_time": {"$gte": time_start},
                         }
-                },
-                {
-                    "$group":
-                        {
+                    },
+                    {"$sort": {"created_time": 1}},
+                    {
+                        "$group": {
                             "_id": {
-                                "date_formatted": {"$dateToString": {
-                                    "format":
-                                        {"$concat": [interval_query_info["pre_date_format"],
-                                                     {"$toString": {
-                                                         "$cond": {
-                                                             "if": {
-                                                                 "$lt": [
-                                                                     {
-                                                                         "$subtract": [
-                                                                             {interval_query_info["interval_time_selector"]: "$created_time"},
-                                                                             {"$mod": [{interval_query_info["interval_time_selector"]: "$created_time"},
-                                                                                       interval_query_info["int"]]}
-                                                                         ]
-                                                                     },
-                                                                     10
-                                                                 ]
-                                                             },
-
-                                                             "then": {
-                                                                 "$concat": ["0", {"$toString": {
-                                                                     "$subtract": [
-                                                                         {interval_query_info["interval_time_selector"]: "$created_time"},
-                                                                         {"$mod": [{interval_query_info["interval_time_selector"]: "$created_time"},
-                                                                                   interval_query_info["int"]]}
-                                                                     ]
-                                                                 }}]
-                                                             },
-
-                                                             "else": {
-                                                                 "$subtract": [
-                                                                     {interval_query_info["interval_time_selector"]: "$created_time"},
-                                                                     {"$mod": [{interval_query_info["interval_time_selector"]: "$created_time"},
-                                                                               interval_query_info["int"]]}
-                                                                 ]
-                                                             }
-                                                         },
-
-                                                     }}, interval_query_info["post_date_format"]]},
-                                    "date": "$created_time"
-                                }},
+                                "date_formatted": {
+                                    "$dateToString": {
+                                        "format": {
+                                            "$concat": [
+                                                interval_query_info["pre_date_format"],
+                                                {
+                                                    "$toString": {
+                                                        "$cond": {
+                                                            "if": {
+                                                                "$lt": [
+                                                                    {
+                                                                        "$subtract": [
+                                                                            {
+                                                                                interval_query_info[
+                                                                                    "interval_time_selector"
+                                                                                ]: "$created_time"
+                                                                            },
+                                                                            {
+                                                                                "$mod": [
+                                                                                    {
+                                                                                        interval_query_info[
+                                                                                            "interval_time_selector"
+                                                                                        ]: "$created_time"
+                                                                                    },
+                                                                                    interval_query_info[
+                                                                                        "int"
+                                                                                    ],
+                                                                                ]
+                                                                            },
+                                                                        ]
+                                                                    },
+                                                                    10,
+                                                                ]
+                                                            },
+                                                            "then": {
+                                                                "$concat": [
+                                                                    "0",
+                                                                    {
+                                                                        "$toString": {
+                                                                            "$subtract": [
+                                                                                {
+                                                                                    interval_query_info[
+                                                                                        "interval_time_selector"
+                                                                                    ]: "$created_time"
+                                                                                },
+                                                                                {
+                                                                                    "$mod": [
+                                                                                        {
+                                                                                            interval_query_info[
+                                                                                                "interval_time_selector"
+                                                                                            ]: "$created_time"
+                                                                                        },
+                                                                                        interval_query_info[
+                                                                                            "int"
+                                                                                        ],
+                                                                                    ]
+                                                                                },
+                                                                            ]
+                                                                        }
+                                                                    },
+                                                                ]
+                                                            },
+                                                            "else": {
+                                                                "$subtract": [
+                                                                    {
+                                                                        interval_query_info[
+                                                                            "interval_time_selector"
+                                                                        ]: "$created_time"
+                                                                    },
+                                                                    {
+                                                                        "$mod": [
+                                                                            {
+                                                                                interval_query_info[
+                                                                                    "interval_time_selector"
+                                                                                ]: "$created_time"
+                                                                            },
+                                                                            interval_query_info[
+                                                                                "int"
+                                                                            ],
+                                                                        ]
+                                                                    },
+                                                                ]
+                                                            },
+                                                        },
+                                                    }
+                                                },
+                                                interval_query_info["post_date_format"],
+                                            ]
+                                        },
+                                        "date": "$created_time",
+                                    }
+                                },
                             },
                             # "date": {"$first": "$created_time"},
                             ## need to remove seconds from candle
@@ -356,128 +509,180 @@ class BeaniCurrencyMarketTradeRepositoryAdapter(CurrencyMarketTradeRepositoryPor
                             "open": {"$first": "$price"},
                             "close": {"$last": "$price"},
                             "high": {"$max": "$price"},
-                            "low": {"$min": "$price"}
+                            "low": {"$min": "$price"},
                         }
-                },
+                    },
+                    {"$limit": 300},
+                ],
+                projection_model=PriceCandleDataGroupedByTimeInterval,
+            )
+            .to_list()
+        )
 
-                {
-                    "$limit": 300
-                },
-            ],
-            projection_model=PriceCandleDataGroupedByTimeInterval
-        ).to_list()
-
-
-
-    async def price_candle_data_grouped_time(self, market_code: str, time_start: datetime, interval: str) -> list[
-        PriceCandleDataGroupedByTimeInterval]:
+    async def price_candle_data_grouped_time(
+        self, market_code: str, time_start: datetime, interval: str
+    ) -> list[PriceCandleDataGroupedByTimeInterval]:
 
         interval_query_info = await self._beani_interval_query(interval)
 
         # https://stackoverflow.com/a/26814496
-        return await CurrencyMarketTradeDocument.find(
-            CurrencyMarketTradeDocument.market_code == market_code
-        ).aggregate(
-            [
-                {
-                    "$match": {
-                        "created_time": {"$gte": time_start},
-                    }
-                },
-                {
-                    "$group":
-                        {
+        return (
+            await CurrencyMarketTradeDocument.find(
+                CurrencyMarketTradeDocument.market_code == market_code
+            )
+            .aggregate(
+                [
+                    {
+                        "$match": {
+                            "created_time": {"$gte": time_start},
+                        }
+                    },
+                    {
+                        "$group": {
                             "_id": {
-                                "date_formatted": {"$dateToString": {
-                                    "format":
-                                        {"$concat": [interval_query_info["pre_date_format"],
-                                                     {"$toString": {
-                                                         "$cond": {
-                                                             "if": {
-                                                                 "$lt": [
-                                                                     {
-                                                                         "$subtract": [
-                                                                             {interval_query_info["interval_time_selector"]: "$created_time"},
-                                                                             {"$mod": [{interval_query_info["interval_time_selector"]: "$created_time"},
-                                                                                       interval_query_info["int"]]}
-                                                                         ]
-                                                                     },
-                                                                     10
-                                                                 ]
-                                                             },
-
-                                                             "then": {
-                                                                 "$concat": ["0", {"$toString": {
-                                                                     "$subtract": [
-                                                                         {interval_query_info["interval_time_selector"]: "$created_time"},
-                                                                         {"$mod": [{interval_query_info["interval_time_selector"]: "$created_time"},
-                                                                                   interval_query_info["int"]]}
-                                                                     ]
-                                                                 }}]
-                                                             },
-
-                                                             "else": {
-                                                                 "$subtract": [
-                                                                     {interval_query_info["interval_time_selector"]: "$created_time"},
-                                                                     {"$mod": [{interval_query_info["interval_time_selector"]: "$created_time"},
-                                                                               interval_query_info["int"]]}
-                                                                 ]
-                                                             }
-                                                         },
-
-                                                     }}, interval_query_info["post_date_format"]]},
-                                    "date": "$created_time"
-                                }},
+                                "date_formatted": {
+                                    "$dateToString": {
+                                        "format": {
+                                            "$concat": [
+                                                interval_query_info["pre_date_format"],
+                                                {
+                                                    "$toString": {
+                                                        "$cond": {
+                                                            "if": {
+                                                                "$lt": [
+                                                                    {
+                                                                        "$subtract": [
+                                                                            {
+                                                                                interval_query_info[
+                                                                                    "interval_time_selector"
+                                                                                ]: "$created_time"
+                                                                            },
+                                                                            {
+                                                                                "$mod": [
+                                                                                    {
+                                                                                        interval_query_info[
+                                                                                            "interval_time_selector"
+                                                                                        ]: "$created_time"
+                                                                                    },
+                                                                                    interval_query_info[
+                                                                                        "int"
+                                                                                    ],
+                                                                                ]
+                                                                            },
+                                                                        ]
+                                                                    },
+                                                                    10,
+                                                                ]
+                                                            },
+                                                            "then": {
+                                                                "$concat": [
+                                                                    "0",
+                                                                    {
+                                                                        "$toString": {
+                                                                            "$subtract": [
+                                                                                {
+                                                                                    interval_query_info[
+                                                                                        "interval_time_selector"
+                                                                                    ]: "$created_time"
+                                                                                },
+                                                                                {
+                                                                                    "$mod": [
+                                                                                        {
+                                                                                            interval_query_info[
+                                                                                                "interval_time_selector"
+                                                                                            ]: "$created_time"
+                                                                                        },
+                                                                                        interval_query_info[
+                                                                                            "int"
+                                                                                        ],
+                                                                                    ]
+                                                                                },
+                                                                            ]
+                                                                        }
+                                                                    },
+                                                                ]
+                                                            },
+                                                            "else": {
+                                                                "$subtract": [
+                                                                    {
+                                                                        interval_query_info[
+                                                                            "interval_time_selector"
+                                                                        ]: "$created_time"
+                                                                    },
+                                                                    {
+                                                                        "$mod": [
+                                                                            {
+                                                                                interval_query_info[
+                                                                                    "interval_time_selector"
+                                                                                ]: "$created_time"
+                                                                            },
+                                                                            interval_query_info[
+                                                                                "int"
+                                                                            ],
+                                                                        ]
+                                                                    },
+                                                                ]
+                                                            },
+                                                        },
+                                                    }
+                                                },
+                                                interval_query_info["post_date_format"],
+                                            ]
+                                        },
+                                        "date": "$created_time",
+                                    }
+                                },
                             },
-
                             "open": {"$first": "$price"},
                             "close": {"$last": "$price"},
                             "high": {"$max": "$price"},
-                            "low": {"$min": "$price"}
+                            "low": {"$min": "$price"},
                         }
-                },
-                {
-                    "$limit": 300
-                },
-                {
-                    "$sort":
-                        {
-                            "_id.date_formatted": 1
-                        }
-                },
-            ],
-            projection_model=PriceCandleDataGroupedByTimeInterval
-        ).to_list()
+                    },
+                    {"$limit": 300},
+                    {"$sort": {"_id.date_formatted": 1}},
+                ],
+                projection_model=PriceCandleDataGroupedByTimeInterval,
+            )
+            .to_list()
+        )
 
-    async def price_last_candle_data_grouped_time(self, market_code: str, interval: int) -> list[
-        PriceCandleDataGroupedByTimeInterval]:
+    async def price_last_candle_data_grouped_time(
+        self, market_code: str, interval: int
+    ) -> list[PriceCandleDataGroupedByTimeInterval]:
         # https://stackoverflow.com/a/26814496
-        return (await CurrencyMarketTradeDocument.find(
-            CurrencyMarketTradeDocument.market_code == market_code
-        ).aggregate(
-            [
-
-                {
-                    "$group":
-                        {
+        return (
+            await CurrencyMarketTradeDocument.find(
+                CurrencyMarketTradeDocument.market_code == market_code
+            )
+            .aggregate(
+                [
+                    {
+                        "$group": {
                             "_id": {
                                 "minute": {"$minute": "$created_time"},
-                                "date_formatted": {"$dateToString": {
-                                    "format": "%Y-%m-%dT%H:%M:00.000000Z", "date": "$created_time"
-                                }},
+                                "date_formatted": {
+                                    "$dateToString": {
+                                        "format": "%Y-%m-%dT%H:%M:00.000000Z",
+                                        "date": "$created_time",
+                                    }
+                                },
                                 "interval": {
                                     "$subtract": [
                                         {"$minute": "$created_time"},
-                                        {"$mod": [{"$minute": "$created_time"}, 1]}
+                                        {"$mod": [{"$minute": "$created_time"}, 1]},
                                     ]
                                 },
-
-                                "date_parsed": {"$dateFromString": {
-                                    "dateString": {"$dateToString": {
-                                        "format": "%Y-%m-%dT%H:%M:00",
-                                        "date": "$created_time"
-                                    }}
-                                }}
+                                "date_parsed": {
+                                    "$dateFromString": {
+                                        "dateString": {
+                                            "$dateToString": {
+                                                "format": "%Y-%m-%dT%H:%M:00",
+                                                "date": "$created_time",
+                                            }
+                                        }
+                                    }
+                                },
                             },
                             # "date": {"$first": "$created_time"},
                             ## need to remove seconds from candle
@@ -485,45 +690,55 @@ class BeaniCurrencyMarketTradeRepositoryAdapter(CurrencyMarketTradeRepositoryPor
                             "open": {"$first": "$price"},
                             "close": {"$last": "$price"},
                             "high": {"$max": "$price"},
-                            "low": {"$min": "$price"}
+                            "low": {"$min": "$price"},
                         }
-                },
-                {
-                    "$sort":
-                        {
-                            "_id.date_parsed": -1
-                        }
-                },
-                {
-                    "$limit": 1
-                }
-            ],
-            projection_model=PriceCandleDataGroupedByTimeInterval
-        ).to_list())
+                    },
+                    {"$sort": {"_id.date_parsed": -1}},
+                    {"$limit": 1},
+                ],
+                projection_model=PriceCandleDataGroupedByTimeInterval,
+            )
+            .to_list()
+        )
 
     async def last(self, market_code: str) -> list[CurrencyMarketTradeDocument]:
-        return await CurrencyMarketTradeDocument.find(CurrencyMarketTradeDocument.market_code == market_code).sort(-CurrencyMarketTradeDocument.created_time).limit(
-            2).to_list()
+        return (
+            await CurrencyMarketTradeDocument.find(
+                CurrencyMarketTradeDocument.market_code == market_code
+            )
+            .sort(-CurrencyMarketTradeDocument.created_time)
+            .limit(2)
+            .to_list()
+        )
 
     async def all(self) -> list[CurrencyMarketTradeDocument] | None:
         return await CurrencyMarketTradeDocument.all().to_list()
 
-    async def all_descending_limit_by_day(self, market_code: str) -> list[CurrencyMarketTradeDocument] | None:
-        start = datetime.strptime(datetime
-                                  .utcnow()
-                                  .strftime("%Y-%m-%dT00:00:00.000000Z"), "%Y-%m-%dT%H:%M:00.000000Z")
+    async def all_descending_limit_by_day(
+        self, market_code: str
+    ) -> list[CurrencyMarketTradeDocument] | None:
+        start = datetime.strptime(
+            datetime.utcnow().strftime("%Y-%m-%dT00:00:00.000000Z"),
+            "%Y-%m-%dT%H:%M:00.000000Z",
+        )
 
-        return await CurrencyMarketTradeDocument.find(
-            CurrencyMarketTradeDocument.market_code == market_code,
-            CurrencyMarketTradeDocument.created_time >= start
-        ).sort(+CurrencyMarketTradeDocument.created_time).to_list()
+        return (
+            await CurrencyMarketTradeDocument.find(
+                CurrencyMarketTradeDocument.market_code == market_code,
+                CurrencyMarketTradeDocument.created_time >= start,
+            )
+            .sort(+CurrencyMarketTradeDocument.created_time)
+            .to_list()
+        )
 
-    async def create_trade(self, trade: CurrencyMarketTrade) -> CurrencyMarketTrade | None:
+    async def create_trade(
+        self, trade: CurrencyMarketTrade
+    ) -> CurrencyMarketTrade | None:
         trade = CurrencyMarketTradeDocument(
             market_code=trade.market_code,
             price=trade.price,
             amount=trade.amount,
-            created_time=datetime.utcnow()
+            created_time=datetime.utcnow(),
         )
 
         await trade.create()
@@ -531,7 +746,6 @@ class BeaniCurrencyMarketTradeRepositoryAdapter(CurrencyMarketTradeRepositoryPor
 
 
 class BeaniUserRepositoryAdapter(UserRepositoryPort):
-
     async def all(self) -> list[User] | None:
         return await UserDocument.all().to_list()
 
@@ -559,54 +773,79 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
         planets = await PlanetDocument.find(PlanetDocument.claimed == True).to_list()
         return planets
 
-    async def by_position_range(self, galaxy: int, from_solar_system: int, to_solar_system: int, fetch_links=False) -> \
-            list[Planet]:
+    async def by_position_range(
+        self,
+        galaxy: int,
+        from_solar_system: int,
+        to_solar_system: int,
+        fetch_links=False,
+    ) -> list[Planet]:
 
-        planets = await PlanetDocument.find(PlanetDocument.galaxy == galaxy,
-                                            PlanetDocument.solar_system >= from_solar_system,
-                                            PlanetDocument.solar_system <= to_solar_system,
-                                            fetch_links=fetch_links).to_list()
+        planets = await PlanetDocument.find(
+            PlanetDocument.galaxy == galaxy,
+            PlanetDocument.solar_system >= from_solar_system,
+            PlanetDocument.solar_system <= to_solar_system,
+            fetch_links=fetch_links,
+        ).to_list()
 
         return planets
 
     async def all_user_planets(self, user_id: str, fetch_links=False) -> list[Planet]:
-        planets = await PlanetDocument.find(PlanetDocument.user == user_id, fetch_links=fetch_links).to_list()
+        planets = await PlanetDocument.find(
+            PlanetDocument.user == user_id, fetch_links=fetch_links
+        ).to_list()
         return planets
 
     async def update(self, planet: PlanetDocument) -> Planet:
         await planet.save_changes()
         return await self.get(str(planet.id))
 
-    async def get_my_planet(self, user_id: str, planet_id: str, fetch_links=False) -> Planet | None:
+    async def get_my_planet(
+        self, user_id: str, planet_id: str, fetch_links=False
+    ) -> Planet | None:
         # if fetch_links provided energy_deposits comes null?
         # @README: seems like fetch_link works with emails but not with energy_deposits, only difference is that
         # on energy deposit we set our own id.
         planet = await PlanetDocument.find_one(
             PlanetDocument.id == PydanticObjectId(planet_id),
             PlanetDocument.user == user_id,
-            fetch_links=fetch_links
+            fetch_links=fetch_links,
         )
 
         return planet
 
     async def get(self, planet_id: str, fetch_links=False) -> Planet | None:
-        planet = await PlanetDocument.find_one(PlanetDocument.id == PydanticObjectId(planet_id),
-                                               fetch_links=fetch_links)
+        planet = await PlanetDocument.find_one(
+            PlanetDocument.id == PydanticObjectId(planet_id), fetch_links=fetch_links
+        )
         return planet
 
-    async def get_by_request_id(self, request_id: str, fetch_links=False) -> Planet | None:
-        planet = await PlanetDocument.find_one(PlanetDocument.request_id == request_id, fetch_links=fetch_links)
+    async def get_by_request_id(
+        self, request_id: str, fetch_links=False
+    ) -> Planet | None:
+        planet = await PlanetDocument.find_one(
+            PlanetDocument.request_id == request_id, fetch_links=fetch_links
+        )
         return planet
 
     async def has_free_planet(self, user_id: str) -> bool:
-        free_planet = await PlanetDocument.find(PlanetDocument.user == user_id,
-                                                PlanetDocument.price_paid == 0).limit(1).to_list()
+        free_planet = (
+            await PlanetDocument.find(
+                PlanetDocument.user == user_id, PlanetDocument.price_paid == 0
+            )
+            .limit(1)
+            .to_list()
+        )
 
         return len(free_planet) > 0
 
     async def last_created_planet(self, fetch_links=False) -> Planet | bool:
-        last_planet = await PlanetDocument.all(fetch_links=fetch_links).sort(-PlanetDocument.created_at).limit(
-            1).to_list()
+        last_planet = (
+            await PlanetDocument.all(fetch_links=fetch_links)
+            .sort(-PlanetDocument.created_at)
+            .limit(1)
+            .to_list()
+        )
 
         if not last_planet:
             return False
@@ -649,7 +888,7 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
             research_level=planet_data.research_level,
             defense_items=planet_data.defense_items,
             pending_levelup_reward=[],
-            energy_deposits=[]
+            energy_deposits=[],
         )
 
         await new_planet.save(link_rule=WriteRules.WRITE)
