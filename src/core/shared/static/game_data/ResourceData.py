@@ -58,9 +58,8 @@ class ResourceData(GameData):
             MINE_CATEGORY,
             "Metal mine to extract metal",
             {
-                0: BuildableItemLevelInfo(0,    25,     0,      20,     0,      0,    0,  120,    125,    0,  20,
-                                          [], 0),
-                1: BuildableItemLevelInfo(1,    50,     0,      40,     0.01,   5,    0,  600,    250,    0,  30,
+                0: BuildableItemLevelInfo(),
+                1: BuildableItemLevelInfo(1,    50,     0,      40,     0.02,   5,    0,  600,    250,    0,  30,
                                           [], 1),
                 2: BuildableItemLevelInfo(2,    100,    0,      60,     0.03,   10,   0,  1200,   500,    0,  40,
                                           [], 1),
@@ -117,9 +116,8 @@ class ResourceData(GameData):
             MINE_CATEGORY,
             "Crystal mine to extract metal",
             {
-                0: BuildableItemLevelInfo(0,    25,     20,      0,     0,      0,    0,  120,    125,    0,  20,
-                                          [], 0),
-                1: BuildableItemLevelInfo(1,    50,     40,      0,     0.01,   5,    0,  600,    250,    0,  30,
+                0: BuildableItemLevelInfo(),
+                1: BuildableItemLevelInfo(1,    50,     40,      0,     0.02,   5,    0,  600,    250,    0,  30,
                                           [], 1),
                 2: BuildableItemLevelInfo(2,    100,    60,      0,     0.03,   10,   0,  1200,   500,    0,  40,
                                           [], 1),
@@ -176,9 +174,8 @@ class ResourceData(GameData):
             MINE_CATEGORY,
             "Petrol mine to extract metal",
             {
-                0: BuildableItemLevelInfo(0,    25,     20,      20,     0,      0,    0,  120,    125,    0,  20,
-                                          [], 0),
-                1: BuildableItemLevelInfo(1,    50,     40,      50,     0.01,   5,    0,  600,    250,    0,  30,
+                0: BuildableItemLevelInfo(),
+                1: BuildableItemLevelInfo(1,    50,     40,      50,     0.02,   5,    0,  600,    250,    0,  30,
                                           [], 1),
                 2: BuildableItemLevelInfo(2,    100,    60,      100,     0.03,   10,   0,  1200,   500,    0,  40,
                                           [], 1),
@@ -235,10 +232,7 @@ class ResourceData(GameData):
             WAREHOUSE_CATEGORY,
             "Metal warehouse to store metal",
             {
-                0: BuildableItemLevelInfo(
-                    0,    30,     10,     20,     0,      0,    500,    10,     30,     0,  0,
-                    [], 0
-                ),
+                0: BuildableItemLevelInfo(),
                 1: BuildableItemLevelInfo(
                     1,    60,     20,     40,     0,      0,    1000,   30,     60,     0,  0,
                     [], 0
@@ -288,10 +282,7 @@ class ResourceData(GameData):
             WAREHOUSE_CATEGORY,
             "Crystal warehouse to store crystal",
             {
-                0: BuildableItemLevelInfo(
-                    0,    30,     10,     20,     0,      0,    500,    10,     30,     0,  0,
-                    [], 0
-                ),
+                0: BuildableItemLevelInfo(),
                 1: BuildableItemLevelInfo(
                     1,    60,     20,     40,     0,      0,    1000,   30,     60,     0,  0,
                     [], 0
@@ -341,10 +332,7 @@ class ResourceData(GameData):
             WAREHOUSE_CATEGORY,
             "Petrol warehouse to store petrol",
             {
-                0: BuildableItemLevelInfo(
-                    0,    30,     10,     20,     0,      0,    500,    10,     30,     0,  0,
-                    [], 0
-                ),
+                0: BuildableItemLevelInfo(),
                 1: BuildableItemLevelInfo(
                     1,    60,     20,     40,     0,      0,    1000,   30,     60,     0,  0,
                     [], 0
