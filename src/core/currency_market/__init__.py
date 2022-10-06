@@ -302,7 +302,8 @@ class CurrencyMarket:
             pair1_amt_matching_planet = getattr(
                 matching_order_planet.resources, req.pair1.lower()
             )
-            pair1_amt_matching_planet += amount_traded
+            pair1_amt_matching_planet += (amount_traded - amount_traded*0.1)  # rest fee
+
             setattr(
                 matching_order_planet.resources,
                 req.pair1.lower(),
@@ -310,14 +311,14 @@ class CurrencyMarket:
             )
 
             pair2_amt_planet = getattr(planet.resources, req.pair2.lower())
-            pair2_amt_planet += amount_traded * matching_order.price
+            pair2_amt_planet += (amount_traded * matching_order.price) - ((amount_traded * matching_order.price)*0.1)  # rest fee
             setattr(planet.resources, req.pair2.lower(), pair2_amt_planet)
 
         elif matching_order.order_type == "sell":
             pair2_amt_matching_planet = getattr(
                 matching_order_planet.resources, req.pair2.lower()
             )
-            pair2_amt_matching_planet += amount_traded * matching_order.price
+            pair2_amt_matching_planet += (amount_traded * matching_order.price) - ((amount_traded * matching_order.price) * 0.1)  # rest fee
             setattr(
                 matching_order_planet.resources,
                 req.pair2.lower(),
@@ -325,7 +326,7 @@ class CurrencyMarket:
             )
 
             pair1_amt_planet = getattr(planet.resources, req.pair1.lower())
-            pair1_amt_planet += amount_traded
+            pair1_amt_planet += amount_traded - amount_traded*0.1  # rest fee
             setattr(planet.resources, req.pair1.lower(), pair1_amt_planet)
 
         await self.planet_repository.update(planet)
@@ -360,7 +361,6 @@ class CurrencyMarket:
             setattr(planet.resources, req.pair1.lower(), pair1_qty)
 
         planet = await self.planet_repository.update(planet)
-        planet = await self.planet_repository.get_my_planet(req.user_id, req.planet_id)
 
         # We can match buy/sell offers
         for matching_order in matching_orders:
@@ -499,6 +499,7 @@ class CurrencyMarket:
             planet = await self.planet_repository.get_my_planet(
                 req.user_id, req.planet_id
             )
+
             planet = await self._transfer_balance(
                 matching_order, planet, amount_traded, req
             )
@@ -548,6 +549,7 @@ class CurrencyMarket:
                 market_code, req.trade_type, req.order_type, req.price_unit
             )
         )
+
         order, completed_trades = None, None
         if req.trade_type == "limit":
             order, completed_trades = await self._limit_order_trade(
