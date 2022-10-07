@@ -18,6 +18,7 @@ from core.shared.ports import (
     PlanetRepositoryPort,
     ResponsePort,
 )
+from core.shared.service.tier_benefit import tier_benefit_trading_fee
 
 
 class TradeRequest(BaseModel):
@@ -298,11 +299,16 @@ class CurrencyMarket:
             matching_order.planet_id, False
         )
 
+        matching_order_planet_fee = tier_benefit_trading_fee(matching_order_planet)
+        planet_fee = tier_benefit_trading_fee(planet)
+
         if matching_order.order_type == "buy":
             pair1_amt_matching_planet = getattr(
                 matching_order_planet.resources, req.pair1.lower()
             )
-            pair1_amt_matching_planet += (amount_traded - amount_traded*0.1)  # rest fee
+            pair1_amt_matching_planet += (
+                amount_traded - amount_traded * matching_order_planet_fee
+            )  # rest fee
 
             setattr(
                 matching_order_planet.resources,
@@ -311,14 +317,18 @@ class CurrencyMarket:
             )
 
             pair2_amt_planet = getattr(planet.resources, req.pair2.lower())
-            pair2_amt_planet += (amount_traded * matching_order.price) - ((amount_traded * matching_order.price)*0.1)  # rest fee
+            pair2_amt_planet += (amount_traded * matching_order.price) - (
+                (amount_traded * matching_order.price) * planet_fee
+            )  # rest fee
             setattr(planet.resources, req.pair2.lower(), pair2_amt_planet)
 
         elif matching_order.order_type == "sell":
             pair2_amt_matching_planet = getattr(
                 matching_order_planet.resources, req.pair2.lower()
             )
-            pair2_amt_matching_planet += (amount_traded * matching_order.price) - ((amount_traded * matching_order.price) * 0.1)  # rest fee
+            pair2_amt_matching_planet += (amount_traded * matching_order.price) - (
+                (amount_traded * matching_order.price) * matching_order_planet_fee
+            )  # rest fee
             setattr(
                 matching_order_planet.resources,
                 req.pair2.lower(),
@@ -326,7 +336,7 @@ class CurrencyMarket:
             )
 
             pair1_amt_planet = getattr(planet.resources, req.pair1.lower())
-            pair1_amt_planet += amount_traded - amount_traded*0.1  # rest fee
+            pair1_amt_planet += amount_traded - amount_traded * planet_fee  # rest fee
             setattr(planet.resources, req.pair1.lower(), pair1_amt_planet)
 
         await self.planet_repository.update(planet)

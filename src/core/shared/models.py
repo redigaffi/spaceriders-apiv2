@@ -4,7 +4,7 @@ from typing import Any, List, Optional
 
 from pydantic import BaseModel, Field, root_validator
 
-from core.shared.service.tier_benefit import tier_benefit_service
+from core.shared.service.tier_benefit import tier_benefit_buildable_items
 from core.shared.static.game_data.Common import (
     BuildableItemBaseType,
     BuildableItemLevelInfo,
@@ -277,7 +277,7 @@ class Planet(BaseModel):
             for upgrade in resources_data.builds:
                 upgrade_data: BuildableItemLevelInfo = resources_data.builds[upgrade]
                 # upgrade_data = resources_data.builds[upgrade]
-                tmp["upgrades"][upgrade_data.level] = tier_benefit_service(
+                tmp["upgrades"][upgrade_data.level] = tier_benefit_buildable_items(
                     self.tier.tier_code, upgrade_data
                 )
 
@@ -311,7 +311,7 @@ class Planet(BaseModel):
             tmp["upgrades"] = {}
             for upgrade in research_data.builds:
                 upgrade_data: BuildableItemLevelInfo = research_data.builds[upgrade]
-                tmp["upgrades"][upgrade_data.level] = tier_benefit_service(
+                tmp["upgrades"][upgrade_data.level] = tier_benefit_buildable_items(
                     self.tier.tier_code, upgrade_data
                 )
 
@@ -345,7 +345,7 @@ class Planet(BaseModel):
             tmp["upgrades"] = {}
             for upgrade in installation_data.builds:
                 upgrade_data: BuildableItemLevelInfo = installation_data.builds[upgrade]
-                tmp["upgrades"][upgrade_data.level] = tier_benefit_service(
+                tmp["upgrades"][upgrade_data.level] = tier_benefit_buildable_items(
                     self.tier.tier_code, upgrade_data
                 )
 
@@ -368,7 +368,7 @@ class Planet(BaseModel):
             tmp["label"] = label
             tmp["description"] = defense_data.description
             tmp["available"] = defense_item.quantity
-            tmp["data"] = tier_benefit_service(
+            tmp["data"] = tier_benefit_buildable_items(
                 self.tier.tier_code, defense_data.get_level_info()
             )
 
