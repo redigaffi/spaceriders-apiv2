@@ -17,6 +17,7 @@ from core.shared.static.game_data.StakingData import StakingBenefits, StakingDat
 
 class TierInfoResponse(BaseModel):
     token_cost: float = None
+    usd_cost: float = None
     name: str = None
     tokens_time_locked: float = None
     benefit_lines: list[str] = []
@@ -98,6 +99,7 @@ class Staking:
             tier_cost_usd = staking_data.usd_cost
             token_price = tier_cost_usd / current_token_price
 
+            tmp.usd_cost = tier_cost_usd
             tmp.token_cost = f"{round(token_price, 2):.2f}"
             tmp.name = StakingData.TIER_NAMES[stake_code]
             tmp.tokens_time_locked = staking_data.tokens_time_locked
@@ -105,6 +107,9 @@ class Staking:
             # tmp.benefit_lines.append(f"{staking_data.max_queue} items in queue simultaneously")
             # tmp.benefit_lines.append(f"{staking_data.discount_items}% discount on all in-game purchases")
             # tmp.benefit_lines.append(f"{staking_data.experience_boost}% experience boost")
+            tmp.benefit_lines.append(
+                f"-{staking_data.trading_fee*100}% ISM trading fees"
+            )
             re[stake_code] = tmp
 
         return await self.response_port.publish_response(re)

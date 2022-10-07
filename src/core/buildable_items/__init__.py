@@ -15,7 +15,7 @@ from core.shared.models import (
 from core.shared.ports import PlanetRepositoryPort, ResponsePort
 from core.shared.service.buildable_items import is_queue_full
 from core.shared.service.planet import resource_reserve_als
-from core.shared.service.tier_benefit import tier_benefit_service
+from core.shared.service.tier_benefit import tier_benefit_buildable_items
 from core.shared.static.game_data.Common import (
     BuildableItemBaseType,
     BuildableItemLevelInfo,
@@ -222,7 +222,7 @@ class BuildableItems:
         next_lvl: BuildableItemLevelInfo = label_info.get_level_info(
             buildable.current_level + 1
         )
-        next_lvl: BuildableItemLevelInfo = tier_benefit_service(
+        next_lvl: BuildableItemLevelInfo = tier_benefit_buildable_items(
             planet.tier.tier_code, next_lvl
         )
 
