@@ -144,7 +144,7 @@ async def get_new_random_planet_planet_position(planet_repository_port: PlanetRe
                                                                                           solar_system + 7)
 
         # [from solar system, to solar system at >= aprox. 80%  capacity]
-        if len(planets_range_occupied) >= 11:
+        if len(planets_range_occupied) >= 70:
             solar_system += 7
             if solar_system + 7 >= 100:
                 solar_system = 0
