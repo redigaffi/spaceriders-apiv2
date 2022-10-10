@@ -3,6 +3,7 @@ import datetime as dt
 import logging as log
 import math
 import random
+from random import random
 
 from pydantic import BaseModel
 
@@ -20,7 +21,7 @@ from core.shared.ports import (
     ResponsePort,
     TokenPricePort,
 )
-from core.shared.service.planet import get_new_planet
+from core.shared.service.planet import get_new_planet, get_new_random_planet_planet_position
 from core.shared.static.game_data.PlanetData import PlanetData
 
 
@@ -152,10 +153,10 @@ class MintPlanet:
             planet_id = str(planet[1])
             last_planet = await self.planet_repository.last_created_planet()
 
-            planet: Planet = get_new_planet(
+            planet: Planet = await get_new_planet(
                 user,
                 random.choice(planet_names),
-                last_planet,
+                self.planet_repository,
                 PlanetData.BUY_PLANET_COST_USD,
                 self.planet_images_bucket_path,
                 True,
@@ -196,15 +197,13 @@ class MintPlanet:
         if owner.lower() != user.lower():
             raise NotMyPlanetException()
 
-        last_planet = await self.planet_repository.last_created_planet()
-
         claimable = int(dt.datetime.now(dt.timezone.utc).timestamp() + 60)
 
         # Mint paid planet should have some claim time
-        planet: Planet = get_new_planet(
+        planet: Planet = await get_new_planet(
             user,
             request.name,
-            last_planet,
+            self.planet_repository,
             PlanetData.BUY_PLANET_COST_USD,
             self.planet_images_bucket_path,
             False,

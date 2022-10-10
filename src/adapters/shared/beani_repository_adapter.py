@@ -790,6 +790,27 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
 
         return planets
 
+    async def occupied_positions_by_range(
+        self,
+        galaxy: int,
+        from_solar_system: int,
+        to_solar_system: int,
+    ) -> dict[str, bool]:
+
+        planets = await PlanetDocument.find(
+            PlanetDocument.galaxy == galaxy,
+            PlanetDocument.solar_system >= from_solar_system,
+            PlanetDocument.solar_system <= to_solar_system,
+            fetch_links=False
+        ).to_list()
+
+        re = {}
+        for planet in planets:
+            pos = f"{planet.galaxy}:{planet.solar_system}:{planet.position}"
+            re[pos] = True
+
+        return re
+
     async def all_user_planets(self, user_id: str, fetch_links=False) -> list[Planet]:
         planets = await PlanetDocument.find(
             PlanetDocument.user == user_id, fetch_links=fetch_links
@@ -827,17 +848,6 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
             PlanetDocument.request_id == request_id, fetch_links=fetch_links
         )
         return planet
-
-    async def has_free_planet(self, user_id: str) -> bool:
-        free_planet = (
-            await PlanetDocument.find(
-                PlanetDocument.user == user_id, PlanetDocument.price_paid == 0
-            )
-            .limit(1)
-            .to_list()
-        )
-
-        return len(free_planet) > 0
 
     async def last_created_planet(self, fetch_links=False) -> Planet | bool:
         last_planet = (

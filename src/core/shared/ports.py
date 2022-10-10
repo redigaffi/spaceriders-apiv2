@@ -201,6 +201,14 @@ class PlanetRepositoryPort(ABC):
     ) -> list[Planet]:
         pass
 
+    async def occupied_positions_by_range(
+        self,
+        galaxy: int,
+        from_solar_system: int,
+        to_solar_system: int,
+    ) -> dict[str, bool]:
+        pass
+
     @abstractmethod
     async def get(self, planet_id: str, fetch_links=False) -> Planet | None:
         pass
@@ -212,17 +220,12 @@ class PlanetRepositoryPort(ABC):
         pass
 
     @abstractmethod
-    async def has_free_planet(self, user_id: str) -> bool:
-        pass
-
-    @abstractmethod
     async def create_planet(self, planet_data: Planet) -> Planet:
         pass
 
     @abstractmethod
     async def last_created_planet(self, fetch_links=False) -> Planet | bool:
         pass
-
 
 class ResponsePort(ABC):
     @abstractmethod
