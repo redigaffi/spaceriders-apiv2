@@ -4,6 +4,7 @@ import random
 import bson
 
 from core.shared.models import BuildableItem, Planet, Reserves
+from core.shared.ports import PlanetRepositoryPort
 from core.shared.static.game_data.Common import (
     BuildableItemBaseType,
     BuildableItemLevelInfo,
@@ -64,16 +65,16 @@ def resource_reserve_als(
     return planet
 
 
-def get_new_planet(
+async def get_new_planet(
     user: str,
     name: str,
-    last_planet: Planet,
+    planet_repository_port: PlanetRepositoryPort,
     price_paid: int,
     planet_images_bucket_path: str,
     claimed: bool,
     claimable: int = None,
 ) -> Planet:
-    galaxy, solar_system, position = get_new_planet_position(last_planet)
+    galaxy, solar_system, position = await get_new_random_planet_planet_position(planet_repository_port)
 
     resource_levels, installation_level, research_level, defense_items = create_levels()
 
@@ -88,7 +89,7 @@ def get_new_planet(
         petrol_mine_amount,
         min_temperature,
         max_temperature,
-    ) = get_planet_data(is_free=True)
+    ) = get_planet_data()
 
     planet = Planet(
         user=user,
@@ -132,34 +133,43 @@ def get_new_planet(
     return planet
 
 
-def get_new_planet_position(latest_planet: Planet | bool) -> tuple:
+async def get_new_random_planet_planet_position(planet_repository_port: PlanetRepositoryPort) -> tuple[int, int, int]:
     galaxy = 0
     solar_system = 0
-    position = 1
+    free_planet_positions = []
 
-    if latest_planet:
-        position = latest_planet.position + 1
-        solar_system = latest_planet.solar_system
-        galaxy = latest_planet.galaxy
+    while True:
 
-        if position > 13:
-            position = 1
-            solar_system += 1
+        planets_range_occupied = await planet_repository_port.occupied_positions_by_range(galaxy, solar_system,
+                                                                                          solar_system + 7)
 
-            if solar_system > 100:
+        # [from solar system, to solar system at >= aprox. 80%  capacity]
+        if len(planets_range_occupied) >= 11:
+            solar_system += 7
+            if solar_system + 7 >= 100:
                 solar_system = 0
                 galaxy += 1
+            continue
 
+        for y in range(solar_system, solar_system+7):
+            for x in range(1, 13):
+                pos = f"{galaxy}:{y}:{x}"
+                if pos not in planets_range_occupied:
+                    free_planet_positions.append(pos)
+
+        break
+
+    random.shuffle(free_planet_positions)
+    planet_pos = random.randrange(len(free_planet_positions))
+
+    galaxy, solar_system, position = map(int, free_planet_positions[planet_pos].split(':'))
     return galaxy, solar_system, position
 
 
-def get_planet_data(is_free: bool):
+def get_planet_data():
     rarity = random.choices(
         PlanetData.RARITIES, weights=PlanetData.RARITY_WEIGHTS, k=1
     )[0]
-
-    if is_free:
-        rarity = PlanetData.UNCOMMON
 
     image = f"{random.randint(1, PlanetData.IMAGES)}"
     diameter_range = PlanetData.DATA[rarity]["diameter"]["range"]
