@@ -81,7 +81,7 @@ async def contract_dependency(cache: CacheServicePort, rpc_urls: str):
         busd_address: str = contract_addresses[ChainServicePort.BUSD_CONTRACT]
         pair_address: str = contract_addresses[ChainServicePort.PAIR_CONTRACT]
 
-    abi_base_path = str(root) + f"/static/abi"
+    abi_base_path = str(root) + "/static/abi"
 
     with open(f"{abi_base_path}/Spaceriders.json") as f:
         spaceriders_token_abi = json.loads(f.read())

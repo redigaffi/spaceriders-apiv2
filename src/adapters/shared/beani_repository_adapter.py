@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, List, Tuple
 
 from beanie import DeleteRules, PydanticObjectId, WriteRules
 from beanie.operators import In
-from pydantic import BaseModel
 
 from adapters.shared.beanie_models_adapter import (
     BKMTransactionDocument,
@@ -801,7 +799,7 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
             PlanetDocument.galaxy == galaxy,
             PlanetDocument.solar_system >= from_solar_system,
             PlanetDocument.solar_system <= to_solar_system,
-            fetch_links=False
+            fetch_links=False,
         ).to_list()
 
         re = {}
@@ -882,9 +880,6 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
             min_temperature=planet_data.min_temperature,
             max_temperature=planet_data.max_temperature,
             reserves=planet_data.reserves,
-            original_total_metal_amount=planet_data.reserves.total_metal,
-            original_total_crystal_amount=planet_data.reserves.total_crystal,
-            original_total_petrol_amount=planet_data.reserves.total_petrol,
             galaxy=planet_data.galaxy,
             solar_system=planet_data.solar_system,
             position=planet_data.position,

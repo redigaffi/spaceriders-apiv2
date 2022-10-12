@@ -1,8 +1,6 @@
 import math
 import random
 
-import bson
-
 from core.shared.models import BuildableItem, Planet, Reserves
 from core.shared.ports import PlanetRepositoryPort
 from core.shared.static.game_data.Common import (
@@ -16,55 +14,6 @@ from core.shared.static.game_data.ResearchData import ResearchData
 from core.shared.static.game_data.ResourceData import ResourceData
 
 
-def resource_reserve_als(
-    label: str, planet: Planet, next_level_info: BuildableItemLevelInfo
-) -> Planet:
-    if label not in [
-        ResourceData.METAL_MINE,
-        ResourceData.CRYSTAL_MINE,
-        ResourceData.PETROL_MINE,
-    ]:
-        return planet
-
-    fields = {
-        ResourceData.METAL_MINE: {
-            "total_reserve": "original_total_metal_amount",
-            "reserve_left": "total_metal",
-            "visible_reserve": "metal",
-        },
-        ResourceData.CRYSTAL_MINE: {
-            "total_reserve": "original_total_crystal_amount",
-            "reserve_left": "total_crystal",
-            "visible_reserve": "crystal",
-        },
-        ResourceData.PETROL_MINE: {
-            "total_reserve": "original_total_petrol_amount",
-            "reserve_left": "total_petrol",
-            "visible_reserve": "petrol",
-        },
-    }
-
-    reserve_upgrade_percentage = next_level_info.new_reserve_found_percentage
-    total_reserve = getattr(planet, fields[label]["total_reserve"])
-    reserve_left = getattr(planet.reserves, fields[label]["reserve_left"])
-    visible_reserve = getattr(planet.reserves, fields[label]["visible_reserve"])
-
-    next_visible_reserve = total_reserve * (reserve_upgrade_percentage / 100)
-
-    setattr(
-        planet.reserves,
-        fields[label]["reserve_left"],
-        reserve_left - next_visible_reserve,
-    )
-    setattr(
-        planet.reserves,
-        fields[label]["visible_reserve"],
-        visible_reserve + next_visible_reserve,
-    )
-
-    return planet
-
-
 async def get_new_planet(
     user: str,
     name: str,
@@ -74,7 +23,9 @@ async def get_new_planet(
     claimed: bool,
     claimable: int = None,
 ) -> Planet:
-    galaxy, solar_system, position = await get_new_random_planet_planet_position(planet_repository_port)
+    galaxy, solar_system, position = await get_new_random_planet_planet_position(
+        planet_repository_port
+    )
 
     resource_levels, installation_level, research_level, defense_items = create_levels()
 
@@ -123,25 +74,26 @@ async def get_new_planet(
     planet.reserves.total_crystal = crystal_mine_amount
     planet.reserves.total_petrol = petrol_mine_amount
 
-    planet.original_total_metal_amount = metal_mine_amount
-    planet.original_total_crystal_amount = crystal_mine_amount
-    planet.original_total_petrol_amount = petrol_mine_amount
-
     planet.claimed = claimed
     planet.claimable = claimable
 
     return planet
 
 
-async def get_new_random_planet_planet_position(planet_repository_port: PlanetRepositoryPort) -> tuple[int, int, int]:
+async def get_new_random_planet_planet_position(
+    planet_repository_port: PlanetRepositoryPort,
+) -> tuple[int, int, int]:
     galaxy = 0
     solar_system = 0
     free_planet_positions = []
 
     while True:
 
-        planets_range_occupied = await planet_repository_port.occupied_positions_by_range(galaxy, solar_system,
-                                                                                          solar_system + 7)
+        planets_range_occupied = (
+            await planet_repository_port.occupied_positions_by_range(
+                galaxy, solar_system, solar_system + 7
+            )
+        )
 
         # [from solar system, to solar system at >= aprox. 80%  capacity]
         if len(planets_range_occupied) >= 70:
@@ -151,7 +103,7 @@ async def get_new_random_planet_planet_position(planet_repository_port: PlanetRe
                 galaxy += 1
             continue
 
-        for y in range(solar_system, solar_system+7):
+        for y in range(solar_system, solar_system + 7):
             for x in range(1, 13):
                 pos = f"{galaxy}:{y}:{x}"
                 if pos not in planets_range_occupied:
@@ -162,7 +114,9 @@ async def get_new_random_planet_planet_position(planet_repository_port: PlanetRe
     random.shuffle(free_planet_positions)
     planet_pos = random.randrange(len(free_planet_positions))
 
-    galaxy, solar_system, position = map(int, free_planet_positions[planet_pos].split(':'))
+    galaxy, solar_system, position = map(
+        int, free_planet_positions[planet_pos].split(":")
+    )
     return galaxy, solar_system, position
 
 

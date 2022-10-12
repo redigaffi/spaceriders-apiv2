@@ -80,8 +80,6 @@ class PlanetBKM:
                 energy_deposit_info = await self.contract_service.spaceriders_game_call(
                     "bkmTransactions", energy_deposit_id_sm
                 )
-                planet_id_sm = energy_deposit_info[1]
-                owner = energy_deposit_info[2]
                 created_timestamp = energy_deposit_info[3]
                 amount = energy_deposit_info[4]
                 tx_type = energy_deposit_info[6]
@@ -151,7 +149,6 @@ class PlanetBKM:
         )
         planet_id_sm = bkm_deposit_info[1]
         owner = bkm_deposit_info[2]
-        created_timestamp = bkm_deposit_info[3]
         amount = bkm_deposit_info[4]
         exists = bkm_deposit_info[5]
         tx_type = bkm_deposit_info[6]

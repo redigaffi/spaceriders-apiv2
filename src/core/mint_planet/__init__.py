@@ -21,7 +21,10 @@ from core.shared.ports import (
     ResponsePort,
     TokenPricePort,
 )
-from core.shared.service.planet import get_new_planet, get_new_random_planet_planet_position
+from core.shared.service.planet import (
+    get_new_planet,
+    get_new_random_planet_planet_position,
+)
 from core.shared.static.game_data.PlanetData import PlanetData
 
 
@@ -151,7 +154,6 @@ class MintPlanet:
 
         for planet in not_stored_planet_ids:
             planet_id = str(planet[1])
-            last_planet = await self.planet_repository.last_created_planet()
 
             planet: Planet = await get_new_planet(
                 user,

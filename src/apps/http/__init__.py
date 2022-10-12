@@ -1,9 +1,7 @@
-import asyncio
 import logging as log
 
 from beanie import init_beanie
 import beanie.exceptions
-from beanie.exceptions import RevisionIdWasChanged
 from decouple import config
 from fastapi import FastAPI, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -28,7 +26,7 @@ import apps.http.dependencies as dependencies
 from apps.http.dependencies import get_middleware
 import apps.http.settings
 from apps.http.urls import register_fastapi_routes
-from core.buildable_items import BuildableItems, FinishBuildRequest
+from core.buildable_items import FinishBuildRequest
 from core.planet_resources import PlanetResourcesUpdateRequest
 from core.shared.models import AppBaseException
 
@@ -38,6 +36,7 @@ from core.shared.models import AppBaseException
 app = FastAPI()
 
 # https://fastapi.tiangolo.com/tutorial/metadata/
+
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema

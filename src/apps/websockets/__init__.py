@@ -1,6 +1,6 @@
 from beanie import init_beanie
 from decouple import config
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI
 import motor.motor_asyncio
 import uvicorn
 

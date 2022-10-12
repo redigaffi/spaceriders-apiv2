@@ -4,10 +4,9 @@ import math
 
 from pydantic import BaseModel
 
-from core.shared.models import AppBaseException, Email, PlanetResponse, PlanetTier
+from core.shared.models import AppBaseException, PlanetResponse, PlanetTier
 from core.shared.ports import (
     ChainServicePort,
-    EmailRepositoryPort,
     PlanetRepositoryPort,
     ResponsePort,
     TokenPricePort,

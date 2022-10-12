@@ -24,14 +24,13 @@ from core.planet_level import PlanetLevel
 from core.planet_staking import Staking
 from core.pve.asteroid import Asteroid
 from core.pve.space_pirates import SpacePirates
-from core.shared.ports import CacheServicePort, ChainServicePort, TokenPricePort
+from core.shared.ports import CacheServicePort, ChainServicePort
 
 response_adapter = BlackHoleResponsePort()
 logging_adapter = LoggingAdapter(get_logger("cronjobs_app"))
 
 
 async def cache_dependency():
-    cache_driver = config("CACHE_DRIVER")
 
     client = await emcache.create_client(
         [emcache.MemcachedHostAddress(config("CACHE_HOST"), int(config("CACHE_PORT")))]

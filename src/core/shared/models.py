@@ -1,6 +1,5 @@
-from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, List, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field, root_validator
 
@@ -107,11 +106,6 @@ class Reserves(BaseModel):
     total_crystal: float = 0
     total_petrol: float = 0
 
-    # Current visible resource reserve
-    metal: float = 0
-    crystal: float = 0
-    petrol: float = 0
-
 
 class EnergyDeposit(BaseModel):
     request_id: str
@@ -160,11 +154,6 @@ class Planet(BaseModel):
     max_temperature: int = None
 
     reserves: Reserves = None
-
-    # Original resources reserve
-    original_total_metal_amount: float = None
-    original_total_crystal_amount: float = None
-    original_total_petrol_amount: float = None
 
     galaxy: int = None
     solar_system: int = None
@@ -419,11 +408,6 @@ class PlanetResponse(BaseModel):
 
     reserves: Reserves = None
 
-    # Original resources reserve
-    original_total_metal_amount: float = None
-    original_total_crystal_amount: float = None
-    original_total_petrol_amount: float = None
-
     galaxy: int = None
     solar_system: int = None
     position: int = None
@@ -461,9 +445,6 @@ class PlanetResponse(BaseModel):
         re.min_temperature = p.min_temperature
         re.max_temperature = p.max_temperature
         re.reserves = p.reserves
-        re.original_total_metal_amount = p.original_total_metal_amount
-        re.original_total_crystal_amount = p.original_total_crystal_amount
-        re.original_total_petrol_amount = p.original_total_petrol_amount
         re.galaxy = p.galaxy
         re.solar_system = p.solar_system
         re.position = p.position

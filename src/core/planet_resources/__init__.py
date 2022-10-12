@@ -144,17 +144,14 @@ class PlanetResources:
             RD.METAL_MINE: {
                 "resource_name": "metal",
                 "reserve_name": "total_metal",
-                "visible_reserve": "metal",
             },
             RD.CRYSTAL_MINE: {
                 "resource_name": "crystal",
                 "reserve_name": "total_crystal",
-                "visible_reserve": "crystal",
             },
             RD.PETROL_MINE: {
                 "resource_name": "petrol",
                 "reserve_name": "total_petrol",
-                "visible_reserve": "petrol",
             },
         }
 
@@ -171,16 +168,16 @@ class PlanetResources:
         storage_capacity *= health_percentage
 
         reserve_withdraw = production
-        visible_resource_planet_reserve = getattr(
-            planet.reserves, fields[label]["visible_reserve"]
+        resource_planet_reserve = getattr(
+            planet.reserves, fields[label]["reserve_name"]
         )
 
         # Extract from visible reserve
-        if visible_resource_planet_reserve - production < 0:
-            energy_factor = float(visible_resource_planet_reserve) / production
+        if resource_planet_reserve - production < 0:
+            energy_factor = float(resource_planet_reserve) / production
             energy_usage = energy_usage * energy_factor
-            production = visible_resource_planet_reserve
-            reserve_withdraw = visible_resource_planet_reserve
+            production = resource_planet_reserve
+            reserve_withdraw = resource_planet_reserve
 
         if production <= 0:
             return
@@ -207,8 +204,8 @@ class PlanetResources:
         )
         setattr(
             planet.reserves,
-            fields[label]["visible_reserve"],
-            (visible_resource_planet_reserve - reserve_withdraw),
+            fields[label]["reserve_name"],
+            (resource_planet_reserve - reserve_withdraw),
         )
 
     def __calculate_production_health(

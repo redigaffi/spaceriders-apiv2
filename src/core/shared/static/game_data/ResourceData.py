@@ -358,7 +358,7 @@ class ResourceData(GameData):
             CRYSTAL_MINE,
             TYPE,
             MINE_CATEGORY,
-            "Crystal mine to extract metal",
+            "Crystal mine to extract Crystal",
             {
                 0: BuildableItemLevelInfo(),
                 1: BuildableItemLevelInfo(
@@ -660,7 +660,7 @@ class ResourceData(GameData):
             PETROL_MINE,
             TYPE,
             MINE_CATEGORY,
-            "Petrol mine to extract metal",
+            "Petrol mine to extract Petrol",
             {
                 0: BuildableItemLevelInfo(),
                 1: BuildableItemLevelInfo(

@@ -1,12 +1,12 @@
 from datetime import datetime, timezone
 
 from decouple import config
-from fastapi import Depends, HTTPException, Request
+from fastapi import HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
 
 from adapters.shared.beani_repository_adapter import BeaniUserRepositoryAdapter
-from core.shared.models import User, UserNotFoundException
+from core.shared.models import User
 from core.shared.ports import UserRepositoryPort
 
 

@@ -90,11 +90,6 @@ class PlanetDocument(Document, Planet):
     min_temperature: int | None = 0
     max_temperature: int | None = 0
 
-    # Original resources reserve
-    original_total_metal_amount: int | None = 0
-    original_total_crystal_amount: int | None = 0
-    original_total_petrol_amount: int | None = 0
-
     galaxy: int | None = 0
     solar_system: int | None = 0
     position: int | None = 0

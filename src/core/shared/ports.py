@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Tuple, TypedDict
+from typing import TypedDict
 
 from core.shared.models import (
     BKMTransaction,
@@ -226,6 +226,7 @@ class PlanetRepositoryPort(ABC):
     @abstractmethod
     async def last_created_planet(self, fetch_links=False) -> Planet | bool:
         pass
+
 
 class ResponsePort(ABC):
     @abstractmethod
