@@ -6,7 +6,6 @@ from fastapi import Depends
 from fastapi.encoders import jsonable_encoder
 
 from adapters.http.security import jwt_bearer
-from core import planet_email
 from core.authenticate import Authenticate, AuthenticationDetailsRequest
 from core.buildable_items import BuildableItems, BuildableRequest
 from core.currency_market import CurrencyMarket, MyOpenOrdersResponse
@@ -16,7 +15,6 @@ from core.mint_planet import (
     ClaimPlanetRequest,
     FetchPlanetCostDataRequest,
     FetchPlanetCostResponse,
-    FreePlanetRequest,
     MintPaidPlanetRequest,
     MintPlanet,
 )

@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 import logging
 import time
-from time import timezone
 
 from eth_account.messages import encode_defunct
 import jwt

@@ -248,7 +248,8 @@ class CurrencyMarket:
                 market_code
             )
         )
-        # price_candle_data = await self.currency_market_trade_repository.price_candle_data_grouped_time(market_code, 1)
+        # price_candle_data =
+        # await self.currency_market_trade_repository.price_candle_data_grouped_time(market_code, 1)
         prices = await self._price_candle_data(market_code, candle_time_frame)
         last_24_info = await self.currency_market_trade_repository.last_24_info(
             market_code

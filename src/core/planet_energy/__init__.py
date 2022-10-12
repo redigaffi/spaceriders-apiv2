@@ -109,7 +109,6 @@ class PlanetEnergy:
         )
         planet_id_sm = energy_deposit_info[1]
         owner = energy_deposit_info[2]
-        created_timestamp = energy_deposit_info[3]
         amount = energy_deposit_info[4]
         exists = energy_deposit_info[5]
 

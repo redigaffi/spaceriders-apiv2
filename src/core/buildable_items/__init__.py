@@ -14,7 +14,6 @@ from core.shared.models import (
 )
 from core.shared.ports import PlanetRepositoryPort, ResponsePort
 from core.shared.service.buildable_items import is_queue_full
-from core.shared.service.planet import resource_reserve_als
 from core.shared.service.tier_benefit import tier_benefit_buildable_items
 from core.shared.static.game_data.Common import (
     BuildableItemBaseType,
@@ -189,7 +188,7 @@ class BuildableItems:
         ]:
             raise WrongBuildableException()
 
-        if request.label not in (ResourceData.TYPES):
+        if request.label not in ResourceData.TYPES:
             raise WrongBuildableException()
 
         planet: Planet = await self.planet_repository_port.get_my_planet(
@@ -262,7 +261,6 @@ class BuildableItems:
         if request.label in [ResourceData.TYPE, InstallationData.TYPE]:
             planet.slots_used += 1
 
-        planet = resource_reserve_als(request.label, planet, next_lvl)
         planet = await self.planet_repository_port.update(planet)
         await self.planet_level_use_case.give_planet_experience(
             GivePlanetExperienceRequest(
