@@ -24,7 +24,7 @@ class MediumContentParser(HTMLParser):
                 self.header_img_src = attrs_map['src']
 
     def handle_data(self, data):
-        self.HTMLDATA.append(data)
+        self.HTMLDATA.append(data.strip())
 
     def clean(self):
         self.HTMLDATA = []
@@ -52,7 +52,7 @@ class MediumScraper():
         for element in xml_tree.iter('item'):
             content_parser.feed(element.find('content:encoded', xml_namespaces).text)
 
-            parsed_content = ''.join(content_parser.HTMLDATA)
+            parsed_content = ' '.join(content_parser.HTMLDATA)
             header_img_src = content_parser.header_img_src
             content_parser.clean()
 
