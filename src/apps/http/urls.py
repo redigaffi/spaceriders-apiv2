@@ -1,3 +1,4 @@
+from crypt import methods
 from controllers.http import HttpController
 from core.authenticate import JwtResponse
 from core.buildable_items import BuildableResponse
@@ -182,4 +183,5 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
             methods=["get"],
         ),
         dict(path=r"/health", endpoint=http_controller.health, methods=["get"]),
+        dict(path=r"/medium_feed", endpoint=http_controller.medium_feed, methods=["get"])
     ]

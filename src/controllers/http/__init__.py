@@ -29,6 +29,7 @@ from core.planet_staking import (
     UnStakeRequest,
 )
 from core.shared.models import Planet
+from core.medium_scraper import MediumScraper
 
 object_id_encoder = {PydanticObjectId: lambda x: str(x)}
 object_id_encoder1 = {ObjectId: lambda x: str(x)}
@@ -187,3 +188,7 @@ class HttpController:
 
     async def health(self):
         return jsonable_encoder({})
+
+    async def medium_feed(self):
+        re = await MediumScraper.get_medium_feed()
+        return jsonable_encoder(re)
