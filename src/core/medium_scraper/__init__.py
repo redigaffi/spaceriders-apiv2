@@ -11,6 +11,10 @@ class CantGetMediumFeed(AppBaseException):
 
 class MediumContentParser(HTMLParser):
     header_img_src = ""
+    subtitle = ""
+    start_tags_to_space = ['blockquote', 'ul', 'li', 'figure', 'strong']
+    end_tags_to_space = ['h1', 'h2', 'h3', 'h5', 'h6', 'ul', 'p']
+    tags_to_avoid = ['h4']
 
     def __init__(self):
         HTMLParser.__init__(self)
@@ -20,11 +24,23 @@ class MediumContentParser(HTMLParser):
         if tag == 'img':
             attrs_map = dict((key, value) for key, value in attrs)
 
-            if attrs_map['alt'] == 'Header':
+            if attrs_map['alt'].lower() == 'header':
                 self.header_img_src = attrs_map['src']
 
+        if tag in self.start_tags_to_space:
+            self.HTMLDATA.append(' ')
+
+    def handle_endtag(self, tag):
+        if tag in self.end_tags_to_space:
+            self.HTMLDATA.append(' ')
+
+        if tag in self.tags_to_avoid:
+            deleted_data = self.HTMLDATA.pop()
+            if tag == "h4":
+                self.subtitle = deleted_data
+
     def handle_data(self, data):
-        self.HTMLDATA.append(data.strip())
+        self.HTMLDATA.append(data)
 
     def clean(self):
         self.HTMLDATA = []
@@ -38,7 +54,6 @@ class MediumScraper():
         xml_namespaces = {'dc': 'http://purl.org/dc/elements/1.1/',
                           'content': 'http://purl.org/rss/1.0/modules/content/'}
 
-        content_parser = MediumContentParser()
         http = urllib3.PoolManager()
         response = http.request('GET', rss_url)
 
@@ -50,11 +65,11 @@ class MediumScraper():
         xml_tree = ET.fromstring(response.data)
 
         for element in xml_tree.iter('item'):
+            content_parser = MediumContentParser()
             content_parser.feed(element.find('content:encoded', xml_namespaces).text)
 
-            parsed_content = ' '.join(content_parser.HTMLDATA)
-            header_img_src = content_parser.header_img_src
-            content_parser.clean()
+            parsed_content = ''.join(content_parser.HTMLDATA)
+            content_parser.close()
 
             categories = [item.text for item in element.findall('category')]
             filtered_categories = categories.copy()
@@ -64,7 +79,8 @@ class MediumScraper():
 
                 filtered_element = {
                     'title': element.find('title').text,
-                    'img': header_img_src,
+                    'subtitle': content_parser.subtitle,
+                    'img': content_parser.header_img_src,
                     'guid': element.find('guid').text,
                     'tags': filtered_categories,
                     'pubDate': element.find('pubDate').text,
@@ -72,7 +88,5 @@ class MediumScraper():
                 }
 
                 filtered_output.append(filtered_element)
-
-        content_parser.close()
 
         return filtered_output
