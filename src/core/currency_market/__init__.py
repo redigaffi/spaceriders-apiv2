@@ -113,7 +113,7 @@ class CurrencyMarket:
         # @TODO: Created time index
         # amount of bars
         now = datetime.utcnow()
-        day1ago_1 = now - timedelta(minutes=120)
+        day1ago_1 = now - timedelta(days=10)
         day1ago_str = day1ago_1.strftime("%Y-%m-%dT%H:00:00.000000Z")
         day1ago = datetime.strptime(day1ago_str, "%Y-%m-%dT%H:00:00.000000Z")
 
@@ -133,6 +133,15 @@ class CurrencyMarket:
         for p in price_candle_data:
             price_candle_tmp[p.id["date_formatted"]] = p
 
+        if day1ago.strftime("%Y-%m-%dT%H:%M:00.000000Z") not in price_candle_tmp:
+            # we need to get last trade previous to day1ago.
+            last_trade_from_arr = await self.currency_market_trade_repository.last_from(
+                market_code,
+                day1ago
+            )
+            if len(last_trade_from_arr) > 0:
+                price_candle_tmp[last_trade_from_arr[0].created_time.strftime("%Y-%m-%dT%H:%M:00.000000Z")] = last_trade_from_arr[0]
+
         current_price = None
         if not len(price_candle_data):
             last_trade_arr = await self.currency_market_trade_repository.last(
@@ -141,10 +150,11 @@ class CurrencyMarket:
             if len(last_trade_arr) > 0:
                 last_trade = last_trade_arr[0]
                 minute = day1ago.strftime("%M")
+                date_formatted = day1ago.strftime("%Y-%m-%dT%H:%M:00.000000Z")
                 current_price = PriceCandleDataGroupedByTimeInterval(
                     _id={
                         "minute": minute,
-                        "date_formatted": now.strftime("%Y-%m-%dT%H:%M:00.000000Z"),
+                        "date_formatted": date_formatted,
                         "interval": minute,
                     },
                     open=last_trade.price,
@@ -152,6 +162,7 @@ class CurrencyMarket:
                     high=last_trade.price,
                     low=last_trade.price,
                 )
+                price_candle_tmp[date_formatted] = current_price
 
         prices = {}
         while day1ago <= now:

@@ -709,6 +709,17 @@ class BeaniCurrencyMarketTradeRepositoryAdapter(CurrencyMarketTradeRepositoryPor
             .to_list()
         )
 
+    async def last_from(self, market_code: str, starting_from: datetime) -> list[CurrencyMarketTrade]:
+        return (
+            await CurrencyMarketTradeDocument.find(
+                CurrencyMarketTradeDocument.market_code == market_code,
+                CurrencyMarketTradeDocument.created_time <= starting_from
+            )
+            .sort(-CurrencyMarketTradeDocument.created_time)
+            .limit(1)
+            .to_list()
+        )
+
     async def all(self) -> list[CurrencyMarketTradeDocument] | None:
         return await CurrencyMarketTradeDocument.all().to_list()
 

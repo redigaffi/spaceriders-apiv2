@@ -126,6 +126,10 @@ class CurrencyMarketTradeRepositoryPort(ABC):
         pass
 
     @abstractmethod
+    async def last_from(self, market_code: str, starting_from: datetime) -> list[CurrencyMarketTrade]:
+        pass
+
+    @abstractmethod
     async def price_candle_data_grouped_time_range(
         self, market_code: str, interval: str, time_start: datetime
     ) -> list[PriceCandleDataGroupedByTimeInterval]:
