@@ -112,16 +112,24 @@ class CurrencyMarket:
         # @TODO: ADD caching
         # @TODO: Created time index
         # amount of bars
-        now = datetime.utcnow()
-        day1ago_1 = now - timedelta(days=10)
-        day1ago_str = day1ago_1.strftime("%Y-%m-%dT%H:00:00.000000Z")
-        day1ago = datetime.strptime(day1ago_str, "%Y-%m-%dT%H:00:00.000000Z")
-
         candle_time_frame_mapping = {
             "1m": dict(minutes=1),
             "15m": dict(minutes=15),
             "1h": dict(hours=1),
+            "1d": dict(days=1),
         }
+
+        candle_time_frame_mapping_format = {
+            "1m": "%Y-%m-%dT%H:00:00.000000Z",
+            "15m": "%Y-%m-%dT%H:00:00.000000Z",
+            "1h": "%Y-%m-%dT%H:00:00.000000Z",
+            "1d": "%Y-%m-%dT00:00:00.000000Z",
+        }
+
+        now = datetime.utcnow()
+        day1ago_1 = now - timedelta(days=10)
+        day1ago_str = day1ago_1.strftime(candle_time_frame_mapping_format[candle_time_frame])
+        day1ago = datetime.strptime(day1ago_str, "%Y-%m-%dT%H:00:00.000000Z")
 
         price_candle_data = (
             await self.currency_market_trade_repository.price_candle_data_grouped_time(
@@ -196,6 +204,7 @@ class CurrencyMarket:
             "1m": 1,
             "15m": 15,
             "1h": 1,
+            "1d": 1,
         }
 
         def min_date_parser(start):
@@ -213,10 +222,18 @@ class CurrencyMarket:
                 range = f"0{range}"
             return start.strftime(f"%Y-%m-%dT{range}:00:00.000000Z")
 
+        def day_date_parser(start):
+            d = int(start.strftime("%d"))
+            range = int(d - d % candle_time_frame_mapping[candle_time_frame])
+            if range < 10:
+                range = f"0{range}"
+            return start.strftime(f"%Y-%m-{range}T00:00:00.000000Z")
+
         candle_time_frame_func_mapping = {
             "1m": min_date_parser,
             "15m": min_date_parser,
             "1h": hour_date_parser,
+            "1d": day_date_parser,
         }
 
         start = datetime.utcnow()
