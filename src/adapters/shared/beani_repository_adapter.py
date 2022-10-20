@@ -342,6 +342,12 @@ class BeaniCurrencyMarketTradeRepositoryAdapter(CurrencyMarketTradeRepositoryPor
                 "interval_time_selector": "$hour",
                 "post_date_format": ":00:00.000000Z",
             },
+            "1d": {
+                "int": 1,
+                "pre_date_format": "%Y-%m-",
+                "interval_time_selector": "$dayOfMonth",
+                "post_date_format": "T00:00:00.000000Z",
+            },
         }
 
         return candle_time_frame_mapping[interval]
