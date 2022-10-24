@@ -306,3 +306,7 @@ class TokenPricePort(ABC):
     @abstractmethod
     async def fetch_token_price_usd(self) -> float:
         pass
+
+
+class MediumContentParserPort(ABC):
+    pass
