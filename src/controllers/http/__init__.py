@@ -48,6 +48,7 @@ class HttpController:
     staking: Staking
     currency_market: CurrencyMarket
     planet_bkm: PlanetBKM
+    medium_scrapper: MediumScraper
 
     async def jwt(self, req: AuthenticationDetailsRequest):
         return await self.authenticate_use_case(req)
@@ -190,5 +191,5 @@ class HttpController:
         return jsonable_encoder({})
 
     async def medium_feed(self):
-        re = await MediumScraper.get_medium_feed()
+        re = await self.medium_scrapper.get_medium_feed()
         return jsonable_encoder(re)

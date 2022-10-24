@@ -1,56 +1,23 @@
+from dataclasses import dataclass
+
 import urllib3
 import xml.etree.ElementTree as ET
-from html.parser import HTMLParser
-from decouple import config
 from core.shared.models import AppBaseException
+from core.shared.ports import MediumContentParserPort
 
 
 class CantGetMediumFeed(AppBaseException):
     msg = "Can't get Medium feed."
 
 
-class MediumContentParser(HTMLParser):
-    header_img_src = ""
-    subtitle = ""
-    start_tags_to_space = ['blockquote', 'ul', 'li', 'figure', 'strong']
-    end_tags_to_space = ['h1', 'h2', 'h3', 'h5', 'h6', 'ul', 'p']
-    tags_to_avoid = ['h4']
+@dataclass
+class MediumScraper:
+    account_name: str
+    medium_content_parser: MediumContentParserPort
 
-    def __init__(self):
-        HTMLParser.__init__(self)
-        self.HTMLDATA = []
+    async def get_medium_feed(self):
 
-    def handle_starttag(self, tag, attrs):
-        if tag == 'img':
-            attrs_map = dict((key, value) for key, value in attrs)
-
-            if attrs_map['alt'].lower() == 'header':
-                self.header_img_src = attrs_map['src']
-
-        if tag in self.start_tags_to_space:
-            self.HTMLDATA.append(' ')
-
-    def handle_endtag(self, tag):
-        if tag in self.end_tags_to_space:
-            self.HTMLDATA.append(' ')
-
-        if tag in self.tags_to_avoid:
-            deleted_data = self.HTMLDATA.pop()
-            if tag == "h4":
-                self.subtitle = deleted_data
-
-    def handle_data(self, data):
-        self.HTMLDATA.append(data)
-
-    def clean(self):
-        self.HTMLDATA = []
-
-
-class MediumScraper():
-    @staticmethod
-    async def get_medium_feed():
-        account_name = config('MEDIUM_ACCOUNT')
-        rss_url = f'https://medium.com/feed/@{account_name}'
+        rss_url = f'https://medium.com/feed/@{self.account_name}'
         xml_namespaces = {'dc': 'http://purl.org/dc/elements/1.1/',
                           'content': 'http://purl.org/rss/1.0/modules/content/'}
 
@@ -65,7 +32,7 @@ class MediumScraper():
         xml_tree = ET.fromstring(response.data)
 
         for element in xml_tree.iter('item'):
-            content_parser = MediumContentParser()
+            content_parser = self.medium_content_parser
             content_parser.feed(element.find('content:encoded', xml_namespaces).text)
 
             parsed_content = ''.join(content_parser.HTMLDATA)
@@ -88,5 +55,6 @@ class MediumScraper():
                 }
 
                 filtered_output.append(filtered_element)
+                self.medium_content_parser.clean()
 
         return filtered_output

@@ -17,12 +17,14 @@ from adapters.shared.beani_repository_adapter import (
 from adapters.shared.cache_adapter import MemCacheCacheServiceAdapter
 from adapters.shared.evm_adapter import EvmChainServiceAdapter, TokenPriceAdapter
 from adapters.shared.logging_adapter import LoggingAdapter, get_logger
+from adapters.shared.medium_parser import MediumContentParser
 from controllers.http import HttpController
 from core.authenticate import Authenticate
 from core.buildable_items import BuildableItems
 from core.currency_market import CurrencyMarket
 from core.fetch_chain_data import FetchChainData
 from core.get_planets import GetPlanets
+from core.medium_scraper import MediumScraper
 from core.mint_planet import MintPlanet
 from core.nft_metadata import NftData
 from core.planet_bkm import PlanetBKM
@@ -345,6 +347,12 @@ async def http_controller():
         bkm_repository, planet_repository, logging_adapter, contract_service
     )
 
+
+    medium_scrapper_use_case = MediumScraper(
+        config("MEDIUM_ACCOUNT"),
+        MediumContentParser()
+    )
+
     return HttpController(
-        a, b, c, d, e, f, g, h, j, trading_use_case, planet_bkm_use_case
+        a, b, c, d, e, f, g, h, j, trading_use_case, planet_bkm_use_case, medium_scrapper_use_case
     )

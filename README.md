@@ -32,7 +32,7 @@ poetry install
 Here, copy the env vars file `.env.eg` to another one called `.env`.
 
 ```bash
-cp .env.eg .env
+cp .env.example .env
 ```
 
 ## 🚀 USAGE
