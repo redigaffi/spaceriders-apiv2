@@ -96,7 +96,7 @@ class CurrencyMarket:
                 market_code=market
             )
 
-            last_price = -1
+            last_price = 0
             if len(last_trade_arr) > 0:
                 last_price = last_trade_arr[0].price
 
@@ -106,6 +106,7 @@ class CurrencyMarket:
                 MarketInfoResponse(market=market_front_code, last_price=last_price)
             )
 
+            re.sort(key=lambda x: x.last_price, reverse=True)
         return re
 
     async def _price_candle_data(self, market_code: str, candle_time_frame: str):
