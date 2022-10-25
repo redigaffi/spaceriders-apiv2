@@ -55,12 +55,13 @@ class PlanetEnergy:
             created_time=datetime.datetime.timestamp(datetime.datetime.now()),
             energy_amount=energy_amount,
             planet_id=request.planet_id,
-            was_recovered=False,
         )
 
         energy_deposit = await self.energy_repository_port.create_energy_deposit(
             energy_deposit
         )
+
+        planet.resources.bkm -= request.amount
         planet.energy_deposits.append(energy_deposit)
         planet.resources.energy += round(energy_amount, 0)
         await self.planet_repository_port.update(planet)
