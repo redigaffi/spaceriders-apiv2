@@ -193,7 +193,6 @@ async def get_planet_energy_use_case(
         energy_repository,
         planet_repository,
         logging_adapter,
-        contract,
         http_response_port,
     )
 

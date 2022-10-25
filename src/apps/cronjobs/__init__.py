@@ -8,7 +8,6 @@ from decouple import config
 import motor.motor_asyncio
 
 from adapters.shared.beani_repository_adapter import (
-    EnergyDepositDocument,
     PlanetDocument,
     UserDocument,
 )
@@ -17,7 +16,6 @@ import apps.cronjobs.dependencies as dependencies
 import apps.cronjobs.settings as settings
 from controllers.cronjobs import CronjobController
 from core.planet_bkm import RecoverBKMTransactionRequest
-from core.planet_energy import PlanetEnergyRecoverEnergyDepositsRequest
 from core.shared.models import Planet
 
 
@@ -59,12 +57,8 @@ async def smart_contract_recover_by_planet_cronjob(controller: CronjobController
         Planet
     ] = await dependencies.planet_repository.all_claimed_planets()
     for planet in all_claimed:
-        energy_request = PlanetEnergyRecoverEnergyDepositsRequest(
-            planet_id=str(planet.id)
-        )
         bkm_request = RecoverBKMTransactionRequest(planet_id=str(planet.id))
 
-        await controller.recover_energy_deposits(energy_request)
         await controller.recover_bkm_deposits(bkm_request)
         await controller.recover_staking(str(planet.id))
 
@@ -81,7 +75,6 @@ async def main():
         database=db,
         document_models=[
             UserDocument,
-            EnergyDepositDocument,
             PlanetDocument,
             EmailDocument,
             BKMTransactionDocument,
