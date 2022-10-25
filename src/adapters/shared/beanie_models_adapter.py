@@ -47,12 +47,10 @@ class EmailDocument(Document, Email):
 
 # INFO: Seems like order matters, if I put this below planet it wont create DBRef in db (no reference)
 class EnergyDepositDocument(Document, EnergyDeposit):
-    request_id: str
+
     created_time: float | None = 0
-    token_amount: float | None = 0
-    usd_value: float | None = 0
+    energy_amount: float = None
     planet_id: str
-    was_recovered: bool = False
 
     class Settings:
         name = "energy_deposits"

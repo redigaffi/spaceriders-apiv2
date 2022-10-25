@@ -97,12 +97,9 @@ class EnergyDepositRepositoryAdapter(EnergyDepositRepositoryPort):
         self, energy_deposit: EnergyDeposit
     ) -> EnergyDeposit:
         energy_document = EnergyDepositDocument(
-            request_id=energy_deposit.request_id,
             planet_id=energy_deposit.planet_id,
-            was_recovered=energy_deposit.was_recovered,
             created_time=energy_deposit.created_time,
-            token_amount=energy_deposit.token_amount,
-            usd_value=energy_deposit.usd_value,
+            energy_amount=energy_deposit.energy_amount
         )
         await energy_document.save()
         return energy_document

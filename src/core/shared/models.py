@@ -108,12 +108,9 @@ class Reserves(BaseModel):
 
 
 class EnergyDeposit(BaseModel):
-    request_id: str
     created_time: float = None
-    token_amount: float = None
-    usd_value: float = None
+    energy_amount: float = None
     planet_id: str
-    was_recovered = False
 
 
 class BKMTransaction(BaseModel):

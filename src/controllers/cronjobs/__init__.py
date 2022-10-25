@@ -11,7 +11,6 @@ from core.pve.space_pirates import SpacePirateRequest, SpacePirates
 
 @dataclass
 class CronjobController:
-    energy_planet_use_case: PlanetEnergy
     staking_use_case: Staking
     planet_level: PlanetLevel
     mint_planet: MintPlanet
@@ -21,11 +20,6 @@ class CronjobController:
 
     async def recover_planets(self, user: str):
         return await self.mint_planet.recover_planet(user)
-
-    async def recover_energy_deposits(
-        self, req: PlanetEnergyRecoverEnergyDepositsRequest
-    ):
-        return await self.energy_planet_use_case.recover_deposits(req)
 
     async def recover_staking(self, planet_id: str):
         return await self.staking_use_case.tier_recover(planet_id)
