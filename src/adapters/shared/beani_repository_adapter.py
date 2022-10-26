@@ -267,7 +267,7 @@ class BeaniCurrencyMarketOrderRepositoryAdapter(CurrencyMarketOrderRepositoryPor
                     }
                 },
                 {"$sort": {"grouped_price": order}},
-                {"$limit": 8},
+                {"$limit": 12},
             ]
 
         buy_group = (
