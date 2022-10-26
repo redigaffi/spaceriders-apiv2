@@ -182,5 +182,5 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
             methods=["get"],
         ),
         dict(path=r"/health", endpoint=http_controller.health, methods=["get"]),
-        dict(path=r"/feed", endpoint=http_controller.medium_feed, methods=["get"])
+        dict(path=r"/feed", endpoint=http_controller.medium_feed, methods=["get"]),
     ]

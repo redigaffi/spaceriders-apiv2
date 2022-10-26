@@ -129,7 +129,9 @@ class CurrencyMarket:
 
         now = datetime.utcnow()
         day1ago_1 = now - timedelta(days=10)
-        day1ago_str = day1ago_1.strftime(candle_time_frame_mapping_format[candle_time_frame])
+        day1ago_str = day1ago_1.strftime(
+            candle_time_frame_mapping_format[candle_time_frame]
+        )
         day1ago = datetime.strptime(day1ago_str, "%Y-%m-%dT%H:00:00.000000Z")
 
         price_candle_data = (
@@ -145,11 +147,14 @@ class CurrencyMarket:
         if day1ago.strftime("%Y-%m-%dT%H:%M:00.000000Z") not in price_candle_tmp:
             # we need to get last trade previous to day1ago.
             last_trade_from_arr = await self.currency_market_trade_repository.last_from(
-                market_code,
-                day1ago
+                market_code, day1ago
             )
             if len(last_trade_from_arr) > 0:
-                price_candle_tmp[last_trade_from_arr[0].created_time.strftime("%Y-%m-%dT%H:%M:00.000000Z")] = last_trade_from_arr[0]
+                price_candle_tmp[
+                    last_trade_from_arr[0].created_time.strftime(
+                        "%Y-%m-%dT%H:%M:00.000000Z"
+                    )
+                ] = last_trade_from_arr[0]
 
         current_price = None
         if not len(price_candle_data):

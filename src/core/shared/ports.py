@@ -126,7 +126,9 @@ class CurrencyMarketTradeRepositoryPort(ABC):
         pass
 
     @abstractmethod
-    async def last_from(self, market_code: str, starting_from: datetime) -> list[CurrencyMarketTrade]:
+    async def last_from(
+        self, market_code: str, starting_from: datetime
+    ) -> list[CurrencyMarketTrade]:
         pass
 
     @abstractmethod

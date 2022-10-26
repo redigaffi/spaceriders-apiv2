@@ -346,12 +346,21 @@ async def http_controller():
         bkm_repository, planet_repository, logging_adapter, contract_service
     )
 
-
     medium_scrapper_use_case = MediumScraper(
-        config("MEDIUM_ACCOUNT"),
-        MediumContentParser()
+        config("MEDIUM_ACCOUNT"), MediumContentParser()
     )
 
     return HttpController(
-        a, b, c, d, e, f, g, h, j, trading_use_case, planet_bkm_use_case, medium_scrapper_use_case
+        a,
+        b,
+        c,
+        d,
+        e,
+        f,
+        g,
+        h,
+        j,
+        trading_use_case,
+        planet_bkm_use_case,
+        medium_scrapper_use_case,
     )

@@ -10,7 +10,7 @@ from core.shared.models import (
     BuildableItem,
     NoPlanetFoundException,
     Planet,
-    QueueIsFullException,
+    QueueIsFullException, QueueItem, QueueActionType,
 )
 from core.shared.ports import PlanetRepositoryPort, ResponsePort
 from core.shared.service.buildable_items import is_queue_full
@@ -261,6 +261,17 @@ class BuildableItems:
         if request.label in [ResourceData.TYPE, InstallationData.TYPE]:
             planet.slots_used += 1
 
+        new_queue_item = QueueItem(
+            label=request.label,
+            type=request.type,
+            action=QueueActionType.BUILDING,
+            next_level=next_lvl.level,
+            quantity=request.quantity,
+            time_to_finish=datetime.timedelta(seconds=time).total_seconds(),
+            started_at=None # If queue empty
+        )
+
+        planet.building_queue.append(new_queue_item)
         planet = await self.planet_repository_port.update(planet)
         await self.planet_level_use_case.give_planet_experience(
             GivePlanetExperienceRequest(

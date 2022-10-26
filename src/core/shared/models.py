@@ -1,5 +1,6 @@
 from datetime import datetime
-from typing import Any
+from enum import Enum
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field, root_validator
 
@@ -132,6 +133,21 @@ class Email(BaseModel):
     read: bool = False
     planet: str
 
+class QueueActionType(Enum):
+    BUILDING = 1
+    REPAIRING = 2
+
+
+#FIFO - Queue
+class QueueItem(BaseModel):
+    label: str
+    type: str
+    action: QueueActionType
+    next_level: Optional[int]
+    quantity: Optional[int]
+    time_to_finish: float
+    started_at: float
+
 
 class Planet(BaseModel):
     id: str = None
@@ -169,6 +185,8 @@ class Planet(BaseModel):
     installation_level: list[BuildableItem] = []
     research_level: list[BuildableItem] = []
     defense_items: list[BuildableItem] = []
+
+    building_queue: list[QueueItem] = []
     energy_deposits: list[EnergyDeposit] = []
     bkm_deposits: list[BKMTransaction] = []
     emails: list[Email] = []
