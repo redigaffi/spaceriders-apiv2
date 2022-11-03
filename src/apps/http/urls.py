@@ -1,6 +1,6 @@
 from controllers.http import HttpController
 from core.authenticate import JwtResponse
-from core.buildable_items import BuildableResponse
+from core.buildable_items import BuildableResponse, ClearQueuePaidResponse
 from core.currency_market import MyOpenOrdersResponse
 from core.fetch_chain_data import FetchChainDataResponse, FetchChainTokenPriceResponse
 from core.get_planets import (
@@ -87,6 +87,12 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
             path=r"/planet/build",
             response_model=BuildableResponse,
             endpoint=http_controller.build,
+            methods=["post"],
+        ),
+        dict(
+            path=r"/planet/queue/clear",
+            response_model=ClearQueuePaidResponse,
+            endpoint=http_controller.clear_queue,
             methods=["post"],
         ),
         dict(
