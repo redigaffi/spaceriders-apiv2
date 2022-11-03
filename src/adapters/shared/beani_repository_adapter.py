@@ -99,7 +99,7 @@ class EnergyDepositRepositoryAdapter(EnergyDepositRepositoryPort):
         energy_document = EnergyDepositDocument(
             planet_id=energy_deposit.planet_id,
             created_time=energy_deposit.created_time,
-            energy_amount=energy_deposit.energy_amount
+            energy_amount=energy_deposit.energy_amount,
         )
         await energy_document.save()
         return energy_document
@@ -712,11 +712,13 @@ class BeaniCurrencyMarketTradeRepositoryAdapter(CurrencyMarketTradeRepositoryPor
             .to_list()
         )
 
-    async def last_from(self, market_code: str, starting_from: datetime) -> list[CurrencyMarketTrade]:
+    async def last_from(
+        self, market_code: str, starting_from: datetime
+    ) -> list[CurrencyMarketTrade]:
         return (
             await CurrencyMarketTradeDocument.find(
                 CurrencyMarketTradeDocument.market_code == market_code,
-                CurrencyMarketTradeDocument.created_time <= starting_from
+                CurrencyMarketTradeDocument.created_time <= starting_from,
             )
             .sort(-CurrencyMarketTradeDocument.created_time)
             .limit(1)
@@ -908,6 +910,7 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
             defense_items=planet_data.defense_items,
             pending_levelup_reward=[],
             energy_deposits=[],
+            building_queue=planet_data.building_queue,
         )
 
         await new_planet.save(link_rule=WriteRules.WRITE)

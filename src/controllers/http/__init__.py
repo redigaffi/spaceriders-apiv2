@@ -7,7 +7,7 @@ from fastapi.encoders import jsonable_encoder
 
 from adapters.http.security import jwt_bearer
 from core.authenticate import Authenticate, AuthenticationDetailsRequest
-from core.buildable_items import BuildableItems, BuildableRequest
+from core.buildable_items import BuildableItems, BuildableRequest, PayToClearQueueRequest
 from core.currency_market import CurrencyMarket, MyOpenOrdersResponse
 from core.fetch_chain_data import FetchChainData
 from core.get_planets import FetchByPlanetPositionRangeRequest, GetPlanets
@@ -109,6 +109,10 @@ class HttpController:
 
     async def build(self, request: BuildableRequest, user=Depends(jwt_bearer)):
         re = await self.buildable_items.build(user, request)
+        return jsonable_encoder(re)
+
+    async def clear_queue(self, request: PayToClearQueueRequest, user=Depends(jwt_bearer)):
+        re = await self.buildable_items.pay_to_clear_queue(user, request)
         return jsonable_encoder(re)
 
     async def repair(self, request: BuildableRequest, user=Depends(jwt_bearer)):

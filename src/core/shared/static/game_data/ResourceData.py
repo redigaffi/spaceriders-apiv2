@@ -50,6 +50,7 @@ class ResourceData(GameData):
         CK.EXPERIENCE,
         CK.REQUIREMENTS,
     ]
+
     __ITEMS = {
         METAL_MINE: BuildableItemBaseType(
             "Metal Mine",
@@ -60,16 +61,16 @@ class ResourceData(GameData):
             {
                 0: BuildableItemLevelInfo(),
                 1: BuildableItemLevelInfo(
-                    1, 50, 0, 40, 0.02, 5, 0, 600, 250, 0, 30, [], 1
+                    1, 50, 0, 40, 0.02, 5, 0, 120, 250, 0, 30, [], 1
                 ),
                 2: BuildableItemLevelInfo(
-                    2, 100, 0, 60, 0.03, 10, 0, 1200, 500, 0, 40, [], 1
+                    2, 100, 0, 60, 0.03, 10, 0, 120, 500, 0, 40, [], 1
                 ),
                 3: BuildableItemLevelInfo(
-                    3, 150, 0, 100, 0.06, 15, 0, 1600, 800, 0, 50, [], 1
+                    3, 150, 0, 100, 0.06, 15, 0, 120, 800, 0, 50, [], 1
                 ),
                 4: BuildableItemLevelInfo(
-                    4, 200, 0, 120, 0.07, 20, 0, 1800, 900, 0, 60, [], 1
+                    4, 200, 0, 120, 0.07, 20, 0, 120, 900, 0, 60, [], 1
                 ),
                 5: BuildableItemLevelInfo(
                     5,
@@ -79,7 +80,7 @@ class ResourceData(GameData):
                     0.08,
                     25,
                     0,
-                    1900,
+                    120,
                     1000,
                     0,
                     70,
@@ -94,7 +95,7 @@ class ResourceData(GameData):
                     0.09,
                     30,
                     0,
-                    2000,
+                    120,
                     1100,
                     0,
                     80,
@@ -362,16 +363,16 @@ class ResourceData(GameData):
             {
                 0: BuildableItemLevelInfo(),
                 1: BuildableItemLevelInfo(
-                    1, 50, 40, 0, 0.02, 5, 0, 600, 250, 0, 30, [], 1
+                    1, 50, 40, 0, 0.02, 5, 0, 120, 250, 0, 30, [], 1
                 ),
                 2: BuildableItemLevelInfo(
-                    2, 100, 60, 0, 0.03, 10, 0, 1200, 500, 0, 40, [], 1
+                    2, 100, 60, 0, 0.03, 10, 0, 120, 500, 0, 40, [], 1
                 ),
                 3: BuildableItemLevelInfo(
-                    3, 150, 100, 0, 0.06, 15, 0, 1600, 800, 0, 50, [], 1
+                    3, 150, 100, 0, 0.06, 15, 0, 120, 800, 0, 50, [], 1
                 ),
                 4: BuildableItemLevelInfo(
-                    4, 200, 120, 0, 0.07, 20, 0, 1800, 900, 0, 60, [], 1
+                    4, 200, 120, 0, 0.07, 20, 0, 120, 900, 0, 60, [], 1
                 ),
                 5: BuildableItemLevelInfo(
                     5,
@@ -381,7 +382,7 @@ class ResourceData(GameData):
                     0.08,
                     25,
                     0,
-                    1900,
+                    120,
                     1000,
                     0,
                     70,
@@ -396,7 +397,7 @@ class ResourceData(GameData):
                     0.09,
                     30,
                     0,
-                    2000,
+                    120,
                     1100,
                     0,
                     80,
@@ -411,7 +412,7 @@ class ResourceData(GameData):
                     0.10,
                     35,
                     0,
-                    2200,
+                    120,
                     1200,
                     0,
                     90,
@@ -1078,7 +1079,6 @@ class ResourceData(GameData):
             },
         ),
     }
-
     @staticmethod
     def valid_type(label: str) -> bool:
         return label in ResourceData.TYPES

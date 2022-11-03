@@ -13,7 +13,7 @@ from core.shared.models import (
     Planet,
     PlanetIdAlreadyExistsException,
     PlanetNameMissingException,
-    PlanetResponse,
+    PlanetResponse, BuildingQueue,
 )
 from core.shared.ports import (
     ChainServicePort,
@@ -213,6 +213,8 @@ class MintPlanet:
         )
 
         planet.request_id = request.planet_id
+        planet.building_queue = BuildingQueue()
+
         re = await self.planet_repository.create_planet(planet)
 
         log.info(f"User {user} minting paid planet finished")

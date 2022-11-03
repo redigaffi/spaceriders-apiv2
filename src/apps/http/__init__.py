@@ -37,6 +37,7 @@ app = FastAPI()
 
 # https://fastapi.tiangolo.com/tutorial/metadata/
 
+
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema

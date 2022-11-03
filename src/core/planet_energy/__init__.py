@@ -46,7 +46,7 @@ class PlanetEnergy:
             user, request.planet_id
         )
 
-        amount = request.amount - (request.amount*0.1)  # fee
+        amount = request.amount - (request.amount * 0.1)  # fee
         energy_amount = amount * 10000
         if planet.resources.bkm <= amount:
             raise NotEnoughBKM

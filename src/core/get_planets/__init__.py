@@ -18,6 +18,7 @@ class FetchByPlanetIdResponse(BaseModel):
     installation: dict
     defense: dict
     emails: list
+    building_queue: dict
 
 
 class FetchByPlanetPositionRangeRequest(BaseModel):
@@ -93,6 +94,7 @@ class GetPlanets:
             installation=ii,
             defense=di,
             emails=em,
+            building_queue=planet.building_queue
         )
 
         return await self.response_port.publish_response(response)

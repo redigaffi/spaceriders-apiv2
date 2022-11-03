@@ -17,7 +17,7 @@ from core.shared.models import (
     Reserves,
     Resources,
     User,
-    UserNotFoundException,
+    UserNotFoundException, BuildingQueueItem, BuildingQueue,
 )
 
 
@@ -107,6 +107,7 @@ class PlanetDocument(Document, Planet):
     research_level: list[BuildableItem] = None
     defense_items: list[BuildableItem] = None
 
+    building_queue: BuildingQueue = None
     energy_deposits: list[Link[EnergyDepositDocument]] = []
     bkm_deposits: list[Link[BKMTransactionDocument]] = []
     emails: list[Link[EmailDocument]] = []

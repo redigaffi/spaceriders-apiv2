@@ -59,7 +59,6 @@ class BuildableItemLevelInfo:
     attack: float = 0
     experience: float = 0
     requirements: list[BuildableItemRequirement] = None
-    new_reserve_found_percentage: float = 0
     has_discount: bool = False
 
 

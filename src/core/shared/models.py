@@ -1,5 +1,6 @@
 from datetime import datetime
-from typing import Any
+from enum import Enum
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field, root_validator
 
@@ -71,6 +72,12 @@ class PlanetTier(BaseModel):
     staked: bool = False
 
 
+class BuildableItemState(Enum):
+    BUILDING = "BUILDING"
+    REPAIRING = "REPAIRING"
+    FINISHED = "FINISHED"
+
+
 class BuildableItem(BaseModel):
     label: str
     type: str
@@ -83,6 +90,7 @@ class BuildableItem(BaseModel):
 
     quantity: int = -1
     quantity_building: int = -1
+    state: BuildableItemState = BuildableItemState.FINISHED
 
 
 class Resources(BaseModel):
@@ -133,6 +141,21 @@ class Email(BaseModel):
     planet: str
 
 
+class BuildingQueueItem(BaseModel):
+    label: str
+    type: str
+    action: BuildableItemState
+    next_level: Optional[int]
+    quantity: Optional[int]
+    time_to_finish: float | int  # in seconds
+    start_at: float | int  # timestamp
+
+
+class BuildingQueue(BaseModel):
+    items: list[BuildingQueueItem] = []
+    reduced_time: bool = False  # has paid to reduce time?
+
+
 class Planet(BaseModel):
     id: str = None
     request_id: str = None
@@ -169,19 +192,12 @@ class Planet(BaseModel):
     installation_level: list[BuildableItem] = []
     research_level: list[BuildableItem] = []
     defense_items: list[BuildableItem] = []
+
+    building_queue: BuildingQueue = None
+
     energy_deposits: list[EnergyDeposit] = []
     bkm_deposits: list[BKMTransaction] = []
     emails: list[Email] = []
-
-    def building_queue(self) -> list[BuildableItem]:
-        buildable_item: list[BuildableItem] = (
-            self.resources_level
-            + self.research_level
-            + self.installation_level
-            + self.defense_items
-        )
-
-        return list(filter(lambda b: b.building or b.repairing, buildable_item))
 
     def set_image_url(self, url: str):
         self.image_url = f"{url}/{self.image}-{self.rarity}.webp"
@@ -422,6 +438,8 @@ class PlanetResponse(BaseModel):
     installation_level: list[BuildableItem] = []
     research_level: list[BuildableItem] = []
     defense_items: list[BuildableItem] = []
+
+    building_queue: BuildingQueue = None
     energy_deposits: list[EnergyDeposit] = []
     emails: list[Email] = []
 
@@ -457,6 +475,7 @@ class PlanetResponse(BaseModel):
         re.defense_items = p.defense_items
         re.energy_deposits = p.energy_deposits
         re.emails = p.emails
+        re.building_queue = p.building_queue
         return re
 
 
