@@ -11,7 +11,7 @@ class PlanetData:
 
     UNCOMMON = "uncommon"
     COMMON = "common"
-    RARE = "RARE"
+    RARE = "rare"
     EPIC = "epic"
     LEGENDARY = "legendary"
 
