@@ -122,7 +122,7 @@ resolved_reference = "837bf17b22e9ec9ff8ebe380fbe0e48825a96eb5"
 
 [[package]]
 name = "bitarray"
-version = "1.2.2"
+version = "2.6.0"
 description = "efficient arrays of booleans -- C extension"
 category = "main"
 optional = false
@@ -194,14 +194,14 @@ IDNA = ["idna (>=2.1)"]
 
 [[package]]
 name = "emcache"
-version = "0.6.1"
+version = "1.0.0"
 description = "A high performance asynchronous Python client for Memcached with full batteries included"
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">=3.8"
 
 [package.extras]
-dev = ["Cython (==0.29.18)", "pytest (==6.2.5)", "pytest-mock (==3.1.0)", "pytest-asyncio (==0.11.0)", "asynctest (==0.13.0)", "pytest-cov (==2.8.1)", "black (==19.10b0)", "isort (==4.3.21)", "flake8 (==3.7.9)"]
+dev = ["Cython (==0.29.32)", "pytest (==6.2.5)", "pytest-mock (==3.1.0)", "pytest-asyncio (==0.11.0)", "pytest-cov (==2.8.1)", "black (==22.3.0)", "isort (==4.3.21)", "flake8 (==3.7.9)"]
 
 [[package]]
 name = "eth-abi"
@@ -225,14 +225,14 @@ tools = ["hypothesis (>=4.18.2,<5.0.0)"]
 
 [[package]]
 name = "eth-account"
-version = "0.6.1"
+version = "0.7.0"
 description = "eth-account: Sign Ethereum transactions and messages with local private keys"
 category = "main"
 optional = false
 python-versions = ">=3.6, <4"
 
 [package.dependencies]
-bitarray = ">=1.2.1,<1.3.0"
+bitarray = ">=2.4.0,<3"
 eth-abi = ">=3.0.0,<4"
 eth-keyfile = ">=0.6.0,<0.7.0"
 eth-keys = ">=0.4.0,<0.5"
@@ -242,10 +242,10 @@ hexbytes = ">=0.1.0,<1"
 rlp = ">=1.0.0,<4"
 
 [package.extras]
-dev = ["bumpversion (>=0.5.3,<1)", "pytest-watch (>=4.1.0,<5)", "wheel", "twine", "ipython", "hypothesis (>=4.18.0,<5)", "pytest (>=6.2.5,<7)", "pytest-xdist", "tox (==3.14.6)", "flake8 (==3.7.9)", "isort (>=4.2.15,<5)", "mypy (==0.770)", "pydocstyle (>=5.0.0,<6)", "Sphinx (>=1.6.5,<2)", "sphinx-rtd-theme (>=0.1.9,<1)", "towncrier (>=19.2.0,<20)"]
-doc = ["Sphinx (>=1.6.5,<2)", "sphinx-rtd-theme (>=0.1.9,<1)", "towncrier (>=19.2.0,<20)"]
-lint = ["flake8 (==3.7.9)", "isort (>=4.2.15,<5)", "mypy (==0.770)", "pydocstyle (>=5.0.0,<6)"]
-test = ["hypothesis (>=4.18.0,<5)", "pytest (>=6.2.5,<7)", "pytest-xdist", "tox (==3.14.6)"]
+test = ["tox (==3.25.0)", "pytest-xdist", "pytest (>=6.2.5,<7)", "hypothesis (>=4.18.0,<5)"]
+lint = ["pydocstyle (>=5.0.0,<6)", "mypy (==0.910)", "isort (>=4.2.15,<5)", "flake8 (==3.7.9)"]
+doc = ["towncrier (>=21,<22)", "sphinx-rtd-theme (>=0.1.9,<1)", "jinja2 (>=3.0.0,<3.1.0)", "Sphinx (>=1.6.5,<5)"]
+dev = ["towncrier (>=21,<22)", "sphinx-rtd-theme (>=0.1.9,<1)", "jinja2 (>=3.0.0,<3.1.0)", "Sphinx (>=1.6.5,<5)", "pydocstyle (>=5.0.0,<6)", "mypy (==0.910)", "isort (>=4.2.15,<5)", "flake8 (==3.7.9)", "tox (==3.25.0)", "pytest-xdist", "pytest (>=6.2.5,<7)", "hypothesis (>=4.18.0,<5)", "ipython", "twine", "wheel", "pytest-watch (>=4.1.0,<5)", "bumpversion (>=0.5.3,<1)"]
 
 [[package]]
 name = "eth-hash"
@@ -555,8 +555,8 @@ six = ">=1.9.0"
 
 [[package]]
 name = "protobuf"
-version = "3.20.3"
-description = "Protocol Buffers"
+version = "4.21.9"
+description = ""
 category = "main"
 optional = false
 python-versions = ">=3.7"
@@ -810,16 +810,16 @@ python-versions = "*"
 
 [[package]]
 name = "web3"
-version = "6.0.0b3"
+version = "6.0.0b7"
 description = "Web3.py"
 category = "main"
 optional = false
-python-versions = ">=3.7.2,<3.11"
+python-versions = ">=3.7.2"
 
 [package.dependencies]
 aiohttp = ">=3.7.4.post0,<4"
 eth-abi = ">=3.0.0,<4.0.0"
-eth-account = ">=0.6.0,<0.7.0"
+eth-account = ">=0.7.0,<0.8.0"
 eth-hash = {version = ">=0.2.0,<1.0.0", extras = ["pycryptodome"]}
 eth-typing = ">=3.0.0,<4.0.0"
 eth-utils = ">=2.0.0,<3.0.0"
@@ -827,16 +827,16 @@ hexbytes = ">=0.1.0,<1.0.0"
 ipfshttpclient = "0.8.0a2"
 jsonschema = ">=4.0.0,<5"
 lru-dict = ">=1.1.6,<2.0.0"
-protobuf = ">=3.10.0,<4"
+protobuf = ">=4.21.6"
 pywin32 = {version = ">=223", markers = "platform_system == \"Windows\""}
 requests = ">=2.16.0,<3.0.0"
 websockets = ">=10.0.0,<11"
 
 [package.extras]
-dev = ["eth-tester[py-evm] (==v0.6.0-beta.5)", "py-geth (>=3.8.0,<4)", "flake8 (==3.8.3)", "isort (>=4.2.15,<4.3.5)", "mypy (==0.910)", "types-setuptools (>=57.4.4,<58)", "types-requests (>=2.26.1,<3)", "types-protobuf (==3.19.13)", "mock", "sphinx-better-theme (>=0.1.4)", "click (>=5.1)", "configparser (==3.5.0)", "contextlib2 (>=0.5.4)", "py-solc (>=0.4.0)", "pytest (>=6.2.5,<7)", "sphinx (>=4.2.0,<5)", "sphinx-rtd-theme (>=0.1.9)", "toposort (>=1.4)", "towncrier (==18.5.0)", "urllib3", "wheel", "bumpversion", "flaky (>=3.7.0,<4)", "hypothesis (>=3.31.2,<6)", "pytest-asyncio (>=0.18.1,<0.19)", "pytest-mock (>=1.10,<2)", "pytest-pythonpath (>=0.3)", "pytest-watch (>=4.2,<5)", "pytest-xdist (>=1.29,<2)", "setuptools (>=38.6.0)", "tox (>=1.8.0)", "tqdm (>4.32,<5)", "twine (>=1.13,<2)", "pluggy (==0.13.1)", "when-changed (>=0.3.0,<0.4)"]
-docs = ["mock", "sphinx-better-theme (>=0.1.4)", "click (>=5.1)", "configparser (==3.5.0)", "contextlib2 (>=0.5.4)", "py-geth (>=3.8.0,<4)", "py-solc (>=0.4.0)", "pytest (>=6.2.5,<7)", "sphinx (>=4.2.0,<5)", "sphinx-rtd-theme (>=0.1.9)", "toposort (>=1.4)", "towncrier (==18.5.0)", "urllib3", "wheel"]
-linter = ["flake8 (==3.8.3)", "isort (>=4.2.15,<4.3.5)", "mypy (==0.910)", "types-setuptools (>=57.4.4,<58)", "types-requests (>=2.26.1,<3)", "types-protobuf (==3.19.13)"]
-tester = ["eth-tester[py-evm] (==v0.6.0-beta.5)", "py-geth (>=3.8.0,<4)"]
+dev = ["eth-tester[py-evm] (==v0.7.0-beta.1)", "py-geth (>=3.9.1,<4)", "black (>=22.1.0,<23.0)", "flake8 (==3.8.3)", "isort (>=4.2.15,<4.3.5)", "mypy (==0.910)", "types-setuptools (>=57.4.4,<58)", "types-requests (>=2.26.1,<3)", "types-protobuf (==3.19.13)", "mock", "sphinx-better-theme (>=0.1.4)", "click (>=5.1)", "configparser (==3.5.0)", "contextlib2 (>=0.5.4)", "py-solc (>=0.4.0)", "pytest (>=6.2.5,<7)", "sphinx (>=4.2.0,<5)", "sphinx-rtd-theme (>=0.1.9)", "toposort (>=1.4)", "towncrier (==18.5.0)", "urllib3", "wheel", "bumpversion", "flaky (>=3.7.0,<4)", "hypothesis (>=3.31.2,<6)", "pytest-asyncio (>=0.18.1,<0.19)", "pytest-mock (>=1.10,<2)", "pytest-pythonpath (>=0.3)", "pytest-watch (>=4.2,<5)", "pytest-xdist (>=1.29,<2)", "setuptools (>=38.6.0)", "tox (>=1.8.0)", "tqdm (>4.32,<5)", "twine (>=1.13,<2)", "pluggy (==0.13.1)", "when-changed (>=0.3.0,<0.4)", "importlib-metadata (<5.0)"]
+docs = ["mock", "sphinx-better-theme (>=0.1.4)", "click (>=5.1)", "configparser (==3.5.0)", "contextlib2 (>=0.5.4)", "py-geth (>=3.9.1,<4)", "py-solc (>=0.4.0)", "pytest (>=6.2.5,<7)", "sphinx (>=4.2.0,<5)", "sphinx-rtd-theme (>=0.1.9)", "toposort (>=1.4)", "towncrier (==18.5.0)", "urllib3", "wheel"]
+linter = ["black (>=22.1.0,<23.0)", "flake8 (==3.8.3)", "isort (>=4.2.15,<4.3.5)", "mypy (==0.910)", "types-setuptools (>=57.4.4,<58)", "types-requests (>=2.26.1,<3)", "types-protobuf (==3.19.13)"]
+tester = ["eth-tester[py-evm] (==v0.7.0-beta.1)", "py-geth (>=3.9.1,<4)"]
 
 [[package]]
 name = "websockets"
@@ -860,8 +860,8 @@ multidict = ">=4.0"
 
 [metadata]
 lock-version = "1.1"
-python-versions = ">=3.10,<3.11"
-content-hash = "f5a9f95ba12bee0aefcd7ea3c48bfbee782041801446ecf6e3847f60ad02ff3b"
+python-versions = ">=3.10,<=3.11"
+content-hash = "aceed9a6f518c4e4b2d72f6d3fbc3f843fa78ecd0f23192b7f5f04e1a6b4a607"
 
 [metadata.files]
 aiohttp = []
@@ -890,9 +890,7 @@ base58 = [
     {file = "base58-2.1.1.tar.gz", hash = "sha256:c5d0cb3f5b6e81e8e35da5754388ddcc6d0d14b6c6a132cb93d69ed580a7278c"},
 ]
 beanie = []
-bitarray = [
-    {file = "bitarray-1.2.2.tar.gz", hash = "sha256:27a69ffcee3b868abab3ce8b17c69e02b63e722d4d64ffd91d659f81e9984954"},
-]
+bitarray = []
 certifi = []
 charset-normalizer = []
 click = [
@@ -908,21 +906,9 @@ dnspython = [
     {file = "dnspython-1.16.0-py2.py3-none-any.whl", hash = "sha256:f69c21288a962f4da86e56c4905b49d11aba7938d3d740e80d9e366ee4f1632d"},
     {file = "dnspython-1.16.0.zip", hash = "sha256:36c5e8e38d4369a08b6780b7f27d790a292b2b08eea01607865bf0936c558e01"},
 ]
-emcache = [
-    {file = "emcache-0.6.1-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:b969d5c9848e6226a6e46f514d4c03a498a58844375063e36c3bc1775e575f50"},
-    {file = "emcache-0.6.1-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:7a7a3480ccaaa41aa680643317272de8c6274900543d8b565d4ad6ee51b55ac1"},
-    {file = "emcache-0.6.1-cp37-cp37m-macosx_10_14_x86_64.whl", hash = "sha256:e7c1709c4bda371f55680960f017421e3c0c51e5f015a57e741f5ab34e837f27"},
-    {file = "emcache-0.6.1-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:4a6d5f9ca119baa15171541430d33013388838f6f1c3acabdc2b277f2672a4dc"},
-    {file = "emcache-0.6.1-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:14df3b4407edf29fb176eac618982a2636b275f8bc2b6fe995f3a87f6c2a20e3"},
-    {file = "emcache-0.6.1-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:093b8b1226442edb2d6d436d0cac3309f4031f8725c4d768da957d212d8f3fef"},
-    {file = "emcache-0.6.1-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:790fd66a15b42a6dca57059947c3fde4e2df5a028e89253f9657f23ee56adf39"},
-    {file = "emcache-0.6.1-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:aa7a17f80fd05e172d9f233c26983c83ea99c820a38bb21da465a59bc5ef4cd6"},
-]
+emcache = []
 eth-abi = []
-eth-account = [
-    {file = "eth-account-0.6.1.tar.gz", hash = "sha256:54b0b7d661e73f4cd12d508c9baa5c9a6e8c194aa7bafc39277cd673683ae50e"},
-    {file = "eth_account-0.6.1-py3-none-any.whl", hash = "sha256:71898127a808d75127a68fa4193aba967489eaf6e62cee1e2e8b08582d01cba8"},
-]
+eth-account = []
 eth-hash = []
 eth-keyfile = [
     {file = "eth-keyfile-0.6.0.tar.gz", hash = "sha256:d30597cdecb8ccd3b56bb275cd86fcdc7a279f86eafa92ddc49f66512f0bff67"},
@@ -1268,10 +1254,7 @@ uvicorn = [
 varint = [
     {file = "varint-1.0.2.tar.gz", hash = "sha256:a6ecc02377ac5ee9d65a6a8ad45c9ff1dac8ccee19400a5950fb51d594214ca5"},
 ]
-web3 = [
-    {file = "web3-6.0.0b3-py3-none-any.whl", hash = "sha256:12810c361c5309e3b6af42d30f10cdd180ffa67e55f952e047b43a32259e1758"},
-    {file = "web3-6.0.0b3.tar.gz", hash = "sha256:010ebe76b2c236375a7c6ff01be54341648b64bd5d065f2a673a12a624a1b643"},
-]
+web3 = []
 websockets = [
     {file = "websockets-10.3-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:661f641b44ed315556a2fa630239adfd77bd1b11cb0b9d96ed8ad90b0b1e4978"},
     {file = "websockets-10.3-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:b529fdfa881b69fe563dbd98acce84f3e5a67df13de415e143ef053ff006d500"},

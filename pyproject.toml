@@ -5,18 +5,18 @@ description = ""
 authors = ["Jordi <jordi.hoock@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.11"
+python = ">=3.10,<=3.11"
 fastapi = "^0.78.0"
 uvicorn = "^0.17.6"
 gunicorn = "^20.1.0"
 python-decouple = "^3.6"
 pymongo = {version="3.12.3", extras = ["srv"]}
 beanie = { git = "https://github.com/roman-right/beanie.git", tag = "1.11.12" }
-web3 = "6.0.0b3"
+web3 = "6.0.0b7"
 PyJWT = "^2.4.0"
 slots = "^0.4.0"
 experience = "^0.0.1"
-emcache = "^0.6.1"
+emcache = "^1.0.0"
 aioschedule = "^0.5.2"
 python-json-logger = "^2.0.2"
 websockets = ">=10.3"
