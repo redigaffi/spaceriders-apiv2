@@ -11,6 +11,7 @@ from core.pve.space_pirates import SpacePirateRequest, SpacePirates
 
 @dataclass
 class CronjobController:
+    energy_planet_use_case: PlanetEnergy
     staking_use_case: Staking
     planet_level: PlanetLevel
     mint_planet: MintPlanet
