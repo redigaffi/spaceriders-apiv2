@@ -99,7 +99,7 @@ class MintPlanet:
         """
         planet_cost, token_amount_cost = await self.__planet_cost()
 
-        token_amount_cost_wei = token_amount_cost * 10**18
+        token_amount_cost_wei = int(token_amount_cost * 10**18)
 
         planet: Planet = await self.planet_repository.get(request.planet_id)
 
