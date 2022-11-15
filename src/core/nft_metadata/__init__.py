@@ -34,6 +34,9 @@ class NftData:
     async def planet_nft_view(self, planet_id: str):
 
         planet = await self.planet_repository_port.get(planet_id)
+        if planet is None:
+            return
+
         attributes = [
             OpenseaAttributeStandardResponse(
                 display_type="string",
