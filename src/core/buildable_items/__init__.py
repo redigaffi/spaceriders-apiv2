@@ -333,7 +333,7 @@ class BuildableItems:
         ]:
             raise WrongBuildableException()
 
-        if request.label not in ResourceData.TYPES:
+        if request.label not in ResourceData.TYPES + DefenseData.TYPES + InstallationData.TYPES + ResearchData.TYPES:
             raise WrongBuildableException()
 
         planet: Planet = await self.planet_repository_port.get_my_planet(
