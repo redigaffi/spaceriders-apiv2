@@ -87,7 +87,7 @@ class MintPlanet:
     async def __planet_cost(self):
         token_price: float = await self.token_price_service.fetch_token_price_usd()
         planet_cost = PlanetData.BUY_PLANET_COST_USD
-        token_amount_cost = math.floor(planet_cost / token_price)
+        token_amount_cost = planet_cost / token_price
         return planet_cost, token_amount_cost
 
     async def fetch_planet_cost_data(
