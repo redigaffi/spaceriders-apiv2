@@ -105,7 +105,6 @@ class Resources(BaseModel):
     petrol_last_updated: float = None
 
     energy_usage: float = 0
-    energy_max_deposit: float = 0
 
 
 class Reserves(BaseModel):
@@ -232,11 +231,6 @@ class Planet(BaseModel):
                 energy_usage *= energy_health_factor
 
         values["resources"].energy_usage = energy_usage
-        # @TODO: Should be a property on resources just like this method once PR is merged
-        if values["rarity"] is not None:
-            values["resources"].energy_max_deposit = PlanetData.DATA[values["rarity"]][
-                CommonKeys.ENERGY_DEPOSIT_MAX_ONCE
-            ]
 
         return values
 
