@@ -9,6 +9,7 @@ from adapters.http.security import jwt_bearer
 from core.authenticate import Authenticate, AuthenticationDetailsRequest
 from core.buildable_items import BuildableItems, BuildableRequest, PayToClearQueueRequest
 from core.currency_market import CurrencyMarket, MyOpenOrdersResponse
+from core.favourite_planet import FavouritePlanet, FavouritePlanetRequest
 from core.fetch_chain_data import FetchChainData
 from core.get_planets import FetchByPlanetPositionRangeRequest, GetPlanets
 from core.mint_planet import (
@@ -49,6 +50,7 @@ class HttpController:
     currency_market: CurrencyMarket
     planet_bkm: PlanetBKM
     medium_scrapper: MediumScraper
+    favourite_planet: FavouritePlanet
 
     async def jwt(self, req: AuthenticationDetailsRequest):
         return await self.authenticate_use_case(req)
@@ -189,6 +191,18 @@ class HttpController:
         self, request: BKMTransactionRequest, user=Depends(jwt_bearer)
     ):
         re = await self.planet_bkm.create_transaction(user, request)
+        return jsonable_encoder(re)
+
+    async def mark_planet_favourite(
+        self, request: FavouritePlanetRequest, user=Depends(jwt_bearer)
+    ):
+        re = await self.favourite_planet.mark_planet_favourite(user, request)
+        return jsonable_encoder(re)
+
+    async def unmark_planet_favourite(
+        self, request: FavouritePlanetRequest, user=Depends(jwt_bearer)
+    ):
+        re = await self.favourite_planet.unmark_planet_favourite(user, request)
         return jsonable_encoder(re)
 
     async def health(self):

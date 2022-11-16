@@ -187,6 +187,18 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
             endpoint=http_controller.fetch_all_market_info,
             methods=["get"],
         ),
+        dict(
+            path=r"/planet/favourite/mark",
+            response_model={},
+            endpoint=http_controller.mark_planet_favourite,
+            methods=["post"],
+        ),
+        dict(
+            path=r"/planet/favourite/unmark",
+            response_model={},
+            endpoint=http_controller.unmark_planet_favourite,
+            methods=["post"],
+        ),
         dict(path=r"/health", endpoint=http_controller.health, methods=["get"]),
         dict(path=r"/feed", endpoint=http_controller.medium_feed, methods=["get"]),
     ]
