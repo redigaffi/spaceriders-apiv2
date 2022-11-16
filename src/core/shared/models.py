@@ -13,6 +13,7 @@ from core.shared.static.game_data.Common import (
 from core.shared.static.game_data.DefenseData import DefenseData as DD
 from core.shared.static.game_data.InstallationData import InstallationData as ID
 from core.shared.static.game_data.PlanetData import PlanetData
+from core.shared.static.game_data.PlanetLevelData import PlanetLevelData
 from core.shared.static.game_data.ResearchData import ResearchData as RE
 from core.shared.static.game_data.ResourceData import ResourceData
 from core.shared.static.game_data.ResourceData import ResourceData as RD
@@ -59,6 +60,8 @@ class User(BaseModel):
     wallet: str = None
     username: str = None
     planets: list["Planet"] = []
+    level: int = None
+    experience: int = None
 
     def exists(self):
         return self.id is not None
@@ -105,7 +108,6 @@ class Resources(BaseModel):
     petrol_last_updated: float = None
 
     energy_usage: float = 0
-    energy_max_deposit: float = 0
 
 
 class Reserves(BaseModel):
@@ -167,11 +169,14 @@ class Planet(BaseModel):
     image_url_bg: str = None  # image with bg
     level: int = None
     experience: int = None
+    experience_needed: int = None
     diameter: int = None
     slots: int = None  # = Diameter/1000
     slots_used: int = None
     min_temperature: int = None
     max_temperature: int = None
+
+    is_favourite: bool = None
 
     reserves: Reserves = None
 
@@ -232,11 +237,11 @@ class Planet(BaseModel):
                 energy_usage *= energy_health_factor
 
         values["resources"].energy_usage = energy_usage
-        # @TODO: Should be a property on resources just like this method once PR is merged
-        if values["rarity"] is not None:
-            values["resources"].energy_max_deposit = PlanetData.DATA[values["rarity"]][
-                CommonKeys.ENERGY_DEPOSIT_MAX_ONCE
-            ]
+
+        try:
+            values["experience_needed"] = PlanetLevelData.get_level_experience(values["level"]+1)
+        except:
+            pass
 
         return values
 
@@ -413,11 +418,14 @@ class PlanetResponse(BaseModel):
     image_url_bg: str = None
     level: int = None
     experience: int = None
+    experience_needed: int = None
     diameter: int = None
     slots: int = None
     slots_used: int = None
     min_temperature: int = None
     max_temperature: int = None
+
+    is_favourite: bool = False
 
     reserves: Reserves = None
 
@@ -476,6 +484,8 @@ class PlanetResponse(BaseModel):
         re.energy_deposits = p.energy_deposits
         re.emails = p.emails
         re.building_queue = p.building_queue
+        re.is_favourite = p.is_favourite
+        re.experience_needed = p.experience_needed
         return re
 
 

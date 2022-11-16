@@ -11,6 +11,7 @@ from core.shared.ports import (
     PlanetRepositoryPort,
     ResponsePort,
     TokenPricePort,
+    CacheServicePort,
 )
 
 
@@ -37,6 +38,7 @@ class PlanetEnergy:
     energy_repository_port: EnergyDepositRepositoryPort
     planet_repository_port: PlanetRepositoryPort
     logging_port: LoggingPort
+    contract_port: CacheServicePort
     response_port: ResponsePort
 
     async def create_deposit(
@@ -47,7 +49,8 @@ class PlanetEnergy:
         )
 
         amount = request.amount - (request.amount * 0.1)  # fee
-        energy_amount = amount * 10000
+        energy_amount = amount / 10
+
         if planet.resources.bkm <= amount:
             raise NotEnoughBKM
 

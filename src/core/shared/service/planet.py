@@ -66,7 +66,7 @@ async def get_new_planet(
     planet.set_image_url(planet_images_bucket_path)
     planet.diameter = diameter
     planet.slots = slots
-    planet.slots_used = 7
+    planet.slots_used = 0
     planet.min_temperature = min_temperature
     planet.max_temperature = max_temperature
 
