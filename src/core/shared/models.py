@@ -172,6 +172,8 @@ class Planet(BaseModel):
     min_temperature: int = None
     max_temperature: int = None
 
+    is_favourite: bool = None
+
     reserves: Reserves = None
 
     galaxy: int = None
@@ -413,6 +415,8 @@ class PlanetResponse(BaseModel):
     min_temperature: int = None
     max_temperature: int = None
 
+    is_favourite: bool = False
+
     reserves: Reserves = None
 
     galaxy: int = None
@@ -470,6 +474,7 @@ class PlanetResponse(BaseModel):
         re.energy_deposits = p.energy_deposits
         re.emails = p.emails
         re.building_queue = p.building_queue
+        re.is_favourite = p.is_favourite
         return re
 
 

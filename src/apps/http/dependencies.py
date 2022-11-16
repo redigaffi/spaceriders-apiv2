@@ -22,6 +22,7 @@ from controllers.http import HttpController
 from core.authenticate import Authenticate
 from core.buildable_items import BuildableItems
 from core.currency_market import CurrencyMarket
+from core.favourite_planet import FavouritePlanet
 from core.fetch_chain_data import FetchChainData
 from core.get_planets import GetPlanets
 from core.medium_scraper import MediumScraper
@@ -258,6 +259,15 @@ async def get_planet_level_use_case(
     )
 
 
+async def get_favourite_planet_use_case(
+    planet_repository_port: PlanetRepositoryPort,
+):
+    return FavouritePlanet(
+        planet_repository_port,
+        http_response_port,
+    )
+
+
 # Controllers
 
 
@@ -351,6 +361,8 @@ async def http_controller():
         config("MEDIUM_ACCOUNT"), MediumContentParser()
     )
 
+    favourite_planet_use_case = await get_favourite_planet_use_case(planet_repository)
+
     return HttpController(
         a,
         b,
@@ -364,4 +376,5 @@ async def http_controller():
         trading_use_case,
         planet_bkm_use_case,
         medium_scrapper_use_case,
+        favourite_planet_use_case
     )

@@ -88,6 +88,8 @@ class PlanetDocument(Document, Planet):
     min_temperature: int | None = 0
     max_temperature: int | None = 0
 
+    is_favourite: bool = False
+
     galaxy: int | None = 0
     solar_system: int | None = 0
     position: int | None = 0
