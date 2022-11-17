@@ -764,7 +764,7 @@ class BeaniUserRepositoryAdapter(UserRepositoryPort):
         return await UserDocument.all().to_list()
 
     async def find_user(self, wallet: str) -> User | None:
-        re = await UserDocument.find_one(UserDocument.wallet == wallet)
+        re = await UserDocument.find_one(UserDocument.wallet == wallet, fetch_links=True)
         return re
 
     async def find_user_or_throw(self, wallet: str) -> User:

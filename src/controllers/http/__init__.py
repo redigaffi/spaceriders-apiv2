@@ -6,6 +6,7 @@ from fastapi import Depends
 from fastapi.encoders import jsonable_encoder
 
 from adapters.http.security import jwt_bearer
+from core.account import Account
 from core.authenticate import Authenticate, AuthenticationDetailsRequest
 from core.buildable_items import BuildableItems, BuildableRequest, PayToClearQueueRequest
 from core.currency_market import CurrencyMarket, MyOpenOrdersResponse
@@ -51,6 +52,7 @@ class HttpController:
     planet_bkm: PlanetBKM
     medium_scrapper: MediumScraper
     favourite_planet: FavouritePlanet
+    account: Account
 
     async def jwt(self, req: AuthenticationDetailsRequest):
         return await self.authenticate_use_case(req)
@@ -203,6 +205,12 @@ class HttpController:
         self, request: FavouritePlanetRequest, user=Depends(jwt_bearer)
     ):
         re = await self.favourite_planet.unmark_planet_favourite(user, request)
+        return jsonable_encoder(re)
+
+    async def account_info(
+        self, wallet_id: str, user=Depends(jwt_bearer)
+    ):
+        re = await self.account.account_info(wallet_id)
         return jsonable_encoder(re)
 
     async def health(self):
