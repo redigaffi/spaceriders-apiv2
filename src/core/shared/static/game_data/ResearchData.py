@@ -197,83 +197,44 @@ class ResearchData(GameData):
             {
                 0: BuildableItemLevelInfo(),
                 1: BuildableItemLevelInfo(
-                    1,
-                    500,
-                    500,
-                    500,
-                    0,
-                    0,
-                    0,
-                    2000,
-                    0,
-                    0,
-                    20,
-                    [BuildableItemRequirement(ID.TYPE, ID.INVESTIGATION_LABORATORY, 2)],
-                    0,
+                    level=1, experience=4047, health=3000, time=1500, cost_metal=3000, cost_crystal=4000, cost_petrol=6000,
+                    production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
                 ),
                 2: BuildableItemLevelInfo(
-                    2,
-                    1000,
-                    800,
-                    600,
-                    0,
-                    0,
-                    0,
-                    3000,
-                    0,
-                    0,
-                    30,
-                    [BuildableItemRequirement(ID.TYPE, ID.INVESTIGATION_LABORATORY, 4)],
-                    0,
+                    level=2, experience=5462, health=4092, time=2403, cost_metal=4049, cost_crystal=5399, cost_petrol=8098,
+                    production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
                 ),
                 3: BuildableItemLevelInfo(
-                    3,
-                    2000,
-                    1100,
-                    700,
-                    0,
-                    0,
-                    0,
-                    4000,
-                    0,
-                    0,
-                    40,
-                    [BuildableItemRequirement(ID.TYPE, ID.INVESTIGATION_LABORATORY, 6)],
-                    0,
+                    level=3, experience=7172, health=5527, time=3691, cost_metal=5317, cost_crystal=7089, cost_petrol=10634,
+                    production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
                 ),
                 4: BuildableItemLevelInfo(
-                    4,
-                    3000,
-                    1400,
-                    800,
-                    0,
-                    0,
-                    0,
-                    5000,
-                    0,
-                    0,
-                    50,
-                    [BuildableItemRequirement(ID.TYPE, ID.INVESTIGATION_LABORATORY, 8)],
-                    0,
+                    level=4, experience=9156, health=7358, time=5427, cost_metal=6787, cost_crystal=9049, cost_petrol=13574,
+                    production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
                 ),
                 5: BuildableItemLevelInfo(
-                    5,
-                    4000,
-                    1700,
-                    900,
-                    0,
-                    0,
-                    0,
-                    6000,
-                    0,
-                    0,
-                    60,
-                    [
-                        BuildableItemRequirement(
-                            ID.TYPE, ID.INVESTIGATION_LABORATORY, 10
-                        )
-                    ],
-                    0,
+                    level=5, experience=11352, health=9628, time=7622, cost_metal=8415, cost_crystal=11220, cost_petrol=16830,
+                    production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
+                ),
+                6: BuildableItemLevelInfo(
+                    level=6, experience=13660, health=12360, time=10204, cost_metal=10126, cost_crystal=13501, cost_petrol=20252,
+                    production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
+                ),
+                7: BuildableItemLevelInfo(
+                    level=7, experience=15937, health=15548, time=12989, cost_metal=11814, cost_crystal=15752, cost_petrol=23628,
+                    production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
+                ),
+                8: BuildableItemLevelInfo(
+                    level=8, experience=18010, health=19150, time=15680, cost_metal=13351, cost_crystal=17801, cost_petrol=26702,
+                    production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
+                ),
+                9: BuildableItemLevelInfo(
+                    level=9, experience=30411, health=25232, time=18852, cost_metal=15029, cost_crystal=20039, cost_petrol=30058,
+                    production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
+                ),
+                10: BuildableItemLevelInfo(
+                    level=10, experience=34101, health=32052, time=22575, cost_metal=16852, cost_crystal=22470, cost_petrol=33705,
+                    production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
                 ),
             },
         ),
