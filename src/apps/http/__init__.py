@@ -129,7 +129,7 @@ class UpdateDataMiddleWare(MyBaseHTTPMiddleware):
                 await planet_resources_use_case(
                     PlanetResourcesUpdateRequest(planet_id=active_planet)
                 )
-        except:
+        except Exception as e:
             pass
 
         return await call_next(request)

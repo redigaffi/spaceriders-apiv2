@@ -220,6 +220,9 @@ class BuildableItems:
             raise NoPlanetFoundException()
 
         queue: list[BuildingQueueItem] = planet.building_queue.items
+        if len(queue) <= 0:
+            return await self.response_port.publish_response(planet)
+
         items: list[BuildingQueueItem] = [queue.pop(0)]
 
         buildable_item_queue = []
