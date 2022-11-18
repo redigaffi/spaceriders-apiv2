@@ -35,20 +35,10 @@ class DefenseData(GameData):
             None,
             "Missile launcher is a cheap yet effective defense mechanism",
             {
-                0: BuildableItemLevelInfo(
-                    0,
-                    100,
-                    50,
-                    40,
-                    0,
-                    0,
-                    0,
-                    50,
-                    50,
-                    40,
-                    10,
-                    [BuildableItemRequirement(ID.TYPE, ID.HANGAR, 2)],
-                    0,
+                0: BuildableItemLevelInfo(),
+                1: BuildableItemLevelInfo(
+                    level=1, experience=150, health=500, time=600, cost_metal=3000, cost_crystal=0, cost_petrol=0,
+                    production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
                 ),
             },
         ),
