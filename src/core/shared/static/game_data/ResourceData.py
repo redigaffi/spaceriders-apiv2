@@ -346,61 +346,61 @@ class ResourceData(GameData):
                 1: BuildableItemLevelInfo(
                     level=1, experience=192, health=2000, time=600,
                     cost_metal=500, cost_crystal=0, cost_petrol=500,
-                    energy_usage=0, production=0, capacity=0,
+                    energy_usage=0, production=0, capacity=750,
                     attack=0, requirements=[], has_discount=False
                 ),
                 2: BuildableItemLevelInfo(
                     level=2, experience=250, health=2080, time=938,
                     cost_metal=750, cost_crystal=0, cost_petrol=750,
-                    energy_usage=0, production=0, capacity=0,
+                    energy_usage=0, production=0, capacity=777,
                     attack=0, requirements=[], has_discount=False
                 ),
                 3: BuildableItemLevelInfo(
                     level=3, experience=349, health=2122, time=1423,
                     cost_metal=911, cost_crystal=0, cost_petrol=911,
-                    energy_usage=0, production=0, capacity=0,
+                    energy_usage=0, production=0, capacity=809,
                     attack=0, requirements=[], has_discount=False
                 ),
                 4: BuildableItemLevelInfo(
                     level=4, experience=458, health=2214, time=2094,
                     cost_metal=1197, cost_crystal=0, cost_petrol=1197,
-                    energy_usage=0, production=0, capacity=0,
+                    energy_usage=0, production=0, capacity=847,
                     attack=0, requirements=[], has_discount=False
                 ),
                 5: BuildableItemLevelInfo(
                     level=5, experience=591, health=2332, time=2985,
                     cost_metal=1543, cost_crystal=0, cost_petrol=1543,
-                    energy_usage=0, production=0, capacity=0,
+                    energy_usage=0, production=0, capacity=892,
                     attack=0, requirements=[], has_discount=False
                 ),
                 6: BuildableItemLevelInfo(
                     level=6, experience=748, health=2481, time=4117,
                     cost_metal=1952, cost_crystal=0, cost_petrol=1952,
-                    energy_usage=0, production=0, capacity=0,
+                    energy_usage=0, production=0, capacity=945,
                     attack=0, requirements=[], has_discount=False
                 ),
                 7: BuildableItemLevelInfo(
                     level=7, experience=928, health=2667, time=5488,
                     cost_metal=2422, cost_crystal=0, cost_petrol=2422,
-                    energy_usage=0, production=0, capacity=0,
+                    energy_usage=0, production=0, capacity=1007,
                     attack=0, requirements=[], has_discount=False
                 ),
                 8: BuildableItemLevelInfo(
                     level=8, experience=1128, health=2893, time=7064,
                     cost_metal=2946, cost_crystal=0, cost_petrol=2946,
-                    energy_usage=0, production=0, capacity=0,
+                    energy_usage=0, production=0, capacity=1079,
                     attack=0, requirements=[], has_discount=False
                 ),
                 9: BuildableItemLevelInfo(
                     level=9, experience=1345, health=3162, time=8767,
                     cost_metal=3515, cost_crystal=0, cost_petrol=3515,
-                    energy_usage=0, production=0, capacity=0,
+                    energy_usage=0, production=0, capacity=1162,
                     attack=0, requirements=[], has_discount=False
                 ),
                 10: BuildableItemLevelInfo(
                     level=10, experience=1572, health=3476, time=10477,
                     cost_metal=4103, cost_crystal=0, cost_petrol=4103,
-                    energy_usage=0, production=0, capacity=0,
+                    energy_usage=0, production=0, capacity=1258,
                     attack=0, requirements=[], has_discount=False
                 ),
             },
@@ -415,43 +415,43 @@ class ResourceData(GameData):
                 0: BuildableItemLevelInfo(),
                 1: BuildableItemLevelInfo(
                     level=1, experience=235, health=2000, time=780, cost_metal=500, cost_crystal=250, cost_petrol=500,
-                    energy_usage=0, production=0, capacity=0, attack=0, requirements=[], has_discount=0
+                    energy_usage=0, production=0, capacity=429, attack=0, requirements=[], has_discount=0
                 ),
                 2: BuildableItemLevelInfo(
                     level=2, experience=320, health=2064, time=1219, cost_metal=681, cost_crystal=341, cost_petrol=681,
-                    energy_usage=0, production=0, capacity=0, attack=0, requirements=[], has_discount=0
+                    energy_usage=0, production=0, capacity=444, attack=0, requirements=[], has_discount=0
                 ),
                 3: BuildableItemLevelInfo(
                     level=3, experience=429, health=2150, time=1850, cost_metal=911, cost_crystal=456, cost_petrol=911,
-                    energy_usage=0, production=0, capacity=0, attack=0, requirements=[], has_discount=0
+                    energy_usage=0, production=0, capacity=462, attack=0, requirements=[], has_discount=0
                 ),
                 4: BuildableItemLevelInfo(
                     level=4, experience=563, health=2408, time=2722, cost_metal=1197, cost_crystal=598, cost_petrol=1197,
-                    energy_usage=0, production=0, capacity=0, attack=0, requirements=[], has_discount=0
+                    energy_usage=0, production=0, capacity=484, attack=0, requirements=[], has_discount=0
                 ),
                 5: BuildableItemLevelInfo(
                      level=5, experience=726, health=2262, time=3880, cost_metal=1543, cost_crystal=771, cost_petrol=1543,
-                    energy_usage=0, production=0, capacity=0, attack=0, requirements=[], has_discount=0
+                    energy_usage=0, production=0, capacity=510, attack=0, requirements=[], has_discount=0
                 ),
                 6: BuildableItemLevelInfo(
                      level=6, experience=918, health=2591, time=5352, cost_metal=1952, cost_crystal=976, cost_petrol=1952,
-                    energy_usage=0, production=0, capacity=0, attack=0, requirements=[], has_discount=0
+                    energy_usage=0, production=0, capacity=540, attack=0, requirements=[], has_discount=0
                 ),
                 7: BuildableItemLevelInfo(
                      level=7, experience=1139, health=2819, time=7135, cost_metal=2422, cost_crystal=1211, cost_petrol=2422,
-                    energy_usage=0, production=0, capacity=0, attack=0, requirements=[], has_discount=0
+                    energy_usage=0, production=0, capacity=575, attack=0, requirements=[], has_discount=0
                 ),
                 8: BuildableItemLevelInfo(
                      level=8, experience=1386, health=3096, time=9183, cost_metal=2946, cost_crystal=1473, cost_petrol=2946,
-                    energy_usage=0, production=0, capacity=0, attack=0, requirements=[], has_discount=0
+                    energy_usage=0, production=0, capacity=616, attack=0, requirements=[], has_discount=0
                 ),
                 9: BuildableItemLevelInfo(
                      level=9, experience=1653, health=3427, time=11397, cost_metal=3513, cost_crystal=1756, cost_petrol=3513,
-                    energy_usage=0, production=0, capacity=0, attack=0, requirements=[], has_discount=0
+                    energy_usage=0, production=0, capacity=664, attack=0, requirements=[], has_discount=0
                 ),
                 10: BuildableItemLevelInfo(
                      level=10, experience=1931, health=3813, time=13620, cost_metal=4103, cost_crystal=2052, cost_petrol=4103,
-                    energy_usage=0, production=0, capacity=0, attack=0, requirements=[], has_discount=0
+                    energy_usage=0, production=0, capacity=719, attack=0, requirements=[], has_discount=0
                 ),
             },
         ),
@@ -465,43 +465,43 @@ class ResourceData(GameData):
                 0: BuildableItemLevelInfo(),
                 1: BuildableItemLevelInfo(
                     level=1, experience=344, health=2000, time=1014, cost_metal=1250, cost_crystal=1250, cost_petrol=0,
-                    production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
+                    production=0, energy_usage=0, capacity=265, attack=0, requirements=[], has_discount=0
                 ),
                 2: BuildableItemLevelInfo(
                     level=2, experience=468, health=2094, time=1585, cost_metal=1703, cost_crystal=1703, cost_petrol=0,
-                    production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
+                    production=0, energy_usage=0, capacity=274, attack=0, requirements=[], has_discount=0
                 ),
                 3: BuildableItemLevelInfo(
                     level=3, experience=626, health=2219, time=2405, cost_metal=2278, cost_crystal=2278, cost_petrol=0,
-                    production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
+                    production=0, energy_usage=0, capacity=286, attack=0, requirements=[], has_discount=0
                 ),
                 4: BuildableItemLevelInfo(
                     level=4, experience=823, health=2383, time=3539, cost_metal=2992, cost_crystal=2992, cost_petrol=0,
-                    production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
+                    production=0, energy_usage=0, capacity=299, attack=0, requirements=[], has_discount=0
                 ),
                 5: BuildableItemLevelInfo(
                     level=5, experience=1061, health=2596, time=5044, cost_metal=3857, cost_crystal=3857, cost_petrol=0,
-                    production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
+                    production=0, energy_usage=0, capacity=315, attack=0, requirements=[], has_discount=0
                 ),
                 6: BuildableItemLevelInfo(
                     level=6, experience=1342, health=2864, time=6957, cost_metal=4880, cost_crystal=4880, cost_petrol=0,
-                    production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
+                    production=0, energy_usage=0, capacity=334, attack=0, requirements=[], has_discount=0
                 ),
                 7: BuildableItemLevelInfo(
                     level=7, experience=1665, health=3197, time=9275, cost_metal=6055, cost_crystal=6055, cost_petrol=0,
-                    production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
+                    production=0, energy_usage=0, capacity=356, attack=0, requirements=[], has_discount=0
                 ),
                 8: BuildableItemLevelInfo(
                     level=8, experience=2026, health=3602, time=11938, cost_metal=7366, cost_crystal=7366, cost_petrol=0,
-                    production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
+                    production=0, energy_usage=0, capacity=381, attack=0, requirements=[], has_discount=0
                 ),
                 9: BuildableItemLevelInfo(
                     level=9, experience=2415, health=4085, time=14816, cost_metal=8782, cost_crystal=8782, cost_petrol=0,
-                    production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
+                    production=0, energy_usage=0, capacity=411, attack=0, requirements=[], has_discount=0
                 ),
                 10: BuildableItemLevelInfo(
                     level=10, experience=2821, health=4649, time=17706, cost_metal=10258, cost_crystal=10258, cost_petrol=0,
-                    production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
+                    production=0, energy_usage=0, capacity=445, attack=0, requirements=[], has_discount=0
                 ),
             },
         ),
