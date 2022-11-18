@@ -248,120 +248,20 @@ class ResourceData(GameData):
                     1,
                 ),
                 12: BuildableItemLevelInfo(
-                    lvl=13, experience=159, health=1143, time=5125, cost_metal=850, cost_crystal=425, cost_petrol=0,
+                    level=12, experience=159, health=1143, time=5125, cost_metal=850, cost_crystal=425, cost_petrol=0,
                     energy_usage=0.172743, production=0.99, capacity=0, attack=0, requirements=[BuildableItemRequirement(ID.TYPE, ID.INVESTIGATION_LABORATORY, 2)], has_discount=0
                 ),
                 13: BuildableItemLevelInfo(
-                    lvl=13, experience=193, health=1182, time=6565, cost_metal=1031, cost_crystal=515, cost_petrol=0,
+                    level=13, experience=193, health=1182, time=6565, cost_metal=1031, cost_crystal=515, cost_petrol=0,
                     energy_usage=0.185249, production=1.06, capacity=0, attack=0, requirements=[BuildableItemRequirement(ID.TYPE, ID.INVESTIGATION_LABORATORY, 3)], has_discount=0
                 ),
                 14: BuildableItemLevelInfo(
-                   lvl=14, experience=232, health=1228, time=8230, cost_metal=1235, cost_crystal=618, cost_petrol=0,
+                    level=14, experience=232, health=1228, time=8230, cost_metal=1235, cost_crystal=618, cost_petrol=0,
                     energy_usage=0.199322, production=1.14, capacity=0, attack=0, requirements=[BuildableItemRequirement(ID.TYPE, ID.INVESTIGATION_LABORATORY, 3)], has_discount=0
                 ),
                 15: BuildableItemLevelInfo(
-                    lvl=15, experience=274, health=1283, time=10092, cost_metal=1462, cost_crystal=731, cost_petrol=0,
+                    level=15, experience=274, health=1283, time=10092, cost_metal=1462, cost_crystal=731, cost_petrol=0,
                     energy_usage=0.215174, production=1.23, capacity=0, attack=0, requirements=[BuildableItemRequirement(ID.TYPE, ID.INVESTIGATION_LABORATORY, 3)], has_discount=0
-                ),
-                16: BuildableItemLevelInfo(
-                    16,
-                    2000,
-                    1020,
-                    0,
-                    0.35,
-                    250,
-                    0,
-                    5500,
-                    2950,
-                    0,
-                    340,
-                    [
-                        BuildableItemRequirement(
-                            ID.TYPE, ID.INVESTIGATION_LABORATORY, 8
-                        ),
-                        BuildableItemRequirement(RD.TYPE, RD.TERRAFORMING, 3),
-                    ],
-                    1,
-                ),
-                17: BuildableItemLevelInfo(
-                    17,
-                    2250,
-                    1230,
-                    0,
-                    0.40,
-                    350,
-                    0,
-                    6500,
-                    3750,
-                    0,
-                    450,
-                    [
-                        BuildableItemRequirement(
-                            ID.TYPE, ID.INVESTIGATION_LABORATORY, 9
-                        ),
-                        BuildableItemRequirement(RD.TYPE, RD.TERRAFORMING, 4),
-                    ],
-                    1,
-                ),
-                18: BuildableItemLevelInfo(
-                    18,
-                    2800,
-                    1350,
-                    0,
-                    0.45,
-                    470,
-                    0,
-                    7500,
-                    4500,
-                    0,
-                    520,
-                    [
-                        BuildableItemRequirement(
-                            ID.TYPE, ID.INVESTIGATION_LABORATORY, 9
-                        ),
-                        BuildableItemRequirement(RD.TYPE, RD.TERRAFORMING, 4),
-                    ],
-                    1,
-                ),
-                19: BuildableItemLevelInfo(
-                    19,
-                    3000,
-                    1420,
-                    0,
-                    0.50,
-                    590,
-                    0,
-                    8500,
-                    5500,
-                    0,
-                    630,
-                    [
-                        BuildableItemRequirement(
-                            ID.TYPE, ID.INVESTIGATION_LABORATORY, 10
-                        ),
-                        BuildableItemRequirement(RD.TYPE, RD.TERRAFORMING, 4),
-                    ],
-                    1,
-                ),
-                20: BuildableItemLevelInfo(
-                    20,
-                    3300,
-                    1500,
-                    0,
-                    0.55,
-                    700,
-                    0,
-                    9500,
-                    7000,
-                    0,
-                    750,
-                    [
-                        BuildableItemRequirement(
-                            ID.TYPE, ID.INVESTIGATION_LABORATORY, 10
-                        ),
-                        BuildableItemRequirement(RD.TYPE, RD.TERRAFORMING, 5),
-                    ],
-                    1,
                 ),
             },
         ),
@@ -752,7 +652,6 @@ class ResourceData(GameData):
                 2: BuildableItemLevelInfo(
                     level=2, experience=320, health=2064, time=1219, cost_metal=681, cost_crystal=341, cost_petrol=681,
                     energy_usage=0, production=0, capacity=0, attack=0, requirements=[], has_discount=0
-                ),
                 ),
                 3: BuildableItemLevelInfo(
                     level=3, experience=429, health=2150, time=1850, cost_metal=911, cost_crystal=456, cost_petrol=911,

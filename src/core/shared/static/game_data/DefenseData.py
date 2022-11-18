@@ -61,7 +61,7 @@ class DefenseData(GameData):
             {
                 0: BuildableItemLevelInfo(),
                 1: BuildableItemLevelInfo(
-                    lvl=1, experience=225, health=1000, time=600, cost_metal=1000, cost_crystal=2000,
+                    level=1, experience=225, health=1000, time=600, cost_metal=1000, cost_crystal=2000,
                     cost_petrol=0,
                     energy_usage=0, production=0, capacity=0, attack=0, requirements=[], has_discount=0
                 ),
