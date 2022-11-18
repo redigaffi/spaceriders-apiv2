@@ -35,9 +35,8 @@ class DefenseData(GameData):
             None,
             "Missile launcher is a cheap yet effective defense mechanism",
             {
-                0: BuildableItemLevelInfo(),
-                1: BuildableItemLevelInfo(
-                    level=1, experience=150, health=500, time=600, cost_metal=3000, cost_crystal=0, cost_petrol=0,
+                0: BuildableItemLevelInfo(
+                    level=0, experience=150, health=500, time=600, cost_metal=3000, cost_crystal=0, cost_petrol=0,
                     production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
                 ),
             },
@@ -49,9 +48,8 @@ class DefenseData(GameData):
             None,
             "The Laser Launcher is a more powerful defense when compared to the simple missile launcher",
             {
-                0: BuildableItemLevelInfo(),
-                1: BuildableItemLevelInfo(
-                    level=1, experience=225, health=1000, time=600, cost_metal=1000, cost_crystal=2000,
+                0: BuildableItemLevelInfo(
+                    level=0, experience=225, health=1000, time=600, cost_metal=1000, cost_crystal=2000,
                     cost_petrol=0,
                     energy_usage=0, production=0, capacity=0, attack=0, requirements=[], has_discount=0
                 ),
