@@ -27,6 +27,6 @@ class StakingData:
 
     DATA: dict[str, StakingBenefits] = {
         TIER_0: StakingBenefits(0, 0, 0, 0, 0.1),
-        TIER_1: StakingBenefits(150, 10, 600, 2, 0.06),
+        TIER_1: StakingBenefits(150, 10, 600, 2, 0.01),
         TIER_2: StakingBenefits(500, 10, 172800, 2, 0.025),
     }
