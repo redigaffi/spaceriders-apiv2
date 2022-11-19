@@ -539,7 +539,9 @@ class ResourceData(GameData):
             WAREHOUSE_CATEGORY,
             "Metal warehouse to store metal",
             {
-                0: BuildableItemLevelInfo(),
+                0: BuildableItemLevelInfo(
+                    level=0, experience=0, health=0, time=0, cost_metal=0, cost_crystal=0, cost_petrol=0, production=0, energy_usage=0, capacity=1500, attack=0, requirements=[],  has_discount=0
+                ),
                 1: BuildableItemLevelInfo(
                     level=1, experience=78, health=2000, time=600, cost_metal=500, cost_crystal=0, cost_petrol=100, production=0, energy_usage=0, capacity=2250, attack=0, requirements=[],  has_discount=0
                 ),
@@ -639,7 +641,9 @@ class ResourceData(GameData):
             WAREHOUSE_CATEGORY,
             "Crystal warehouse to store crystal",
             {
-                0: BuildableItemLevelInfo(),
+                0: BuildableItemLevelInfo(
+                    level=0, experience=0, health=0, time=0, cost_metal=0, cost_crystal=0, cost_petrol=0, production=0, energy_usage=0, capacity=857, attack=0, requirements=[],  has_discount=0
+                ),
                 1: BuildableItemLevelInfo(
                     level=1, experience=150, health=2000, time=780, cost_metal=500, cost_crystal=250, cost_petrol=200, production=0, energy_usage=0, capacity=1286, attack=0, requirements=[], has_discount=0
                 ),
@@ -739,7 +743,9 @@ class ResourceData(GameData):
             WAREHOUSE_CATEGORY,
             "Petrol warehouse to store petrol",
             {
-                0: BuildableItemLevelInfo(),
+                0: BuildableItemLevelInfo(
+                    level=0, experience=0, health=0, time=0, cost_metal=0, cost_crystal=0, cost_petrol=0, production=0, energy_usage=0, capacity=530, attack=0, requirements=[],  has_discount=0
+                ),
                 1: BuildableItemLevelInfo(
                     level=1, experience=247, health=2000, time=1014, cost_metal=750, cost_crystal=500, cost_petrol=300, production=0, energy_usage=0, capacity=795, attack=0, requirements=[], has_discount=0
                 ),
