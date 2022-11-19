@@ -35,16 +35,14 @@ class InstallationData(GameData):
             "Investigation laboratory is needed in order to conduct new research",
             {
                 # level=1, cost_metal=150, cost_petrol=50, cost_crystal=600, energy_usage=0, production=0, capacity=0, time=1200, health=0, attack=0, experience=15, requirements=[], has_discount=0
-                0: BuildableItemLevelInfo(
-                    level=0, experience=0, health=0, time=0, cost_metal=0, cost_crystal=0, cost_petrol=0, production=0, energy_usage=0, capacity=0, attack=0,
+                0: BuildableItemLevelInfo(),
+                1: BuildableItemLevelInfo(
+                    level=1, experience=293, health=2000, time=900, cost_metal=400, cost_crystal=800, cost_petrol=400, production=0, energy_usage=0, capacity=0, attack=0,
                     requirements=[
                         BuildableItemRequirement(RSOUD.TYPE, RSOUD.METAL_MINE, 5),
                         BuildableItemRequirement(RSOUD.TYPE, RSOUD.CRYSTAL_MINE, 5),
                         BuildableItemRequirement(RSOUD.TYPE, RSOUD.PETROL_MINE, 5)
                     ], has_discount=0
-                ),
-                1: BuildableItemLevelInfo(
-                    level=1, experience=293, health=2000, time=900, cost_metal=400, cost_crystal=800, cost_petrol=400, production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
                 ),
                 2: BuildableItemLevelInfo(
                     level=2, experience=414, health=2083, time=1477, cost_metal=565, cost_crystal=1130, cost_petrol=565, production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
@@ -112,14 +110,12 @@ class InstallationData(GameData):
             None,
             "Hangar is needed in order to build and store spaceships and defense",
             {
-                0: BuildableItemLevelInfo(
-                    level=0, experience=0, health=0, time=0, cost_metal=0, cost_crystal=0, cost_petrol=0, production=0, energy_usage=0, capacity=0, attack=0,
+                0: BuildableItemLevelInfo(),
+                1: BuildableItemLevelInfo(
+                    level=1, experience=235, health=3000, time=600, cost_metal=800, cost_crystal=400, cost_petrol=300, production=0, energy_usage=0, capacity=0, attack=0,
                     requirements=[
                     BuildableItemRequirement(TYPE, INVESTIGATION_LABORATORY, 5)
                     ], has_discount=0
-                ),
-                1: BuildableItemLevelInfo(
-                    level=1, experience=235, health=3000, time=600, cost_metal=800, cost_crystal=400, cost_petrol=300, production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
                 ),
                 2: BuildableItemLevelInfo(
                     level=2, experience=320, health=3064, time=938, cost_metal=1090, cost_crystal=545, cost_petrol=409, production=0, energy_usage=0, capacity=0, attack=0, requirements=[], has_discount=0
