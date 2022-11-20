@@ -6,8 +6,6 @@ from .Common import (
     BuildableItemRequirement,
 )
 from .Common import CommonKeys as CK
-from .InstallationData import InstallationData as ID
-from .ResearchData import ResearchData as RD
 from .GameData import GameData
 
 
