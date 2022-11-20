@@ -127,8 +127,11 @@ def get_planet_data():
         PlanetData.RARITIES, weights=PlanetData.RARITY_WEIGHTS, k=1
     )[0]
 
-    planet_type = random.choice(PlanetData.PlANET_TYPES)
-    image = PlanetData.PLANET_TYPE_IMAGE_MAPPING[planet_type]
+    planet_type = random.choices(
+        PlanetData.PlANET_TYPES, weights=PlanetData.PLANET_TYPE_WEIGHTS, k=1
+    )[0]
+
+    planet_type_image = PlanetData.PLANET_TYPE_IMAGE_MAPPING[planet_type]
 
     planet_level_data = PlanetData.DATA[rarity][planet_type]
 
@@ -136,10 +139,13 @@ def get_planet_data():
     diameter = random.randint(diameter_range[0], diameter_range[1])
     slots = math.floor(diameter / 1000)
 
-    reserve_range = planet_level_data[CK.RESERVES][CK.RANGE]
-    metal_mine_amount = random.randint(reserve_range[0], reserve_range[1])
-    crystal_mine_amount = random.randint(reserve_range[0], reserve_range[1])
-    petrol_mine_amount = random.randint(reserve_range[0], reserve_range[1])
+    metal_reserve_range = planet_level_data[CK.RESERVES][CK.METAL]
+    crystal_reserve_range = planet_level_data[CK.RESERVES][CK.CRYSTAL]
+    petrol_reserve_range = planet_level_data[CK.RESERVES][CK.PETROL]
+
+    metal_mine_amount = random.randint(metal_reserve_range[0], metal_reserve_range[1])
+    crystal_mine_amount = random.randint(crystal_reserve_range[0], crystal_reserve_range[1])
+    petrol_mine_amount = random.randint(petrol_reserve_range[0], petrol_reserve_range[1])
 
     # @TODO: calculate based on distance to sun
     min_temperature = random.randint(-60, 0)
@@ -147,7 +153,7 @@ def get_planet_data():
 
     return (
         planet_level_data[CK.INITIAL_RESERVE],
-        image,
+        planet_type_image,
         rarity,
         diameter,
         slots,
