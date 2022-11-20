@@ -16,7 +16,6 @@ class MediumScraper:
     medium_content_parser: MediumContentParserPort
 
     async def get_medium_feed(self):
-
         rss_url = f"https://medium.com/feed/@{self.account_name}"
         xml_namespaces = {
             "dc": "http://purl.org/dc/elements/1.1/",
@@ -38,7 +37,6 @@ class MediumScraper:
             content_parser.feed(element.find("content:encoded", xml_namespaces).text)
 
             parsed_content = "".join(content_parser.HTMLDATA)
-            content_parser.close()
 
             categories = [item.text for item in element.findall("category")]
             filtered_categories = categories.copy()
@@ -57,6 +55,8 @@ class MediumScraper:
                 }
 
                 filtered_output.append(filtered_element)
-                self.medium_content_parser.clean()
+
+            content_parser.clean()
+            content_parser.close()
 
         return filtered_output
