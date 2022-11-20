@@ -16,7 +16,6 @@ class MediumScraper:
     medium_content_parser: MediumContentParserPort
 
     async def get_medium_feed(self):
-
         rss_url = f"https://medium.com/feed/@{self.account_name}"
         xml_namespaces = {
             "dc": "http://purl.org/dc/elements/1.1/",
@@ -34,11 +33,9 @@ class MediumScraper:
         xml_tree = ET.fromstring(response.data)
 
         for element in xml_tree.iter("item"):
-            content_parser = self.medium_content_parser
-            content_parser.feed(element.find("content:encoded", xml_namespaces).text)
+            self.medium_content_parser.feed(element.find("content:encoded", xml_namespaces).text)
 
-            parsed_content = "".join(content_parser.HTMLDATA)
-            content_parser.close()
+            parsed_content = "".join(self.medium_content_parser.HTMLDATA)
 
             categories = [item.text for item in element.findall("category")]
             filtered_categories = categories.copy()
@@ -48,8 +45,8 @@ class MediumScraper:
 
                 filtered_element = {
                     "title": element.find("title").text,
-                    "subtitle": content_parser.subtitle,
-                    "img": content_parser.header_img_src,
+                    "subtitle": self.medium_content_parser.subtitle,
+                    "img": self.medium_content_parser.header_img_src,
                     "guid": element.find("guid").text,
                     "tags": filtered_categories,
                     "pubDate": element.find("pubDate").text,
@@ -57,6 +54,9 @@ class MediumScraper:
                 }
 
                 filtered_output.append(filtered_element)
-                self.medium_content_parser.clean()
+
+            self.medium_content_parser.clean()
+
+        self.medium_content_parser.close()
 
         return filtered_output
