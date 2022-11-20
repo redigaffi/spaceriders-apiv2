@@ -911,6 +911,7 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
             pending_levelup_reward=[],
             energy_deposits=[],
             building_queue=planet_data.building_queue,
+            type=planet_data.type
         )
 
         await new_planet.save(link_rule=WriteRules.WRITE)

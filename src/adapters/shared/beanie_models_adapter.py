@@ -80,6 +80,7 @@ class PlanetDocument(Document, Planet):
     name: str = "Planet"
     rarity: str = "Common"
     image: str | None = 0
+    type: str | None = ""
     level: int | None = 0
     experience: int | None = 0
     diameter: int | None = 0

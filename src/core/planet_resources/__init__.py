@@ -107,10 +107,6 @@ class PlanetResources:
                     mine_health / lvl_health, (mine_info.energy_usage * credit_minutes)
                 )
 
-            production *= PlanetData.DATA[planet.rarity][
-                CommonKeys.RESOURCE_EXTRACTION_MULTIPLIER
-            ][resource_names[label]]
-
             if planet.resources.energy <= 0:
                 production = 0
                 energy_usage = 0
