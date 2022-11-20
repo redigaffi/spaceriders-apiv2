@@ -13,15 +13,8 @@ class PlanetData:
     GAS = "gas"
     SAND = "sand"
 
-    UNCOMMON = "uncommon"
-    COMMON = "common"
-    RARE = "rare"
-    EPIC = "epic"
-    LEGENDARY = "legendary"
-
-    RARITY_WEIGHTS = (50, 25, 15, 8, 2)
-    RARITIES = [COMMON, UNCOMMON, RARE, EPIC, LEGENDARY]
     PlANET_TYPES = [POISON, WATER, FIRE, GAS, SAND]
+    PLANET_TYPE_WEIGHTS = (50, 25, 15, 8, 2)
     PLANET_TYPE_IMAGE_MAPPING = {
         POISON: 1,
         WATER: 2,
@@ -30,6 +23,15 @@ class PlanetData:
         SAND: 5,
     }
 
+    UNCOMMON = "uncommon"
+    COMMON = "common"
+    RARE = "rare"
+    EPIC = "epic"
+    LEGENDARY = "legendary"
+
+    RARITIES = [COMMON, UNCOMMON, RARE, EPIC, LEGENDARY]
+    RARITY_WEIGHTS = (50, 25, 15, 8, 2)
+
     DATA = {
         COMMON: {
             POISON: {
@@ -37,7 +39,9 @@ class PlanetData:
                     CK.RANGE: (180000, 200000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (862393, 1062393),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 499.50,
@@ -52,7 +56,9 @@ class PlanetData:
                     CK.RANGE: (180000, 200000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (862393, 1062393),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 499.50,
@@ -67,7 +73,9 @@ class PlanetData:
                     CK.RANGE: (180000, 200000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (862393, 1062393),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 499.50,
@@ -82,7 +90,9 @@ class PlanetData:
                     CK.RANGE: (180000, 200000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (862393, 1062393),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 499.50,
@@ -97,7 +107,9 @@ class PlanetData:
                     CK.RANGE: (180000, 200000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (862393, 1062393),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 499.50,
@@ -113,7 +125,9 @@ class PlanetData:
                     CK.RANGE: (200000, 230000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (1102991, 1302991),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 624.38,
@@ -127,7 +141,9 @@ class PlanetData:
                     CK.RANGE: (200000, 230000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (1102991, 1302991),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 624.38,
@@ -141,7 +157,9 @@ class PlanetData:
                     CK.RANGE: (200000, 230000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (1102991, 1302991),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 624.38,
@@ -155,7 +173,9 @@ class PlanetData:
                     CK.RANGE: (200000, 230000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (1102991, 1302991),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 624.38,
@@ -169,7 +189,9 @@ class PlanetData:
                     CK.RANGE: (200000, 230000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (1102991, 1302991),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 624.38,
@@ -186,7 +208,9 @@ class PlanetData:
                     CK.RANGE: (230000, 260000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (1343589, 1543589),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 749.25,
@@ -200,7 +224,9 @@ class PlanetData:
                     CK.RANGE: (230000, 260000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (1343589, 1543589),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 749.25,
@@ -214,7 +240,9 @@ class PlanetData:
                     CK.RANGE: (230000, 260000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (1343589, 1543589),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 749.25,
@@ -228,7 +256,9 @@ class PlanetData:
                     CK.RANGE: (230000, 260000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (1343589, 1543589),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 749.25,
@@ -242,7 +272,9 @@ class PlanetData:
                     CK.RANGE: (230000, 260000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (1343589, 1543589),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 749.25,
@@ -260,7 +292,9 @@ class PlanetData:
                     CK.RANGE: (2600000, 3000000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (1584187, 1784187),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 874.13,
@@ -274,7 +308,9 @@ class PlanetData:
                     CK.RANGE: (2600000, 3000000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (1584187, 1784187),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 874.13,
@@ -288,7 +324,9 @@ class PlanetData:
                     CK.RANGE: (2600000, 3000000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (1584187, 1784187),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 874.13,
@@ -302,7 +340,9 @@ class PlanetData:
                     CK.RANGE: (2600000, 3000000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (1584187, 1784187),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 874.13,
@@ -316,7 +356,9 @@ class PlanetData:
                     CK.RANGE: (2600000, 3000000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (1584187, 1784187),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 874.13,
@@ -332,7 +374,9 @@ class PlanetData:
                     CK.RANGE: (300000, 330000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (1824785, 2024785),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 999.00,
@@ -346,7 +390,9 @@ class PlanetData:
                     CK.RANGE: (300000, 330000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (1824785, 2024785),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 999.00,
@@ -360,7 +406,9 @@ class PlanetData:
                     CK.RANGE: (300000, 330000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (1824785, 2024785),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 999.00,
@@ -374,7 +422,9 @@ class PlanetData:
                     CK.RANGE: (300000, 330000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (1824785, 2024785),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 999.00,
@@ -388,7 +438,9 @@ class PlanetData:
                     CK.RANGE: (300000, 330000),
                 },
                 CK.RESERVES: {
-                    CK.RANGE: (1824785, 2024785),
+                    CK.METAL: (862393, 1062393),
+                    CK.CRYSTAL: (862393, 1062393),
+                    CK.PETROL: (862393, 1062393),
                 },
                 CK.INITIAL_RESERVE: {
                     CK.METAL: 999.00,
