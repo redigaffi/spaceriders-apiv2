@@ -159,7 +159,11 @@ class PlanetResources:
 
         warehouse_health = warehouse.health
         max_health = warehouse_info.health
-        health_percentage = warehouse_health / max_health
+
+        health_percentage = 1
+        if warehouse.current_level > 0:
+            health_percentage = warehouse_health / max_health
+
         storage_capacity = warehouse_info.capacity
         storage_capacity *= health_percentage
 
