@@ -52,10 +52,11 @@ class PlanetLevel:
 
             email: PlanetSendEmailRequest = PlanetSendEmailRequest(
                 planet_id_receiver=str(planet.id),
-                title="Level up howdy!!",
+                title="Level up howdy!",
                 sub_title="You lovin' it!",
                 template="plain",
-                body=f"You have reached level {planet.level}. As a reward, you'll get free resources.",
+                topic="level_up",
+                body=f"You have reached level {planet.level}. Congratulations!",
             )
             await self.email_use_case.create(email)
             return await self.response_port.publish_response(planet)

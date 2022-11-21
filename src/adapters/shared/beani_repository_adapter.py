@@ -49,6 +49,7 @@ class EmailRepositoryAdapter(EmailRepositoryPort):
             sender=email.sender,
             read=email.read,
             planet=email.planet,
+            topic=email.topic,
         )
 
         await email_document.save()
