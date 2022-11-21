@@ -29,6 +29,7 @@ class EmailDocument(Document, Email):
     sender: str = None
     read: bool = False
     planet: str
+    topic: str = None
 
     # def to_email(self) -> Email:
     #     return Email(id=str(self.id), title=self.title, sub_title=self.sub_title, template=self.template,

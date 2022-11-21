@@ -139,6 +139,7 @@ class Email(BaseModel):
     sender: str = None
     read: bool = False
     planet: str
+    topic: str = None
 
 
 class BuildingQueueItem(BaseModel):
@@ -402,6 +403,7 @@ class Planet(BaseModel):
                     "template": email.template,
                     "body": email.body,
                     "read": email.read,
+                    "topic": email.topic,
                 }
             )
         return re
