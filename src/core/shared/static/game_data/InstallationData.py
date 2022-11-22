@@ -114,7 +114,9 @@ class InstallationData(GameData):
                 1: BuildableItemLevelInfo(
                     level=1, experience=235, health=3000, time=600, cost_metal=800, cost_crystal=400, cost_petrol=300, production=0, energy_usage=0, capacity=0, attack=0,
                     requirements=[
-                    BuildableItemRequirement(TYPE, INVESTIGATION_LABORATORY, 5)
+                        BuildableItemRequirement(RSOUD.TYPE, RSOUD.METAL_MINE, 1),
+                        BuildableItemRequirement(RSOUD.TYPE, RSOUD.CRYSTAL_MINE, 1),
+                        BuildableItemRequirement(RSOUD.TYPE, RSOUD.PETROL_MINE, 1)
                     ], has_discount=0
                 ),
                 2: BuildableItemLevelInfo(
