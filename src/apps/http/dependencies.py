@@ -19,6 +19,7 @@ from adapters.shared.evm_adapter import EvmChainServiceAdapter, TokenPriceAdapte
 from adapters.shared.logging_adapter import LoggingAdapter, get_logger
 from adapters.shared.medium_parser import MediumContentParser
 from controllers.http import HttpController
+from core.account import Account
 from core.authenticate import Authenticate
 from core.buildable_items import BuildableItems
 from core.currency_market import CurrencyMarket
@@ -268,6 +269,14 @@ async def get_favourite_planet_use_case(
     )
 
 
+async def get_account_use_case(
+    user_repository_port: UserRepositoryPort,
+):
+    return Account(
+        user_repository_port,
+        http_response_port,
+    )
+
 # Controllers
 
 
@@ -363,6 +372,8 @@ async def http_controller():
 
     favourite_planet_use_case = await get_favourite_planet_use_case(planet_repository)
 
+    account_use_case = await get_account_use_case(user_repository)
+
     return HttpController(
         a,
         b,
@@ -376,5 +387,6 @@ async def http_controller():
         trading_use_case,
         planet_bkm_use_case,
         medium_scrapper_use_case,
-        favourite_planet_use_case
+        favourite_planet_use_case,
+        account_use_case,
     )

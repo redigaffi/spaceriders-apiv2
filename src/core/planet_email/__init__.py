@@ -17,6 +17,7 @@ class PlanetSendEmailRequest(BaseModel):
     template: str
     body: str
     sender: str = "Universe"
+    topic: str
 
 
 @dataclass
@@ -35,6 +36,7 @@ class PlanetEmail:
             sender=email_request.sender,
             read=False,
             planet=email_request.planet_id_receiver,
+            topic=email_request.topic,
         )
 
         email = await self.email_repository_port.create(email)

@@ -31,11 +31,11 @@ class CommonKeys:
     ENERGY_USAGE = "energy_usage"
     HEALTH = "health"
     EXPERIENCE = "experience"
-    NEW_RESERVE_FOUND_PERCENTAGE = "new_reserve_found_percentage"
-
-    ENERGY_DEPOSIT_MAX_ONCE = "energy_deposit_max_once"
-    RESOURCE_EXTRACTION_MULTIPLIER = "resource_extraction_multiplier"
     INITIAL_RESERVE = "initial_resources"
+    DIAMETER = "diameter"
+    RESERVES = "reserves"
+    RANGE = "range"
+    TEMPERATURE = "temperature"
 
 
 @dataclass

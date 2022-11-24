@@ -206,5 +206,6 @@ class SpacePirates:
                 template="space_pirates",
                 body=json.dumps(report),
                 sender="Universe",
+                topic="",
             )
         )

@@ -107,10 +107,6 @@ class PlanetResources:
                     mine_health / lvl_health, (mine_info.energy_usage * credit_minutes)
                 )
 
-            production *= PlanetData.DATA[planet.rarity][
-                CommonKeys.RESOURCE_EXTRACTION_MULTIPLIER
-            ][resource_names[label]]
-
             if planet.resources.energy <= 0:
                 production = 0
                 energy_usage = 0
@@ -163,7 +159,11 @@ class PlanetResources:
 
         warehouse_health = warehouse.health
         max_health = warehouse_info.health
-        health_percentage = warehouse_health / max_health
+
+        health_percentage = 1
+        if warehouse.current_level > 0:
+            health_percentage = warehouse_health / max_health
+
         storage_capacity = warehouse_info.capacity
         storage_capacity *= health_percentage
 

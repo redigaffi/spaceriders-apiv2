@@ -5,7 +5,7 @@ from core.shared.models import BuildableItem, Planet, Reserves
 from core.shared.ports import PlanetRepositoryPort
 from core.shared.static.game_data.Common import (
     BuildableItemBaseType,
-    BuildableItemLevelInfo,
+    BuildableItemLevelInfo, CommonKeys as CK,
 )
 from core.shared.static.game_data.DefenseData import DefenseData
 from core.shared.static.game_data.InstallationData import InstallationData
@@ -27,7 +27,7 @@ async def get_new_planet(
         planet_repository_port
     )
 
-    resource_levels, installation_level, research_level, defense_items = create_levels()
+    resource_levels, installation_level, research_level, defense_items = create_planet_levels()
 
     (
         initial_reserve,
@@ -40,6 +40,7 @@ async def get_new_planet(
         petrol_mine_amount,
         min_temperature,
         max_temperature,
+        planet_type,
     ) = get_planet_data()
 
     planet = Planet(
@@ -51,6 +52,7 @@ async def get_new_planet(
         installation_level=installation_level,
         research_level=research_level,
         defense_items=defense_items,
+        type=planet_type
     )
 
     planet.reserves = Reserves()
@@ -125,22 +127,33 @@ def get_planet_data():
         PlanetData.RARITIES, weights=PlanetData.RARITY_WEIGHTS, k=1
     )[0]
 
-    image = f"{random.randint(1, PlanetData.IMAGES)}"
-    diameter_range = PlanetData.DATA[rarity]["diameter"]["range"]
+    planet_type = random.choices(
+        PlanetData.PlANET_TYPES, weights=PlanetData.PLANET_TYPE_WEIGHTS, k=1
+    )[0]
+
+    planet_type_image = PlanetData.PLANET_TYPE_IMAGE_MAPPING[planet_type]
+
+    planet_level_data = PlanetData.DATA[rarity][planet_type]
+
+    diameter_range = planet_level_data[CK.DIAMETER][CK.RANGE]
     diameter = random.randint(diameter_range[0], diameter_range[1])
     slots = math.floor(diameter / 1000)
 
-    reserve_range = PlanetData.DATA[rarity]["reserves"]["range"]
-    metal_mine_amount = random.randint(reserve_range[0], reserve_range[1])
-    crystal_mine_amount = random.randint(reserve_range[0], reserve_range[1])
-    petrol_mine_amount = random.randint(reserve_range[0], reserve_range[1])
+    metal_reserve_range = planet_level_data[CK.RESERVES][CK.METAL]
+    crystal_reserve_range = planet_level_data[CK.RESERVES][CK.CRYSTAL]
+    petrol_reserve_range = planet_level_data[CK.RESERVES][CK.PETROL]
 
+    metal_mine_amount = random.randint(metal_reserve_range[0], metal_reserve_range[1])
+    crystal_mine_amount = random.randint(crystal_reserve_range[0], crystal_reserve_range[1])
+    petrol_mine_amount = random.randint(petrol_reserve_range[0], petrol_reserve_range[1])
+
+    # @TODO: calculate based on distance to sun
     min_temperature = random.randint(-60, 0)
     max_temperature = random.randint(1, 150)
 
     return (
-        PlanetData.DATA[rarity]["initial_resources"],
-        image,
+        planet_level_data[CK.INITIAL_RESERVE],
+        planet_type_image,
         rarity,
         diameter,
         slots,
@@ -149,10 +162,11 @@ def get_planet_data():
         petrol_mine_amount,
         min_temperature,
         max_temperature,
+        planet_type,
     )
 
 
-def create_levels() -> tuple:
+def create_planet_levels() -> tuple:
     resource_levels = []
     installation_level = []
     research_level = []

@@ -49,6 +49,7 @@ class EmailRepositoryAdapter(EmailRepositoryPort):
             sender=email.sender,
             read=email.read,
             planet=email.planet,
+            topic=email.topic,
         )
 
         await email_document.save()
@@ -764,7 +765,7 @@ class BeaniUserRepositoryAdapter(UserRepositoryPort):
         return await UserDocument.all().to_list()
 
     async def find_user(self, wallet: str) -> User | None:
-        re = await UserDocument.find_one(UserDocument.wallet == wallet)
+        re = await UserDocument.find_one(UserDocument.wallet == wallet, fetch_links=True)
         return re
 
     async def find_user_or_throw(self, wallet: str) -> User:
@@ -911,6 +912,7 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
             pending_levelup_reward=[],
             energy_deposits=[],
             building_queue=planet_data.building_queue,
+            type=planet_data.type
         )
 
         await new_planet.save(link_rule=WriteRules.WRITE)

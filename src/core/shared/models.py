@@ -8,11 +8,9 @@ from core.shared.service.tier_benefit import tier_benefit_buildable_items
 from core.shared.static.game_data.Common import (
     BuildableItemBaseType,
     BuildableItemLevelInfo,
-    CommonKeys,
 )
 from core.shared.static.game_data.DefenseData import DefenseData as DD
 from core.shared.static.game_data.InstallationData import InstallationData as ID
-from core.shared.static.game_data.PlanetData import PlanetData
 from core.shared.static.game_data.PlanetLevelData import PlanetLevelData
 from core.shared.static.game_data.ResearchData import ResearchData as RE
 from core.shared.static.game_data.ResourceData import ResourceData
@@ -141,6 +139,7 @@ class Email(BaseModel):
     sender: str = None
     read: bool = False
     planet: str
+    topic: str = None
 
 
 class BuildingQueueItem(BaseModel):
@@ -165,6 +164,7 @@ class Planet(BaseModel):
     name: str = None
     rarity: str = None
     image: str = None  # image num
+    type: str = None  # planet type
     image_url: str = None  # image without bg
     image_url_bg: str = None  # image with bg
     level: int = None
@@ -403,6 +403,7 @@ class Planet(BaseModel):
                     "template": email.template,
                     "body": email.body,
                     "read": email.read,
+                    "topic": email.topic,
                 }
             )
         return re
@@ -414,6 +415,7 @@ class PlanetResponse(BaseModel):
     name: str = None
     rarity: str = None
     image: str = None
+    type: str = None
     image_url: str = None
     image_url_bg: str = None
     level: int = None
@@ -486,6 +488,7 @@ class PlanetResponse(BaseModel):
         re.building_queue = p.building_queue
         re.is_favourite = p.is_favourite
         re.experience_needed = p.experience_needed
+        re.type = p.type
         return re
 
 
