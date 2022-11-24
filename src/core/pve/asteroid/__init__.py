@@ -211,6 +211,7 @@ class Asteroid:
                 template="asteroid_collision",
                 body=json.dumps(report),
                 sender="Universe",
+                topic="",
             )
         )
 
