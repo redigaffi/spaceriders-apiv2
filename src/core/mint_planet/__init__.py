@@ -1,9 +1,7 @@
 from dataclasses import dataclass
 import datetime as dt
 import logging as log
-import math
 import random
-from random import random
 
 from pydantic import BaseModel
 
