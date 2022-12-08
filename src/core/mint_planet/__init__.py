@@ -164,6 +164,8 @@ class MintPlanet:
             )
 
             planet.request_id = planet_id
+            planet.building_queue = BuildingQueue()
+
             re = await self.planet_repository.create_planet(planet)
 
         return await self.response_port.publish_response({})
