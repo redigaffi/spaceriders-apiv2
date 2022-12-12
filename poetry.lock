@@ -193,6 +193,28 @@ DNSSEC = ["pycryptodome", "ecdsa (>=0.13)"]
 IDNA = ["idna (>=2.1)"]
 
 [[package]]
+name = "elastic-apm"
+version = "6.13.2"
+description = "The official Python module for Elastic APM"
+category = "main"
+optional = false
+python-versions = "<4,>=3.6"
+
+[package.dependencies]
+certifi = "*"
+urllib3 = "*"
+wrapt = ">=1.14.1"
+
+[package.extras]
+aiohttp = ["aiohttp"]
+flask = ["blinker"]
+opentelemetry = ["opentelemetry-api", "opentelemetry-sdk"]
+opentracing = ["opentracing (>=2.0.0)"]
+sanic = ["sanic"]
+starlette = ["starlette"]
+tornado = ["tornado"]
+
+[[package]]
 name = "emcache"
 version = "0.6.1"
 description = "A high performance asynchronous Python client for Memcached with full batteries included"
@@ -847,6 +869,14 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "wrapt"
+version = "1.14.1"
+description = "Module for decorators, wrappers and monkey patching."
+category = "main"
+optional = false
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
+
+[[package]]
 name = "yarl"
 version = "1.8.1"
 description = "Yet another URL library"
@@ -861,7 +891,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.10,<3.11"
-content-hash = "f5a9f95ba12bee0aefcd7ea3c48bfbee782041801446ecf6e3847f60ad02ff3b"
+content-hash = "0aafaceab90ea9012bbe65f22e492a5d2937e0c55940be40d547c1b0238d5941"
 
 [metadata.files]
 aiohttp = []
@@ -908,6 +938,7 @@ dnspython = [
     {file = "dnspython-1.16.0-py2.py3-none-any.whl", hash = "sha256:f69c21288a962f4da86e56c4905b49d11aba7938d3d740e80d9e366ee4f1632d"},
     {file = "dnspython-1.16.0.zip", hash = "sha256:36c5e8e38d4369a08b6780b7f27d790a292b2b08eea01607865bf0936c558e01"},
 ]
+elastic-apm = []
 emcache = [
     {file = "emcache-0.6.1-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:b969d5c9848e6226a6e46f514d4c03a498a58844375063e36c3bc1775e575f50"},
     {file = "emcache-0.6.1-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:7a7a3480ccaaa41aa680643317272de8c6274900543d8b565d4ad6ee51b55ac1"},
@@ -1322,4 +1353,5 @@ websockets = [
     {file = "websockets-10.3-pp37-pypy37_pp73-win_amd64.whl", hash = "sha256:3eda1cb7e9da1b22588cefff09f0951771d6ee9fa8dbe66f5ae04cc5f26b2b55"},
     {file = "websockets-10.3.tar.gz", hash = "sha256:fc06cc8073c8e87072138ba1e431300e2d408f054b27047d047b549455066ff4"},
 ]
+wrapt = []
 yarl = []
