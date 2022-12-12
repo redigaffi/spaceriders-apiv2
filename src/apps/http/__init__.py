@@ -29,6 +29,7 @@ from apps.http.urls import register_fastapi_routes
 from core.buildable_items import FinishBuildRequest
 from core.planet_resources import PlanetResourcesUpdateRequest
 from core.shared.models import AppBaseException
+from elasticapm.contrib.starlette import make_apm_client, ElasticAPM
 
 # @TODO: Add logger port
 # @TODO: Websockets: https://github.com/tiangolo/fastapi/issues/685 --- https://fastapi.tiangolo.com/advanced/websockets/
@@ -92,6 +93,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(GZipMiddleware, minimum_size=1000)
+apm = make_apm_client({
+    'SERVICE_NAME': 'spaceriders-api',
+})
+app.add_middleware(ElasticAPM, client=apm)
+
 
 
 class MyBaseHTTPMiddleware(BaseHTTPMiddleware):
