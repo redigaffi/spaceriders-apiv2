@@ -21,20 +21,5 @@ phases:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker images...
-      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:stg-latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - echo Writing image definitions file...
-      - printf '[{"name":"api","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions1.json
-      - printf '[{"name":"cronjobs","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions2.json
-      - printf '[{"name":"websockets","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions3.json
-artifacts:
-  secondary-artifacts:
-    api:
-      files: imagedefinitions1.json
-      name: api
-    cronjobs:
-      files: imagedefinitions2.json
-      name: cronjobs
-    websockets:
-      files: imagedefinitions3.json
-      name: websockets
