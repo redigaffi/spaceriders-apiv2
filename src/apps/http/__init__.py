@@ -151,7 +151,8 @@ apm = elasticapm.get_client()
 if apm is None:
     apm = make_apm_client({
         'SERVICE_NAME': 'spaceriders-api',
-        'SERVER_URL': 'http://apmserver:8200'
+        'SERVER_URL': 'http://apmserver:8200',
+        'ENVIRONMENT': config('ENV')
     })
 app.add_middleware(ElasticAPM, client=apm)
 

@@ -20,7 +20,8 @@ app = FastAPI()
 
 apm = make_apm_client({
     'SERVICE_NAME': 'spaceriders-websocket',
-    'SERVER_URL': 'http://apmserver:8200'
+    'SERVER_URL': 'http://apmserver:8200',
+    'ENVIRONMENT': config('ENV')
 })
 app.add_middleware(ElasticAPM, client=apm)
 
