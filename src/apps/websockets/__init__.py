@@ -15,14 +15,18 @@ from adapters.shared.beanie_models_adapter import (
 )
 import apps.websockets.dependencies as dependencies
 from elasticapm.contrib.starlette import make_apm_client, ElasticAPM
+import elasticapm
+
 
 app = FastAPI()
 
-apm = make_apm_client({
-    'SERVICE_NAME': 'spaceriders-websocket',
-    'SERVER_URL': 'http://apmserver:8200',
-    'ENVIRONMENT': config('ENV')
-})
+apm = elasticapm.get_client()
+if apm is None:
+    apm = make_apm_client({
+        'SERVICE_NAME': 'spaceriders-websocket',
+        'SERVER_URL': 'http://apmserver:8200',
+        'ENVIRONMENT': config('ENV')
+    })
 app.add_middleware(ElasticAPM, client=apm)
 
 @app.on_event("startup")
