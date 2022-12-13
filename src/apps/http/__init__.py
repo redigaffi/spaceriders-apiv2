@@ -35,7 +35,11 @@ from elasticapm.contrib.starlette import make_apm_client, ElasticAPM
 # @TODO: Websockets: https://github.com/tiangolo/fastapi/issues/685 --- https://fastapi.tiangolo.com/advanced/websockets/
 
 app = FastAPI()
-
+apm = make_apm_client({
+    'SERVICE_NAME': 'spaceriders-api',
+    'SERVER_URL': 'http://apmserver:8200'
+})
+app.add_middleware(ElasticAPM, client=apm)
 # https://fastapi.tiangolo.com/tutorial/metadata/
 
 
@@ -93,11 +97,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(GZipMiddleware, minimum_size=1000)
-apm = make_apm_client({
-    'SERVICE_NAME': 'spaceriders-api',
-    'SERVER_URL': 'http://apmserver:8200'
-})
-app.add_middleware(ElasticAPM, client=apm)
+
 
 
 

@@ -25,8 +25,7 @@ class MemCacheCacheServiceAdapter(CacheServicePort):
                 noreply=False,
             )
         except Exception as ex:
-            print("exc")
-            print(ex)
+            pass
 
     async def get(self, key: str):
         try:
