@@ -37,16 +37,10 @@ import logging
 # @TODO: Websockets: https://github.com/tiangolo/fastapi/issues/685 --- https://fastapi.tiangolo.com/advanced/websockets/
 
 app = FastAPI()
-apm_logger = logging.getLogger("elasticapm")
-apm_logger.setLevel(logging.DEBUG)
+# apm_logger = logging.getLogger("elasticapm")
+# apm_logger.setLevel(logging.DEBUG)
 
-apm = elasticapm.get_client()
-if apm is None:
-    apm = make_apm_client({
-        'SERVICE_NAME': 'spaceriders-api',
-        'SERVER_URL': 'http://apmserver:8200'
-    })
-app.add_middleware(ElasticAPM, client=apm)
+
 # https://fastapi.tiangolo.com/tutorial/metadata/
 
 
@@ -151,6 +145,17 @@ class UpdateDataMiddleWare(MyBaseHTTPMiddleware):
 
 app.add_middleware(UpdateDataMiddleWare)
 
+apm = elasticapm.get_client()
+if apm is None:
+    apm = make_apm_client({
+        'SERVICE_NAME': 'spaceriders-api',
+        'SERVER_URL': 'http://apmserver:8200'
+    })
+app.add_middleware(ElasticAPM, client=apm)
+try:
+    1 / 0
+except ZeroDivisionError:
+    apm.client.capture_exception()
 
 @app.on_event("startup")
 async def app_init():
