@@ -30,15 +30,22 @@ from core.buildable_items import FinishBuildRequest
 from core.planet_resources import PlanetResourcesUpdateRequest
 from core.shared.models import AppBaseException
 from elasticapm.contrib.starlette import make_apm_client, ElasticAPM
+import elasticapm
+import logging
 
 # @TODO: Add logger port
 # @TODO: Websockets: https://github.com/tiangolo/fastapi/issues/685 --- https://fastapi.tiangolo.com/advanced/websockets/
 
 app = FastAPI()
-apm = make_apm_client({
-    'SERVICE_NAME': 'spaceriders-api',
-    'SERVER_URL': 'http://apmserver:8200'
-})
+apm_logger = logging.getLogger("elasticapm")
+apm_logger.setLevel(logging.DEBUG)
+
+apm = elasticapm.get_client()
+if apm is None:
+    apm = make_apm_client({
+        'SERVICE_NAME': 'spaceriders-api',
+        'SERVER_URL': 'http://apmserver:8200'
+    })
 app.add_middleware(ElasticAPM, client=apm)
 # https://fastapi.tiangolo.com/tutorial/metadata/
 
