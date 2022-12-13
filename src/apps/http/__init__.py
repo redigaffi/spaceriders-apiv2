@@ -155,7 +155,7 @@ app.add_middleware(ElasticAPM, client=apm)
 try:
     1 / 0
 except ZeroDivisionError:
-    apm.client.capture_exception()
+    apm.capture_exception()
 
 @app.on_event("startup")
 async def app_init():
