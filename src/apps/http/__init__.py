@@ -70,6 +70,8 @@ async def exception_handler(request: Request, call_next):
     try:
         return await call_next(request)
     except Exception as exc:
+        apm.capture_exception()
+
         if isinstance(exc, AppBaseException):
             return JSONResponse(
                 status_code=exc.code,
@@ -152,10 +154,7 @@ if apm is None:
         'SERVER_URL': 'http://apmserver:8200'
     })
 app.add_middleware(ElasticAPM, client=apm)
-try:
-    1 / 0
-except ZeroDivisionError:
-    apm.capture_exception()
+
 
 @app.on_event("startup")
 async def app_init():
