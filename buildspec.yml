@@ -23,3 +23,6 @@ phases:
       - echo Pushing the Docker images...
       - docker push $REPOSITORY_URI:stg-latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - curl -X POST https://portainer.spaceriders.io/api/webhooks/7709b025-fd72-41c2-8288-e366f6c241b5
+      - curl -X POST https://portainer.spaceriders.io/api/webhooks/1be32d25-470f-40a4-a78b-b5fdbe119a88
+      - curl -X POST https://portainer.spaceriders.io/api/webhooks/be4aedc9-44fc-445a-a82f-ca4da8142340
