@@ -36,7 +36,7 @@ class DefenseData(GameData):
             "Missile launcher is a cheap yet effective defense mechanism",
             {
                 0: BuildableItemLevelInfo(
-                    level=0, experience=150, health=500, time=600, cost_metal=3000, cost_crystal=0, cost_petrol=0, production=0, energy_usage=0, capacity=0, attack=0,
+                    level=0, experience=75, health=500, time=300, cost_metal=1500, cost_crystal=0, cost_petrol=0, production=0, energy_usage=0, capacity=0, attack=0,
                     requirements=[
                         BuildableItemRequirement(ID.TYPE, ID.HANGAR, 3)
                     ], has_discount=0
@@ -51,11 +51,11 @@ class DefenseData(GameData):
             "The Laser Turret is a more powerful defense when compared to the simple missile launcher",
             {
                 0: BuildableItemLevelInfo(
-                    level=0, experience=225, health=1000, time=600, cost_metal=1000, cost_crystal=2000, cost_petrol=0, production=0, energy_usage=0, capacity=0, attack=0,
+                    level=0, experience=113, health=1000, time=500, cost_metal=500, cost_crystal=1000, cost_petrol=0, production=0, energy_usage=0, capacity=0, attack=0,
                     requirements=[
-                    BuildableItemRequirement(RD.TYPE, RD.LASER_RESEARCH, 5)
+                        BuildableItemRequirement(RD.TYPE, RD.LASER_RESEARCH, 5)
                     ], has_discount=0
-                )
+                ),
             },
         ),
     }
