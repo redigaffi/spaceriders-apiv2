@@ -54,9 +54,7 @@ async def cache_dependency():
             emcache.MemcachedHostAddress(
                 config("CACHE_HOST"), int(config("CACHE_PORT"))
             )
-        ],
-        min_connections=5,
-        max_connections=1024,
+        ]
     )
 
     return MemCacheCacheServiceAdapter(client)
