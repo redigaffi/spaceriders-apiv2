@@ -162,6 +162,10 @@ class CurrencyMarketTradeRepositoryPort(ABC):
 
 class UserRepositoryPort(ABC):
     @abstractmethod
+    async def update(self, user: User) -> User:
+        pass
+
+    @abstractmethod
     async def all(self) -> list[User] | None:
         pass
 

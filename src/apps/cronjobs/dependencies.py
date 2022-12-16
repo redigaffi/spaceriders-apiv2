@@ -20,7 +20,7 @@ from core.mint_planet import MintPlanet
 from core.planet_bkm import PlanetBKM
 from core.planet_email import PlanetEmail
 from core.planet_energy import PlanetEnergy
-from core.planet_level import PlanetLevel
+from core.experience_points import ExperiencePoints
 from core.planet_staking import Staking
 from core.pve.asteroid import Asteroid
 from core.pve.space_pirates import SpacePirates
@@ -124,7 +124,7 @@ async def cronjob_controller():
     )
 
     email_use_case = PlanetEmail(planet_repository, email_repository, response_adapter)
-    planet_level = PlanetLevel(
+    planet_level = ExperiencePoints(
         planet_repository, email_use_case, contract, response_adapter
     )
 

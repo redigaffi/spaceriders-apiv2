@@ -13,6 +13,7 @@ from core.currency_market import CurrencyMarket, MyOpenOrdersResponse
 from core.favourite_planet import FavouritePlanet, FavouritePlanetRequest
 from core.fetch_chain_data import FetchChainData
 from core.get_planets import FetchByPlanetPositionRangeRequest, GetPlanets
+from core.leaderboard import LeaderBoard
 from core.mint_planet import (
     ClaimPlanetRequest,
     FetchPlanetCostDataRequest,
@@ -53,6 +54,7 @@ class HttpController:
     medium_scrapper: MediumScraper
     favourite_planet: FavouritePlanet
     account: Account
+    leader_board: LeaderBoard
 
     async def jwt(self, req: AuthenticationDetailsRequest):
         return await self.authenticate_use_case(req)
@@ -211,6 +213,18 @@ class HttpController:
         self, wallet_id: str, user=Depends(jwt_bearer)
     ):
         re = await self.account.account_info(wallet_id)
+        return jsonable_encoder(re)
+
+    async def leaderboard_get_by_planets(
+        self, user=Depends(jwt_bearer)
+    ):
+        re = await self.leader_board.get_by_planets()
+        return jsonable_encoder(re)
+
+    async def leaderboard_get_by_users(
+        self, user=Depends(jwt_bearer)
+    ):
+        re = await self.leader_board.get_by_users()
         return jsonable_encoder(re)
 
     async def health(self):

@@ -30,7 +30,7 @@ class Account:
             total_planet_xp += planet.experience
 
         account_level = 0
-        for i in range(15):
+        for i in range(AccountLevelData.get_max_level()):
             xp_total_required = AccountLevelData.get_level_experience(i)
 
             if total_planet_xp < xp_total_required:

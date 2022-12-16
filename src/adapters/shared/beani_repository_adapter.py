@@ -761,6 +761,11 @@ class BeaniCurrencyMarketTradeRepositoryAdapter(CurrencyMarketTradeRepositoryPor
 
 
 class BeaniUserRepositoryAdapter(UserRepositoryPort):
+
+    async def update(self, user: UserDocument) -> User:
+        await user.save_changes()
+        return await self.find_user(str(user.id))
+
     async def all(self) -> list[User] | None:
         return await UserDocument.all().to_list()
 

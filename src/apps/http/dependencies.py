@@ -26,13 +26,14 @@ from core.currency_market import CurrencyMarket
 from core.favourite_planet import FavouritePlanet
 from core.fetch_chain_data import FetchChainData
 from core.get_planets import GetPlanets
+from core.leaderboard import LeaderBoard
 from core.medium_scraper import MediumScraper
 from core.mint_planet import MintPlanet
 from core.nft_metadata import NftData
 from core.planet_bkm import PlanetBKM
 from core.planet_email import PlanetEmail
 from core.planet_energy import PlanetEnergy
-from core.planet_level import PlanetLevel
+from core.experience_points import ExperiencePoints
 from core.planet_resources import PlanetResources
 from core.planet_staking import Staking
 from core.shared.ports import (
@@ -172,7 +173,7 @@ async def get_planets_use_case(planet_repository: PlanetRepositoryPort):
 
 
 async def get_buildable_items_use_case(
-    planet_repository: PlanetRepositoryPort, lvl_up_use_case: PlanetLevel
+    planet_repository: PlanetRepositoryPort, lvl_up_use_case: ExperiencePoints
 ):
     return BuildableItems(planet_repository, lvl_up_use_case, http_response_port)
 
@@ -247,11 +248,13 @@ async def get_staking_use_case(
 
 async def get_planet_level_use_case(
     planet_repository_port: PlanetRepositoryPort,
+    user_repository_port: UserRepositoryPort,
     email_use_case: PlanetEmail,
     chain_service_adapter: ChainServicePort,
 ):
-    return PlanetLevel(
+    return ExperiencePoints(
         planet_repository_port,
+        user_repository_port,
         email_use_case,
         chain_service_adapter,
         http_response_port,
@@ -275,6 +278,16 @@ async def get_account_use_case(
         http_response_port,
     )
 
+
+async def get_leaderboard_use_case(
+    planet_repository_port: PlanetRepositoryPort,
+    user_repository_port: UserRepositoryPort
+):
+    return LeaderBoard(
+        planet_repository_port,
+        user_repository_port,
+        http_response_port,
+    )
 # Controllers
 
 
@@ -283,12 +296,13 @@ async def get_middleware():
     contract_service = await contract_dependency(cache, config("RPCS_URL"))
     planet_repository = BeaniPlanetRepositoryAdapter()
     email_repository = EmailRepositoryAdapter()
+    user_repository = BeaniUserRepositoryAdapter()
 
     token_price = await token_price_dependency(cache, contract_service)
     email_use_case = await get_email_use_case(planet_repository, email_repository)
 
     lvl_up_use_case = await get_planet_level_use_case(
-        planet_repository, email_use_case, contract_service
+        planet_repository, user_repository, email_use_case, contract_service
     )
 
     items_use_case = await get_buildable_items_use_case(
@@ -319,8 +333,8 @@ async def http_controller():
 
     token_price = await token_price_dependency(cache, contract_service)
 
-    h = await get_email_use_case(planet_repository, email_repository)
-    k = await get_planet_level_use_case(planet_repository, h, contract_service)
+    email_use_case = await get_email_use_case(planet_repository, email_repository)
+    planet_level_use_case = await get_planet_level_use_case(planet_repository, user_repository, email_use_case, contract_service)
 
     auth_contract_service = contract_service
     if config("ENV") == "testnet":
@@ -330,7 +344,7 @@ async def http_controller():
     b = await buy_planet_use_case(token_price, contract_service, planet_repository)
     c = await fetch_chain_data_use_case(token_price, contract_service)
     d = await get_planets_use_case(planet_repository)
-    e = await get_buildable_items_use_case(planet_repository, k)
+    e = await get_buildable_items_use_case(planet_repository, planet_level_use_case)
     f = await get_planet_energy_use_case(
         token_price,
         energy_repository,
@@ -372,6 +386,7 @@ async def http_controller():
 
     account_use_case = await get_account_use_case(user_repository)
 
+    leaderboard_user_case = await get_leaderboard_use_case(planet_repository, user_repository)
     return HttpController(
         a,
         b,
@@ -380,11 +395,12 @@ async def http_controller():
         e,
         f,
         g,
-        h,
+        email_use_case,
         j,
         trading_use_case,
         planet_bkm_use_case,
         medium_scrapper_use_case,
         favourite_planet_use_case,
         account_use_case,
+        leaderboard_user_case
     )

@@ -206,6 +206,10 @@ class PlanetLevelData:
     }
 
     @staticmethod
+    def get_max_level(self):
+        return 50
+
+    @staticmethod
     def get_level_experience(level: int):
         return PlanetLevelData.LEVEL[level][CK.EXPERIENCE]
 
