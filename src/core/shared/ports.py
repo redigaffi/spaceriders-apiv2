@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import TypedDict
+from typing import TypedDict, AsyncIterator
 
 from core.shared.models import (
     BKMTransaction,
@@ -183,6 +183,10 @@ class UserRepositoryPort(ABC):
 
 
 class PlanetRepositoryPort(ABC):
+    @abstractmethod
+    async def planet_leaderboard(self, page: int, per_page: int) -> list[Planet] | None:
+        pass
+
     @abstractmethod
     async def get_by_request_id(
         self, request_id: str, fetch_links=False

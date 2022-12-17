@@ -206,7 +206,7 @@ class PlanetLevelData:
     }
 
     @staticmethod
-    def get_max_level(self):
+    def get_max_level():
         return 50
 
     @staticmethod

@@ -216,15 +216,15 @@ class HttpController:
         return jsonable_encoder(re)
 
     async def leaderboard_get_by_planets(
-        self, user=Depends(jwt_bearer)
+        self, page: int = 0, per_page: int = 10, user=Depends(jwt_bearer)
     ):
-        re = await self.leader_board.get_by_planets()
+        re = await self.leader_board.get_by_planets(page, per_page)
         return jsonable_encoder(re)
 
     async def leaderboard_get_by_users(
-        self, user=Depends(jwt_bearer)
+        self, page: int = 0, per_page: int = 10, user=Depends(jwt_bearer)
     ):
-        re = await self.leader_board.get_by_users()
+        re = await self.leader_board.get_by_users(page, per_page)
         return jsonable_encoder(re)
 
     async def health(self):
