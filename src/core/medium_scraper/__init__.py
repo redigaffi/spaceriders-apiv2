@@ -55,6 +55,7 @@ class MediumScraper:
 
                 filtered_output.append(filtered_element)
 
+            self.medium_content_parser.header_img_src = ''
             self.medium_content_parser.clean()
 
         self.medium_content_parser.close()
