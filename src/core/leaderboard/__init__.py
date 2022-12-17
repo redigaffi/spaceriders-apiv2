@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 from core.shared.ports import PlanetRepositoryPort, UserRepositoryPort, ResponsePort
 
@@ -7,8 +8,16 @@ from pydantic import BaseModel
 
 class PlanetLeaderBoardResponse(BaseModel):
     planet_name: str
-    user_alias: str
+    level: int
+    experience: int
+    faction: str
+    dominion: int
+    badges: list[str]
+
+
+class UserLeaderBoardResponse(BaseModel):
     wallet: str
+    username: Optional[str] = None
     level: int
     experience: int
     faction: str
@@ -30,10 +39,8 @@ class LeaderBoard:
             re.append(
                 PlanetLeaderBoardResponse(
                     planet_name=planet.name,
-                    user_alias=planet.user,
-                    wallet="",
-                    level=0,
-                    experience=0,
+                    level=planet.level,
+                    experience=planet.experience,
                     faction="",
                     dominion=0,
                     badges=[]
@@ -42,10 +49,21 @@ class LeaderBoard:
 
         return await self.response_port.publish_response(re)
 
-
-
-
-
-
     async def get_by_users(self, page: int, per_page: int):
-        pass
+        all_users = await self.user_repository_port.user_leaderboard(page, per_page)
+        re = []
+        for user in all_users:
+            re.append(
+                UserLeaderBoardResponse(
+                    wallet=user.wallet,
+                    username=user.username,
+                    level=user.level,
+                    experience=user.experience,
+                    faction="",
+                    dominion=0,
+                    badges=[]
+                )
+            )
+
+        return await self.response_port.publish_response(re)
+

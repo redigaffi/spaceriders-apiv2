@@ -162,6 +162,10 @@ class CurrencyMarketTradeRepositoryPort(ABC):
 
 class UserRepositoryPort(ABC):
     @abstractmethod
+    async def user_leaderboard(self, page: int, per_page: int) -> list[User] | None:
+        pass
+
+    @abstractmethod
     async def update(self, user: User) -> User:
         pass
 

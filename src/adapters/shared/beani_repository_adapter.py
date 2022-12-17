@@ -762,6 +762,13 @@ class BeaniCurrencyMarketTradeRepositoryAdapter(CurrencyMarketTradeRepositoryPor
 
 
 class BeaniUserRepositoryAdapter(UserRepositoryPort):
+    async def user_leaderboard(self, page: int, per_page: int) -> list[User] | None:
+        return await UserDocument.find()\
+            .sort(-UserDocument.level)\
+            .sort(-UserDocument.experience)\
+            .skip(page*per_page)\
+            .limit(per_page)\
+            .to_list()
 
     async def update(self, user: UserDocument) -> User:
         await user.save_changes()
