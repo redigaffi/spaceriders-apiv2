@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from core.mint_planet import MintPlanet
 from core.planet_bkm import PlanetBKM, RecoverBKMTransactionRequest
 from core.planet_energy import PlanetEnergy, PlanetEnergyRecoverEnergyDepositsRequest
-from core.planet_level import PlanetLevel
+from core.experience_points import ExperiencePoints
 from core.planet_staking import Staking
 from core.pve.asteroid import Asteroid
 from core.pve.space_pirates import SpacePirateRequest, SpacePirates
@@ -13,7 +13,7 @@ from core.pve.space_pirates import SpacePirateRequest, SpacePirates
 class CronjobController:
     energy_planet_use_case: PlanetEnergy
     staking_use_case: Staking
-    planet_level: PlanetLevel
+    planet_level: ExperiencePoints
     mint_planet: MintPlanet
     asteroid: Asteroid
     space_pirate: SpacePirates

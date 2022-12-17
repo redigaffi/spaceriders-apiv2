@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import AsyncIterator
 
 from beanie import DeleteRules, PydanticObjectId, WriteRules
 from beanie.operators import In
@@ -761,6 +762,18 @@ class BeaniCurrencyMarketTradeRepositoryAdapter(CurrencyMarketTradeRepositoryPor
 
 
 class BeaniUserRepositoryAdapter(UserRepositoryPort):
+    async def user_leaderboard(self, page: int, per_page: int) -> list[User] | None:
+        return await UserDocument.find()\
+            .sort(-UserDocument.level)\
+            .sort(-UserDocument.experience)\
+            .skip(page*per_page)\
+            .limit(per_page)\
+            .to_list()
+
+    async def update(self, user: UserDocument) -> User:
+        await user.save_changes()
+        return await self.find_user(str(user.id))
+
     async def all(self) -> list[User] | None:
         return await UserDocument.all().to_list()
 
@@ -783,6 +796,15 @@ class BeaniUserRepositoryAdapter(UserRepositoryPort):
 
 
 class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
+
+    async def planet_leaderboard(self, page: int, per_page: int) -> list[Planet] | None:
+        return await PlanetDocument.find()\
+            .sort(-PlanetDocument.level)\
+            .sort(-PlanetDocument.experience)\
+            .skip(page*per_page)\
+            .limit(per_page)\
+            .to_list()
+
     # seems like you cant update if it had fetch_links
     async def all_claimed_planets(self) -> list[Planet]:
         planets = await PlanetDocument.find(PlanetDocument.claimed == True).to_list()

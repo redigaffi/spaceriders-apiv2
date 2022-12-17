@@ -6,7 +6,7 @@ import random
 from pydantic import BaseModel
 
 from core.planet_email import PlanetEmail, PlanetSendEmailRequest
-from core.planet_level import PlanetLevel
+from core.experience_points import ExperiencePoints
 from core.shared.models import BuildableItem
 from core.shared.ports import PlanetRepositoryPort, ResponsePort
 from core.shared.static.game_data.DefenseData import DefenseData
@@ -21,7 +21,7 @@ class SpacePirateRequest(BaseModel):
 @dataclass
 class SpacePirates:
     planet_repository_port: PlanetRepositoryPort
-    planet_level: PlanetLevel
+    planet_level: ExperiencePoints
     planet_email: PlanetEmail
     response_port: ResponsePort
 

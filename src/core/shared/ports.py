@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import TypedDict
+from typing import TypedDict, AsyncIterator
 
 from core.shared.models import (
     BKMTransaction,
@@ -162,6 +162,14 @@ class CurrencyMarketTradeRepositoryPort(ABC):
 
 class UserRepositoryPort(ABC):
     @abstractmethod
+    async def user_leaderboard(self, page: int, per_page: int) -> list[User] | None:
+        pass
+
+    @abstractmethod
+    async def update(self, user: User) -> User:
+        pass
+
+    @abstractmethod
     async def all(self) -> list[User] | None:
         pass
 
@@ -179,6 +187,10 @@ class UserRepositoryPort(ABC):
 
 
 class PlanetRepositoryPort(ABC):
+    @abstractmethod
+    async def planet_leaderboard(self, page: int, per_page: int) -> list[Planet] | None:
+        pass
+
     @abstractmethod
     async def get_by_request_id(
         self, request_id: str, fetch_links=False

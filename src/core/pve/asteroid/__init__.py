@@ -5,7 +5,7 @@ import random
 from random import shuffle
 
 from core.planet_email import PlanetEmail, PlanetSendEmailRequest
-from core.planet_level import GivePlanetExperienceRequest, PlanetLevel
+from core.experience_points import GivePlanetExperienceRequest, ExperiencePoints
 from core.shared.models import BuildableItem
 from core.shared.ports import PlanetRepositoryPort, ResponsePort
 from core.shared.static.game_data.AsteroidData import AsteroidData
@@ -17,7 +17,7 @@ from core.shared.static.game_data.StakingData import StakingData
 @dataclass
 class Asteroid:
     planet_repository_port: PlanetRepositoryPort
-    planet_level: PlanetLevel
+    planet_level: ExperiencePoints
     planet_email: PlanetEmail
     response_port: ResponsePort
 

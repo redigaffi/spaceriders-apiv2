@@ -205,6 +205,16 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
             endpoint=http_controller.account_info,
             methods=["get"],
         ),
+        dict(
+            path=r"/leaderboard/planets",
+            endpoint=http_controller.leaderboard_get_by_planets,
+            methods=["get"],
+        ),
+        dict(
+            path=r"/leaderboard/users",
+            endpoint=http_controller.leaderboard_get_by_users,
+            methods=["get"],
+        ),
         dict(path=r"/health", endpoint=http_controller.health, methods=["get"]),
         dict(path=r"/feed", endpoint=http_controller.medium_feed, methods=["get"]),
     ]

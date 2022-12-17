@@ -206,6 +206,10 @@ class AccountLevelData:
     }
 
     @staticmethod
+    def get_max_level():
+        return 50
+
+    @staticmethod
     def get_level_experience(level: int):
         return list(AccountLevelData.LEVEL.values())[level][CK.EXPERIENCE]
 

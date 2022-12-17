@@ -4,7 +4,7 @@ import math
 
 from pydantic import BaseModel
 
-from core.planet_level import GivePlanetExperienceRequest, PlanetLevel
+from core.experience_points import GivePlanetExperienceRequest, ExperiencePoints, GiveUserExperienceRequest
 from core.shared.models import (
     AppBaseException,
     BuildableItem,
@@ -98,7 +98,7 @@ class CantRepairIfHealthIsFullException(AppBaseException):
 @dataclass
 class BuildableItems:
     planet_repository_port: PlanetRepositoryPort
-    planet_level_use_case: PlanetLevel
+    planet_level_use_case: ExperiencePoints
     response_port: ResponsePort
 
     async def _update_item_state(self, planet, item, queue):
@@ -434,6 +434,11 @@ class BuildableItems:
                 planet_id=str(planet.id), experience_amount=next_lvl.experience
             )
         )
+        await self.planet_level_use_case.give_user_experience(
+            GiveUserExperienceRequest(
+                user_id=str(planet.user), experience_amount=next_lvl.experience
+            )
+        )
 
         response = BuildableResponse.from_buildable_item(buildable)
         response.metal_paid = next_lvl.cost_metal
@@ -526,6 +531,11 @@ class BuildableItems:
         await self.planet_level_use_case.give_planet_experience(
             GivePlanetExperienceRequest(
                 planet_id=str(planet.id), experience_amount=experience
+            )
+        )
+        await self.planet_level_use_case.give_user_experience(
+            GiveUserExperienceRequest(
+                user_id=str(planet.user), experience_amount=experience
             )
         )
 
