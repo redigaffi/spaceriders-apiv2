@@ -5,14 +5,15 @@ from core.shared.ports import PlanetRepositoryPort, UserRepositoryPort, Response
 
 from pydantic import BaseModel
 
+from core.shared.static.game_data.AccountLevelData import AccountLevelData
+from core.shared.static.game_data.PlanetLevelData import PlanetLevelData
+
 
 class PlanetLeaderBoardResponse(BaseModel):
     planet_name: str
     level: int
     experience: int
-    faction: str
-    dominion: int
-    badges: list[str]
+    experience_needed: int
 
 
 class UserLeaderBoardResponse(BaseModel):
@@ -23,6 +24,8 @@ class UserLeaderBoardResponse(BaseModel):
     faction: str
     dominion: int
     badges: list[str]
+    experience_needed: int
+
 
 
 @dataclass
@@ -41,9 +44,7 @@ class LeaderBoard:
                     planet_name=planet.name,
                     level=planet.level,
                     experience=planet.experience,
-                    faction="",
-                    dominion=0,
-                    badges=[]
+                    experience_needed=PlanetLevelData.get_level_experience(planet.level+1)
                 )
             )
 
@@ -61,7 +62,8 @@ class LeaderBoard:
                     experience=user.experience,
                     faction="",
                     dominion=0,
-                    badges=[]
+                    badges=[],
+                    experience_needed=AccountLevelData.get_level_experience(user.level + 1)
                 )
             )
 
