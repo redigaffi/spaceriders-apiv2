@@ -14,6 +14,7 @@ class PlanetLeaderBoardResponse(BaseModel):
     level: int
     experience: int
     experience_needed: int
+    image_url_bg: str = None
 
 
 class UserLeaderBoardResponse(BaseModel):
@@ -27,11 +28,11 @@ class UserLeaderBoardResponse(BaseModel):
     experience_needed: int
 
 
-
 @dataclass
 class LeaderBoard:
     planet_repository_port: PlanetRepositoryPort
     user_repository_port: UserRepositoryPort
+    planet_images_bucket_path: str
     response_port: ResponsePort
 
     async def get_by_planets(self, page: int, per_page: int):
@@ -39,12 +40,14 @@ class LeaderBoard:
 
         re = []
         for planet in all_planets:
+            planet.set_image_url()
             re.append(
                 PlanetLeaderBoardResponse(
                     planet_name=planet.name,
                     level=planet.level,
                     experience=planet.experience,
-                    experience_needed=PlanetLevelData.get_level_experience(planet.level+1)
+                    experience_needed=PlanetLevelData.get_level_experience(planet.level+1),
+                    image_url_bg=planet.image_url_bg
                 )
             )
 

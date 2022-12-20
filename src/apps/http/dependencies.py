@@ -286,6 +286,7 @@ async def get_leaderboard_use_case(
     return LeaderBoard(
         planet_repository_port,
         user_repository_port,
+        config("PLANET_IMAGES_BUCKET_PATH"),
         http_response_port,
     )
 # Controllers
