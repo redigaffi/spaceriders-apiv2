@@ -205,8 +205,8 @@ class Planet(BaseModel):
     emails: list[Email] = []
 
     def set_image_url(self, url: str):
-        self.image_url = f"{url}/{self.image}-{self.rarity}.webp"
-        self.image_url_bg = f"{url}/{self.image}-{self.rarity}-bg.webp"
+        self.image_url = f"{url}/{self.type}-{self.rarity}-{self.image}.webp"
+        self.image_url_bg = f"{url}/{self.type}-{self.rarity}-{self.image}-bg.webp"
 
     # @TODO: Pydantic bug dont serialize properties, using root_validator is a workaround
     # @SEE: https://github.com/samuelcolvin/pydantic/pull/2625

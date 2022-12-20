@@ -7,21 +7,17 @@ from .Common import CommonKeys as CK
 class PlanetData:
     BUY_PLANET_COST_USD = 15
 
-    POISON = "poison"
-    WATER = "water"
-    FIRE = "fire"
-    GAS = "gas"
-    SAND = "sand"
+    CHLORINE = "chlorine"
+    OCEAN = "ocean"
+    LAVA = "lava"
+    ICE = "ice"
+    DESERT = "desert"
 
-    PlANET_TYPES = [POISON, GAS, WATER, SAND, FIRE]
+    PlANET_TYPES = [CHLORINE, ICE, OCEAN, DESERT, LAVA]
     PLANET_TYPE_WEIGHTS = (44, 30, 17, 7, 2)
-    PLANET_TYPE_IMAGE_MAPPING = {
-        POISON: 1,
-        WATER: 2,
-        FIRE: 3,
-        GAS: 4,
-        SAND: 5,
-    }
+
+    # How much images we have per type and rarity
+    PLANET_IMAGES_AMOUNT_PER_TYPE_RARITY = 2
 
     UNCOMMON = "uncommon"
     COMMON = "common"
@@ -34,7 +30,7 @@ class PlanetData:
 
     DATA = {
         COMMON: {                                                                                                                                   
-            POISON: {
+            CHLORINE: {
                 CK.DIAMETER: {
                     CK.RANGE: (180000, 200000),
                 },
@@ -51,7 +47,7 @@ class PlanetData:
                 },
             },
 
-            WATER: {
+            OCEAN: {
                 CK.DIAMETER: {
                     CK.RANGE: (180000, 200000),
                 },
@@ -68,7 +64,7 @@ class PlanetData:
                 },
             },
 
-            FIRE: {
+            LAVA: {
                 CK.DIAMETER: {
                     CK.RANGE: (180000, 200000),
                 },
@@ -85,7 +81,7 @@ class PlanetData:
                 },
             },
 
-            GAS: {
+            ICE: {
                 CK.DIAMETER: {
                     CK.RANGE: (180000, 200000),
                 },
@@ -102,7 +98,7 @@ class PlanetData:
                 },
             },
 
-            SAND: {
+            DESERT: {
                 CK.DIAMETER: {
                     CK.RANGE: (180000, 200000),
                 },
@@ -120,7 +116,7 @@ class PlanetData:
             },
         },
         UNCOMMON: {
-            POISON: {
+            CHLORINE: {
                 CK.DIAMETER: {
                     CK.RANGE: (200000, 230000),
                 },
@@ -136,7 +132,7 @@ class PlanetData:
                     CK.ENERGY: 750,
                 },
             },
-            WATER: {
+            OCEAN: {
                 CK.DIAMETER: {
                     CK.RANGE: (200000, 230000),
                 },
@@ -152,7 +148,7 @@ class PlanetData:
                     CK.ENERGY: 750,
                 },
             },
-            FIRE: {
+            LAVA: {
                 CK.DIAMETER: {
                     CK.RANGE: (200000, 230000),
                 },
@@ -168,7 +164,7 @@ class PlanetData:
                     CK.ENERGY: 750,
                 },
             },
-            GAS: {
+            ICE: {
                 CK.DIAMETER: {
                     CK.RANGE: (200000, 230000),
                 },
@@ -184,7 +180,7 @@ class PlanetData:
                     CK.ENERGY: 750,
                 },
             },
-            SAND: {
+            DESERT: {
                 CK.DIAMETER: {
                     CK.RANGE: (200000, 230000),
                 },
@@ -203,7 +199,7 @@ class PlanetData:
 
         },
         RARE: {
-            POISON: {
+            CHLORINE: {
                 CK.DIAMETER: {
                     CK.RANGE: (230000, 260000),
                 },
@@ -219,7 +215,7 @@ class PlanetData:
                     CK.ENERGY: 1000,
                 },
             },
-            WATER: {
+            OCEAN: {
                 CK.DIAMETER: {
                     CK.RANGE: (230000, 260000),
                 },
@@ -235,7 +231,7 @@ class PlanetData:
                     CK.ENERGY: 1000,
                 },
             },
-            FIRE: {
+            LAVA: {
                 CK.DIAMETER: {
                     CK.RANGE: (230000, 260000),
                 },
@@ -251,7 +247,7 @@ class PlanetData:
                     CK.ENERGY: 1000,
                 },
             },
-            GAS: {
+            ICE: {
                 CK.DIAMETER: {
                     CK.RANGE: (230000, 260000),
                 },
@@ -267,7 +263,7 @@ class PlanetData:
                     CK.ENERGY: 1000,
                 },
             },
-            SAND: {
+            DESERT: {
                 CK.DIAMETER: {
                     CK.RANGE: (230000, 260000),
                 },
@@ -287,7 +283,7 @@ class PlanetData:
 
         },
         EPIC: {
-            POISON: {
+            CHLORINE: {
                 CK.DIAMETER: {
                     CK.RANGE: (260000, 300000),
                 },
@@ -303,7 +299,7 @@ class PlanetData:
                     CK.ENERGY: 1250,
                 },
             },
-            WATER: {
+            OCEAN: {
                 CK.DIAMETER: {
                     CK.RANGE: (260000, 300000),
                 },
@@ -319,7 +315,7 @@ class PlanetData:
                     CK.ENERGY: 1250,
                 },
             },
-            FIRE: {
+            LAVA: {
                 CK.DIAMETER: {
                     CK.RANGE: (260000, 300000),
                 },
@@ -335,7 +331,7 @@ class PlanetData:
                     CK.ENERGY: 1250,
                 },
             },
-            GAS: {
+            ICE: {
                 CK.DIAMETER: {
                     CK.RANGE: (260000, 300000),
                 },
@@ -351,7 +347,7 @@ class PlanetData:
                     CK.ENERGY: 1250,
                 },
             },
-            SAND: {
+            DESERT: {
                 CK.DIAMETER: {
                     CK.RANGE: (260000, 300000),
                 },
@@ -369,7 +365,7 @@ class PlanetData:
             },
         },
         LEGENDARY: {
-            POISON: {
+            CHLORINE: {
                 CK.DIAMETER: {
                     CK.RANGE: (300000, 330000),
                 },
@@ -385,7 +381,7 @@ class PlanetData:
                     CK.ENERGY: 1500,
                 },
             },
-            WATER: {
+            OCEAN: {
                 CK.DIAMETER: {
                     CK.RANGE: (300000, 330000),
                 },
@@ -401,7 +397,7 @@ class PlanetData:
                     CK.ENERGY: 1500,
                 },
             },
-            FIRE: {
+            LAVA: {
                 CK.DIAMETER: {
                     CK.RANGE: (300000, 330000),
                 },
@@ -417,7 +413,7 @@ class PlanetData:
                     CK.ENERGY: 1500,
                 },
             },
-            GAS: {
+            ICE: {
                 CK.DIAMETER: {
                     CK.RANGE: (300000, 330000),
                 },
@@ -433,7 +429,7 @@ class PlanetData:
                     CK.ENERGY: 1500,
                 },
             },
-            SAND: {
+            DESERT: {
                 CK.DIAMETER: {
                     CK.RANGE: (300000, 330000),
                 },
