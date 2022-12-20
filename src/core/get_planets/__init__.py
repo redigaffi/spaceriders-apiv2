@@ -39,6 +39,7 @@ class PlanetInformationResponse(BaseModel):
     solar_system: int = None
     position: int = None
     user: str = None
+    type: str = None
 
     @staticmethod
     def from_planet_response(p: PlanetResponse) -> "PlanetInformationResponse":
@@ -54,6 +55,7 @@ class PlanetInformationResponse(BaseModel):
         re.solar_system = p.solar_system
         re.position = p.position
         re.user = p.user
+        re.type = p.type
         return re
 
 
@@ -145,6 +147,7 @@ class GetPlanets:
                     re.planets[a][b].image_url_bg = planets_by_position[
                         pos
                     ].image_url_bg
+                    re.planets[a][b].type = planets_by_position[pos].type
 
                 except KeyError:
                     empty_planet = PlanetInformationResponse()
