@@ -131,8 +131,7 @@ def get_planet_data():
         PlanetData.PlANET_TYPES, weights=PlanetData.PLANET_TYPE_WEIGHTS, k=1
     )[0]
 
-    planet_type_image = PlanetData.PLANET_TYPE_IMAGE_MAPPING[planet_type]
-
+    planet_image = random.randrange(1, PlanetData.PLANET_IMAGES_AMOUNT_PER_TYPE_RARITY+1)
     planet_level_data = PlanetData.DATA[rarity][planet_type]
 
     diameter_range = planet_level_data[CK.DIAMETER][CK.RANGE]
@@ -153,7 +152,7 @@ def get_planet_data():
 
     return (
         planet_level_data[CK.INITIAL_RESERVE],
-        planet_type_image,
+        planet_image,
         rarity,
         diameter,
         slots,
