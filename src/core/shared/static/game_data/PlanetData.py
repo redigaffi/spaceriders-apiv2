@@ -12,9 +12,10 @@ class PlanetData:
     LAVA = "lava"
     ICE = "ice"
     DESERT = "desert"
-
-    PlANET_TYPES = [CHLORINE, ICE, OCEAN, DESERT, LAVA]
-    PLANET_TYPE_WEIGHTS = (44, 30, 17, 7, 2)
+    GAS = "gas"
+    
+    PlANET_TYPES = [CHLORINE, ICE, OCEAN, DESERT, LAVA, GAS]
+    PLANET_TYPE_WEIGHTS = (40, 28, 16, 10, 4, 2)
 
     # How much images we have per type and rarity
     PLANET_IMAGES_AMOUNT_PER_TYPE_RARITY = 2
@@ -114,6 +115,23 @@ class PlanetData:
                     CK.ENERGY: 500,
                 },
             },
+            
+            GAS: {
+                CK.DIAMETER: {
+                    CK.RANGE: (180000, 200000),
+                },
+                CK.RESERVES: {
+                    CK.METAL: (450000, 550000),
+                    CK.CRYSTAL: (2571429, 3142857),
+                    CK.PETROL: (3180212, 3886926),
+                },
+                CK.INITIAL_RESERVE: {
+                    CK.METAL: 500,
+                    CK.PETROL: 309,
+                    CK.CRYSTAL: 429,
+                    CK.ENERGY: 500,
+                },
+            },
         },
         UNCOMMON: {
             CHLORINE: {
@@ -196,7 +214,22 @@ class PlanetData:
                     CK.ENERGY: 750,
                 },
             },
-
+            GAS: {
+                CK.DIAMETER: {
+                    CK.RANGE: (200000, 230000),
+                },
+                CK.RESERVES: {
+                    CK.METAL: (472500, 577500),
+                    CK.CRYSTAL: (2700000, 3300000),
+                    CK.PETROL: (3339223, 4081272),
+                },
+                CK.INITIAL_RESERVE: {
+                    CK.METAL: 525,
+                    CK.PETROL: 325,
+                    CK.CRYSTAL: 450,
+                    CK.ENERGY: 750,
+                },
+            },
         },
         RARE: {
             CHLORINE: {
@@ -279,7 +312,22 @@ class PlanetData:
                     CK.ENERGY: 1000,
                 },
             },
-
+            GAS: {
+                CK.DIAMETER: {
+                    CK.RANGE: (230000, 260000),
+                },
+                CK.RESERVES: {
+                    CK.METAL: (517500, 632500),
+                    CK.CRYSTAL: (2957143, 3614286),
+                    CK.PETROL: (3657244, 4469965),
+                },
+                CK.INITIAL_RESERVE: {
+                    CK.METAL: 575,
+                    CK.PETROL: 356,
+                    CK.CRYSTAL: 493,
+                    CK.ENERGY: 1000,
+                },
+            },
 
         },
         EPIC: {
@@ -363,6 +411,22 @@ class PlanetData:
                     CK.ENERGY: 1250,
                 },
             },
+            GAS: {
+                CK.DIAMETER: {
+                    CK.RANGE: (260000, 300000),
+                },
+                CK.RESERVES: {
+                    CK.METAL: (585000, 715000),
+                    CK.CRYSTAL: (3342857, 4085714),
+                    CK.PETROL: (4134276, 5053004),
+                },
+                CK.INITIAL_RESERVE: {
+                    CK.METAL: 650,
+                    CK.PETROL: 402,
+                    CK.CRYSTAL: 557,
+                    CK.ENERGY: 1250,
+                },
+            },
         },
         LEGENDARY: {
             CHLORINE: {
@@ -442,6 +506,22 @@ class PlanetData:
                     CK.METAL: 750,
                     CK.PETROL: 398,
                     CK.CRYSTAL: 750,
+                    CK.ENERGY: 1500,
+                },
+            },
+            GAS: {
+                CK.DIAMETER: {
+                    CK.RANGE: (300000, 330000),
+                },
+                CK.RESERVES: {
+                    CK.METAL: (675000, 825000),
+                    CK.CRYSTAL: (3857143, 4714286),
+                    CK.PETROL: (4770318, 5830389),
+                },
+                CK.INITIAL_RESERVE: {
+                    CK.METAL: 750,
+                    CK.PETROL: 464,
+                    CK.CRYSTAL: 643,
                     CK.ENERGY: 1500,
                 },
             },
