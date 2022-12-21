@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+import json
 
 from fastapi import WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
@@ -41,7 +41,16 @@ class WebsocketConnectionManager:
             if connection == websocket:
                 continue
 
-            await connection.send_text(message)
+            if connection.client_state == WebSocketState.CONNECTED:
+                await connection.send_text(message)
+
+    async def broadcast_from_list_except(self, message, websockets: list[WebSocket], websocket: WebSocket):
+        for connection in websockets:
+            if connection == websocket:
+                continue
+
+            if connection.client_state == WebSocketState.CONNECTED:
+                await connection.send_text(message)
 
 
 websocket_manager = WebsocketConnectionManager()
@@ -60,6 +69,14 @@ response_port = WebsocketResponsePort()
 class WebsocketEntryPoint:
     websocket_manager: WebsocketConnectionManager
     websocket_controller: WebsocketController
+    chat_messages: dict[str, list[dict[str, str]]]
+    websocket_frequency: dict
+
+    # chat = {
+    #     "1.1": [
+    #         {"sender": "wallet1", "message": "hello"}
+    #     ]
+    # }
 
     async def __call__(self, websocket: WebSocket):
         await self.websocket_manager.connect(websocket)
@@ -75,6 +92,37 @@ class WebsocketEntryPoint:
                     await self.websocket_manager.send_personal_message(
                         '{"response_type": "ping", "data": "pong"}', websocket
                     )
+
+                elif use_case == "subscribe_frequency":
+                    frequency = data["data"]["frequency"]
+                    if frequency not in self.websocket_frequency:
+                        self.websocket_frequency[frequency] = []
+                    self.websocket_frequency[frequency].append(websocket)
+
+                elif use_case == "emit_frequency":
+                    frequency = data["data"]["frequency"]
+                    message = data["data"]["message"]
+                    sender = data["data"]["sender"]
+
+                    if frequency not in self.websocket_frequency:
+                        self.websocket_frequency[frequency] = [websocket]
+
+                    if websocket not in self.websocket_frequency[frequency]:
+                        self.websocket_frequency[frequency].append(websocket)
+
+                    if frequency not in self.chat_messages:
+                        self.chat_messages[frequency] = []
+
+                    self.chat_messages[frequency].append({
+                        "sender": sender,
+                        "message": message
+                    })
+
+                    await self.websocket_manager.broadcast_from_list_except(message, self.websocket_frequency[frequency], websocket)
+
+                elif use_case == "receive_full_chat":
+                    frequency = data["data"]["frequency"]
+                    await self.websocket_manager.send_personal_message(json.dumps(self.chat_messages[frequency]), websocket)
 
                 elif use_case == "trade":
                     trade_re = await self.trade(data)
@@ -177,4 +225,4 @@ async def ws_controller():
 
 async def ws_entry_point():
     ws_controller_dependency = await ws_controller()
-    return WebsocketEntryPoint(websocket_manager, ws_controller_dependency)
+    return WebsocketEntryPoint(websocket_manager, ws_controller_dependency, {}, {})

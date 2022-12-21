@@ -20,14 +20,14 @@ import elasticapm
 
 app = FastAPI()
 
-apm = elasticapm.get_client()
-if apm is None:
-    apm = make_apm_client({
-        'SERVICE_NAME': 'spaceriders-websocket',
-        'SERVER_URL': 'http://apmserver:8200',
-        'ENVIRONMENT': config('ENV')
-    })
-app.add_middleware(ElasticAPM, client=apm)
+# apm = elasticapm.get_client()
+# if apm is None:
+#     apm = make_apm_client({
+#         'SERVICE_NAME': 'spaceriders-websocket',
+#         'SERVER_URL': 'http://apmserver:8200',
+#         'ENVIRONMENT': config('ENV')
+#     })
+# app.add_middleware(ElasticAPM, client=apm)
 
 @app.on_event("startup")
 async def app_init():
