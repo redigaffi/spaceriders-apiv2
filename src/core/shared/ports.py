@@ -161,6 +161,11 @@ class CurrencyMarketTradeRepositoryPort(ABC):
 
 
 class UserRepositoryPort(ABC):
+
+    @abstractmethod
+    async def all_users_count(self) -> int:
+        pass
+
     @abstractmethod
     async def user_leaderboard(self, page: int, per_page: int) -> list[User] | None:
         pass
@@ -187,6 +192,10 @@ class UserRepositoryPort(ABC):
 
 
 class PlanetRepositoryPort(ABC):
+    @abstractmethod
+    async def all_claimed_planets_count(self) -> int:
+        pass
+
     @abstractmethod
     async def planet_leaderboard(self, page: int, per_page: int) -> list[Planet] | None:
         pass

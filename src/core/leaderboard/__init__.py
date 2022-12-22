@@ -8,6 +8,13 @@ from pydantic import BaseModel
 from core.shared.static.game_data.AccountLevelData import AccountLevelData
 from core.shared.static.game_data.PlanetLevelData import PlanetLevelData
 
+class PaginatedResponse(BaseModel):
+    total_elements: int
+    total_pages: int
+    per_page: int
+    current_page: int
+    data: list
+
 
 class PlanetLeaderBoardResponse(BaseModel):
     planet_name: str
@@ -37,11 +44,12 @@ class LeaderBoard:
 
     async def get_by_planets(self, page: int, per_page: int):
         all_planets = await self.planet_repository_port.planet_leaderboard(page, per_page)
+        planet_count = await self.planet_repository_port.all_claimed_planets_count()
 
-        re = []
+        data = []
         for planet in all_planets:
             planet.set_image_url(self.planet_images_bucket_path)
-            re.append(
+            data.append(
                 PlanetLeaderBoardResponse(
                     planet_name=planet.name,
                     level=planet.level,
@@ -51,13 +59,21 @@ class LeaderBoard:
                 )
             )
 
-        return await self.response_port.publish_response(re)
+        return await self.response_port.publish_response(PaginatedResponse(
+            total_elements=planet_count,
+            total_pages=planet_count//per_page,
+            per_page=per_page,
+            current_page=page,
+            data=data
+        ))
 
     async def get_by_users(self, page: int, per_page: int):
         all_users = await self.user_repository_port.user_leaderboard(page, per_page)
-        re = []
+        user_count = await self.user_repository_port.all_users_count()
+
+        data = []
         for user in all_users:
-            re.append(
+            data.append(
                 UserLeaderBoardResponse(
                     wallet=user.wallet,
                     username=user.username,
@@ -70,5 +86,10 @@ class LeaderBoard:
                 )
             )
 
-        return await self.response_port.publish_response(re)
-
+        return await self.response_port.publish_response(PaginatedResponse(
+            total_elements=user_count,
+            total_pages=user_count // per_page,
+            per_page=per_page,
+            current_page=page,
+            data=data
+        ))
