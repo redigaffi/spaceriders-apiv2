@@ -777,6 +777,9 @@ class BeaniUserRepositoryAdapter(UserRepositoryPort):
     async def all(self) -> list[User] | None:
         return await UserDocument.all().to_list()
 
+    async def all_users_count(self) -> int:
+        return await UserDocument.all().count()
+
     async def find_user(self, wallet: str) -> User | None:
         re = await UserDocument.find_one(UserDocument.wallet == wallet, fetch_links=True)
         return re
@@ -798,12 +801,16 @@ class BeaniUserRepositoryAdapter(UserRepositoryPort):
 class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
 
     async def planet_leaderboard(self, page: int, per_page: int) -> list[Planet] | None:
-        return await PlanetDocument.find()\
+        return await PlanetDocument.find(PlanetDocument.claimed == True)\
             .sort(-PlanetDocument.level)\
             .sort(-PlanetDocument.experience)\
             .skip(page*per_page)\
             .limit(per_page)\
             .to_list()
+
+    async def all_claimed_planets_count(self) -> int:
+        planets = await PlanetDocument.find(PlanetDocument.claimed == True).count()
+        return planets
 
     # seems like you cant update if it had fetch_links
     async def all_claimed_planets(self) -> list[Planet]:

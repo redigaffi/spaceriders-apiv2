@@ -8,10 +8,10 @@ class AsteroidData:
     Data class representing in game items
     """
 
-    LEVELS = ["1-9"]
+    LEVELS = ["2-9"]
 
     ASTEROIDS = {
-        "1-9": {
+        "2-9": {
             # Expressed in km
             "diameter": (40, 70),
             # Expressed in meters

@@ -8,10 +8,10 @@ class SpacePiratesData:
     Data class representing in game items
     """
 
-    LEVELS = ["0-9"]
+    LEVELS = ["2-9"]
 
     SPACE_PIRATES = {
-        "0-9": {
+        "2-9": {
             # Amount of spacepirates
             "amount": (2, 3),
             "amount_steal_per_surviving_pirate": (50, 100),
@@ -54,4 +54,4 @@ class SpacePiratesData:
 
                 return amount, distance, speed, health, steal_per_space_ship
 
-        raise ValueError(f"No asteroid info for level {planet_level}")
+        raise ValueError(f"No space pirate info for level {planet_level}")
