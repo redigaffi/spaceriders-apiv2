@@ -40,7 +40,7 @@ class LeaderBoard:
 
         re = []
         for planet in all_planets:
-            planet.set_image_url()
+            planet.set_image_url(self.planet_images_bucket_path)
             re.append(
                 PlanetLeaderBoardResponse(
                     planet_name=planet.name,
