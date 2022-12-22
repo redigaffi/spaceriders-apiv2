@@ -125,7 +125,7 @@ async def cronjob_controller():
 
     email_use_case = PlanetEmail(planet_repository, email_repository, response_adapter)
     planet_level = ExperiencePoints(
-        planet_repository, email_use_case, contract, response_adapter
+        planet_repository, user_repository, email_use_case, contract, response_adapter
     )
 
     planet_mint = MintPlanet(
