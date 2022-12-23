@@ -122,7 +122,13 @@ class WebsocketEntryPoint:
 
                 elif use_case == "receive_full_chat":
                     frequency = data["data"]["frequency"]
-                    await self.websocket_manager.send_personal_message(json.dumps(self.chat_messages[frequency]), websocket)
+
+                    if frequency not in self.chat_messages:
+                        msgs = []
+                    else:
+                        msgs = self.chat_messages[frequency]
+
+                    await self.websocket_manager.send_personal_message(json.dumps(msgs), websocket)
 
                 elif use_case == "trade":
                     trade_re = await self.trade(data)
