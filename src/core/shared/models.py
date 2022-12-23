@@ -60,6 +60,10 @@ class User(BaseModel):
     planets: list["Planet"] = []
     level: int = None
     experience: int = None
+    last_login: int = None
+
+    daily_login_next_reward_timer: int = None
+    daily_login_streak: int = None
 
     def exists(self):
         return self.id is not None

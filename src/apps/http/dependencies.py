@@ -128,13 +128,15 @@ async def token_price_dependency(cache: CacheServicePort, contract: ChainService
 
 
 async def authenticate_use_case(
-    user_repo: UserRepositoryPort, chain_service_adapter: ChainServicePort
+    user_repo: UserRepositoryPort, chain_service_adapter: ChainServicePort, planet_repo: PlanetRepositoryPort, planet_email: PlanetEmail
 ):
     return Authenticate(
         config("SECRET_KEY"),
         config("ENV"),
         user_repo,
         chain_service_adapter,
+        planet_repo,
+        planet_email,
         http_response_port,
     )
 
@@ -341,7 +343,7 @@ async def http_controller():
     if config("ENV") == "testnet":
         auth_contract_service = contract_mainnet_service
 
-    a = await authenticate_use_case(user_repository, auth_contract_service)
+    a = await authenticate_use_case(user_repository, auth_contract_service, planet_repository, email_use_case)
     b = await buy_planet_use_case(token_price, contract_service, planet_repository)
     c = await fetch_chain_data_use_case(token_price, contract_service)
     d = await get_planets_use_case(planet_repository)
