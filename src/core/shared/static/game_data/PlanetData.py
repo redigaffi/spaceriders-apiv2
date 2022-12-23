@@ -15,7 +15,7 @@ class PlanetData:
     GAS = "gas"
     
     PlANET_TYPES = [CHLORINE, ICE, OCEAN, DESERT, LAVA, GAS]
-    PLANET_TYPE_WEIGHTS = (40, 28, 16, 10, 4, 2)
+    PLANET_TYPE_WEIGHTS = (24, 21, 18, 15, 12, 10)
 
     # How much images we have per type and rarity
     PLANET_IMAGES_AMOUNT_PER_TYPE_RARITY = 2
