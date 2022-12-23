@@ -14,12 +14,31 @@ class AccountInfoResponse(BaseModel):
     level: int
 
 
+class UpdateUsernameRequest(BaseModel):
+    wallet: str
+    username: str
+
+
+class UpdateUsernameResponse(BaseModel):
+    wallet: str
+    username: str
 
 
 @dataclass
 class Account:
     user_repository_port: UserRepositoryPort
     response_port: ResponsePort
+
+    async def update_user_name(self, req: UpdateUsernameRequest):
+        user: User = await self.user_repository_port.find_user_or_throw(req.wallet)
+        if len(req.username) > 0:
+            user.username = req.username
+            user = await self.user_repository_port.update(user)
+
+        return await self.response_port.publish_response(UpdateUsernameResponse(
+            wallet=user.wallet,
+            username=user.username
+        ))
 
     async def account_info(self, wallet_id: str):
         user: User = await self.user_repository_port.find_user(wallet_id)
