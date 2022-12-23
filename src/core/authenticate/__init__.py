@@ -171,8 +171,12 @@ class Authenticate:
             }
 
             # Check daily rewards, important to do it before updating `user.last_login` timestamp
-            if not new_user and len(user.planets) > 0:
-                user = await self.__check_daily_login_reward(user)
+            try:
+                if not new_user and len(user.planets) > 0:
+                    user = await self.__check_daily_login_reward(user)
+            except Exception as e:
+                # Dont block login if something breaks during daily login reward calculation!
+                logging.info(f"Something happened when checking daily login reward; exc: {e}")
 
             user.last_login = int(datetime.timestamp(datetime.now()))
             await self.user_repository_port.update(user)
