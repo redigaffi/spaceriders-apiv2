@@ -17,7 +17,7 @@ from core.shared.models import (
     BuildableItem,
     EnergyDeposit,
     Planet,
-    PlanetTier,
+    PlanetTier, User,
 )
 
 
@@ -204,6 +204,12 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
             response_model={},
             endpoint=http_controller.account_info,
             methods=["get"],
+        ),
+        dict(
+            path=r"/account/username",
+            response_model={},
+            endpoint=http_controller.update_username,
+            methods=["post"],
         ),
         dict(
             path=r"/leaderboard/planets",

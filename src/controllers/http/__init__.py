@@ -6,7 +6,7 @@ from fastapi import Depends
 from fastapi.encoders import jsonable_encoder
 
 from adapters.http.security import jwt_bearer
-from core.account import Account
+from core.account import Account, UpdateUsernameRequest
 from core.authenticate import Authenticate, AuthenticationDetailsRequest
 from core.buildable_items import BuildableItems, BuildableRequest, PayToClearQueueRequest
 from core.currency_market import CurrencyMarket, MyOpenOrdersResponse
@@ -213,6 +213,12 @@ class HttpController:
         self, wallet_id: str, user=Depends(jwt_bearer)
     ):
         re = await self.account.account_info(wallet_id)
+        return jsonable_encoder(re)
+
+    async def update_username(
+        self, request: UpdateUsernameRequest, user=Depends(jwt_bearer)
+    ):
+        re = await self.account.update_user_name(request)
         return jsonable_encoder(re)
 
     async def leaderboard_get_by_planets(
