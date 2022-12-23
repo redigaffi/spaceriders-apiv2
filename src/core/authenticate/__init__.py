@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from datetime import datetime, timezone
 import logging
 import time
 
@@ -8,8 +7,13 @@ import jwt
 from pydantic import BaseModel
 from web3.auto import w3
 
-from core.shared.models import AppBaseException
-from core.shared.ports import ChainServicePort, ResponsePort, UserRepositoryPort
+from core.planet_email import PlanetEmail, PlanetSendEmailRequest
+from core.shared.models import AppBaseException, User
+from core.shared.ports import ChainServicePort, ResponsePort, UserRepositoryPort, PlanetRepositoryPort
+from datetime import datetime
+import json
+
+from core.shared.static.game_data.DailyLoginRewardsData import DailyLoginRewardsData
 
 
 class AuthenticationDetailsRequest(BaseModel):
@@ -32,6 +36,8 @@ class Authenticate:
     env: str
     user_repository_port: UserRepositoryPort
     chain_service: ChainServicePort
+    planet_repository_port: PlanetRepositoryPort
+    email_use_case: PlanetEmail
     response_port: ResponsePort
 
     async def __ticket_testnet_access(self, address: str):
@@ -88,6 +94,59 @@ class Authenticate:
 
         return has_access
 
+    async def __check_daily_login_reward(self, user: User):
+
+
+        async def give_reward_planet(planets, day):
+            email_data = {
+                "day": day,
+            }
+            for planet in planets:
+                metal = DailyLoginRewardsData.get_rewards_by_day(day)["metal"]
+                petrol = DailyLoginRewardsData.get_rewards_by_day(day)["petrol"]
+                crystal = DailyLoginRewardsData.get_rewards_by_day(day)["crystal"]
+                energy = DailyLoginRewardsData.get_rewards_by_day(day)["energy"]
+
+                planet.resources.metal += metal
+                planet.resources.petrol += petrol
+                planet.resources.crystal += crystal
+                planet.resources.energy += energy
+                await self.planet_repository_port.update(planet)
+
+                email_data["metal"] = metal
+                email_data["crystal"] = crystal
+                email_data["petrol"] = petrol
+                email_data["energy"] = energy
+
+                email: PlanetSendEmailRequest = PlanetSendEmailRequest(
+                    planet_id_receiver=str(planet.id),
+                    title="Daily login reward",
+                    sub_title="Free resources just for logging in!",
+                    template="daily_login_reward",
+                    topic="",
+                    body=json.dumps(email_data),
+                )
+                await self.email_use_case.create(email)
+
+        now = int(datetime.timestamp(datetime.now()))
+
+        if not user.daily_login_next_reward_timer:
+            user.daily_login_streak = 1
+            user.daily_login_next_reward_timer = now + 86400  # +24h
+            await give_reward_planet(user.planets, 1)
+
+        elif user.daily_login_next_reward_timer <= user.last_login <= (user.daily_login_next_reward_timer + 86400):  # +24h
+            user.daily_login_next_reward_timer = now + 86400  # +24h
+            user.daily_login_streak += 1
+            await give_reward_planet(user.planets, user.daily_login_streak)
+
+        elif now >= user.last_login + 86400:  # +24h
+            user.daily_login_streak = 1
+            user.daily_login_next_reward_timer = now + 86400  # +24h
+            await give_reward_planet(user.planets, 1)
+
+        return user
+
     async def __call__(self, auth_details_request: AuthenticationDetailsRequest) -> str:
         message = encode_defunct(text="its me:" + auth_details_request.address)
         recovered_address = w3.eth.account.recover_message(
@@ -100,14 +159,27 @@ class Authenticate:
         if auth_details_request.address == recovered_address:
             user = await self.user_repository_port.find_user(recovered_address)
 
+            new_user = False
             if user is None:
+                new_user = True
                 user = await self.user_repository_port.create_user(recovered_address)
 
             payload = {
                 "user_id": user.wallet,
-                "exp": datetime.timestamp(datetime.now()) + 43200,
+                "exp": datetime.timestamp(datetime.now()) + 21600,
                 "token_type": "access",
             }
+
+            # Check daily rewards, important to do it before updating `user.last_login` timestamp
+            try:
+                if not new_user and len(user.planets) > 0:
+                    user = await self.__check_daily_login_reward(user)
+            except Exception as e:
+                # Dont block login if something breaks during daily login reward calculation!
+                logging.info(f"Something happened when checking daily login reward; exc: {e}")
+
+            user.last_login = int(datetime.timestamp(datetime.now()))
+            await self.user_repository_port.update(user)
 
             logging.info(f"Wallet {user.wallet} authenticated")
             jwt_str = jwt.encode(payload, self.secret_key, algorithm="HS256")

@@ -100,7 +100,7 @@ tests = ["mypy", "PyHamcrest (>=2.0.2)", "pytest (>=4.6)", "pytest-benchmark", "
 
 [[package]]
 name = "beanie"
-version = "1.11.11"
+version = "1.16.4"
 description = "Asynchronous Python ODM for MongoDB"
 category = "main"
 optional = false
@@ -109,16 +109,16 @@ develop = false
 
 [package.dependencies]
 click = ">=7"
+lazy-model = ">=0.0.3"
 motor = ">=2.5,<4.0"
-pydantic = ">=1.9.0"
+pydantic = ">=1.10.0"
 toml = "*"
-yarl = ">=1.6"
 
 [package.source]
 type = "git"
 url = "https://github.com/roman-right/beanie.git"
-reference = "1.11.12"
-resolved_reference = "837bf17b22e9ec9ff8ebe380fbe0e48825a96eb5"
+reference = "1.16.4"
+resolved_reference = "f75e26a387c6b7f19cf3c77356c034a40a554fcd"
 
 [[package]]
 name = "bitarray"
@@ -484,6 +484,17 @@ pyrsistent = ">=0.14.0,<0.17.0 || >0.17.0,<0.17.1 || >0.17.1,<0.17.2 || >0.17.2"
 [package.extras]
 format = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validator", "rfc3987", "uri-template", "webcolors (>=1.11)"]
 format-nongpl = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validator", "rfc3986-validator (>0.1.0)", "uri-template", "webcolors (>=1.11)"]
+
+[[package]]
+name = "lazy-model"
+version = "0.0.5"
+description = ""
+category = "main"
+optional = false
+python-versions = ">=3.7,<4.0"
+
+[package.dependencies]
+pydantic = ">=1.9.0"
 
 [[package]]
 name = "lru-dict"
@@ -891,7 +902,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.10,<3.11"
-content-hash = "0aafaceab90ea9012bbe65f22e492a5d2937e0c55940be40d547c1b0238d5941"
+content-hash = "dc97ee1fed5f7f1bb088a485987fbb4eb8a2d1950363abe3b802076999e0adef"
 
 [metadata.files]
 aiohttp = []
@@ -992,6 +1003,7 @@ ipfshttpclient = [
     {file = "ipfshttpclient-0.8.0a2.tar.gz", hash = "sha256:0d80e95ee60b02c7d414e79bf81a36fc3c8fbab74265475c52f70b2620812135"},
 ]
 jsonschema = []
+lazy-model = []
 lru-dict = []
 motor = [
     {file = "motor-2.5.1-py3-none-any.whl", hash = "sha256:961fdceacaae2c7236c939166f66415be81be8bbb762da528386738de3a0f509"},

@@ -129,8 +129,10 @@ class UserDocument(Document, User):
     username: str | None = None
     level: int | None = 0
     experience: int | None = 0
-
     planets: list[Link[PlanetDocument]] = []
+
+    daily_login_next_reward_timer: int | None = None
+    daily_login_streak: int | None = None
 
     class Settings:
         name = "user"
