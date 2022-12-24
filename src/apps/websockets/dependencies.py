@@ -1,3 +1,4 @@
+import datetime
 from dataclasses import dataclass
 import json
 
@@ -100,9 +101,11 @@ class WebsocketEntryPoint:
                     self.websocket_frequency[frequency].append(websocket)
 
                 elif use_case == "emit_frequency":
+                    timestamp = datetime.datetime.timestamp(datetime.datetime.now())
                     frequency = data["data"]["frequency"]
                     message = data["data"]["message"]
                     sender = data["data"]["sender"]
+                    sender_alias = data["data"]["sender_alias"]
 
                     if frequency not in self.websocket_frequency:
                         self.websocket_frequency[frequency] = [websocket]
@@ -113,12 +116,16 @@ class WebsocketEntryPoint:
                     if frequency not in self.chat_messages:
                         self.chat_messages[frequency] = []
 
-                    self.chat_messages[frequency].append({
+                    msg = {
                         "sender": sender,
-                        "message": message
-                    })
+                        "sender_alias": sender_alias,
+                        "message": message,
+                        "frequency": frequency,
+                        "timestamp": timestamp
+                    }
+                    self.chat_messages[frequency].append(msg)
 
-                    await self.websocket_manager.broadcast_from_list_except(message, self.websocket_frequency[frequency], websocket)
+                    await self.websocket_manager.broadcast_from_list_except(json.dumps(msg), self.websocket_frequency[frequency], websocket)
 
                 elif use_case == "receive_full_chat":
                     frequency = data["data"]["frequency"]
