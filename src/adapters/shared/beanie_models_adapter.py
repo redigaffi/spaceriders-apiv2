@@ -126,7 +126,7 @@ class PlanetDocument(Document, Planet):
 
 class UserDocument(Document, User):
     wallet: str
-    username: str | None = None
+    username: str | None = ""
     level: int | None = 0
     experience: int | None = 0
     planets: list[Link[PlanetDocument]] = []

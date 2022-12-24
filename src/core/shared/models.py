@@ -56,7 +56,7 @@ class QueueIsFullException(AppBaseException):
 class User(BaseModel):
     id: str = None
     wallet: str = None
-    username: str = None
+    username: str = ""
     planets: list["Planet"] = []
     level: int = None
     experience: int = None
