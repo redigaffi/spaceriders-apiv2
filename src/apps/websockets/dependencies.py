@@ -129,11 +129,13 @@ class WebsocketEntryPoint:
 
                 elif use_case == "receive_full_chat":
                     frequency = data["data"]["frequency"]
+                    msgs = {
+                        "response_type": "receive_full_chat",
+                        "data": []
+                    }
 
-                    if frequency not in self.chat_messages:
-                        msgs = []
-                    else:
-                        msgs = self.chat_messages[frequency]
+                    if frequency in self.chat_messages:
+                        msgs["data"] = self.chat_messages[frequency]
 
                     await self.websocket_manager.send_personal_message(json.dumps(msgs), websocket)
 
