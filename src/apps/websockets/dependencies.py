@@ -50,7 +50,8 @@ class WebsocketConnectionManager:
             if connection == websocket:
                 continue
 
-            await connection.send_text(message)
+            if connection.client_state == WebSocketState.CONNECTED:
+                await connection.send_text(message)
 
 
 websocket_manager = WebsocketConnectionManager()
