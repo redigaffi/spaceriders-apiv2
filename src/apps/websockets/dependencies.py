@@ -145,8 +145,7 @@ class WebsocketEntryPoint:
 
                     if frequency in self.chat_messages:
                         msgs["data"] = self.chat_messages[frequency]
-                    print("receive_full_chat")
-                    print(self.chat_messages[frequency])
+
 
 
                     await self.websocket_manager.send_personal_message(json.dumps(msgs), websocket)
