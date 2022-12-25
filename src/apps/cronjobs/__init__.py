@@ -87,7 +87,7 @@ async def main():
     schedule.every(1200).seconds.do(
         smart_contract_recover_by_planet_cronjob, controller
     )
-    schedule.every(1200).seconds.do(smart_contract_recover_by_user_cronjob, controller)
+    #schedule.every(1200).seconds.do(smart_contract_recover_by_user_cronjob, controller)
     schedule.every(16).hours.do(asteroid, controller)
     schedule.every(12).hours.do(space_pirate, controller)
 
