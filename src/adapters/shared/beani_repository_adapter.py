@@ -800,7 +800,7 @@ class BeaniUserRepositoryAdapter(UserRepositoryPort):
 class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
 
     async def planet_leaderboard(self, page: int, per_page: int) -> list[Planet] | None:
-        return await PlanetDocument.find(PlanetDocument.claimed == True)\
+        return await PlanetDocument.find()\
             .sort(-PlanetDocument.level, -PlanetDocument.experience)\
             .skip(page*per_page)\
             .limit(per_page)\
