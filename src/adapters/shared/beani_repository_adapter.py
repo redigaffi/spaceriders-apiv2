@@ -801,10 +801,9 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
 
     async def planet_leaderboard(self, page: int, per_page: int) -> list[Planet] | None:
         return await PlanetDocument.find()\
-            .sort(-PlanetDocument.level, -PlanetDocument.experience)\
             .skip(page*per_page)\
-            .limit(per_page)\
-            .to_list()
+            .limit(per_page) \
+            .sort(-PlanetDocument.level, -PlanetDocument.experience).to_list()
 
     async def all_claimed_planets_count(self) -> int:
         planets = await PlanetDocument.find(PlanetDocument.claimed == True).count()
