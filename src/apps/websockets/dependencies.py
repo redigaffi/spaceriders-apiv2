@@ -46,8 +46,9 @@ class WebsocketConnectionManager:
                 await connection.send_text(message)
 
     async def broadcast_from_list_except(self, message, websockets: list[WebSocket], websocket: WebSocket):
+        print("broadcast_from_list_except 0")
         for connection in websockets:
-            print("broadcast_from_list_except")
+            print("broadcast_from_list_except 1")
             if connection == websocket:
                 print("broadcast_from_list_except if")
                 continue
