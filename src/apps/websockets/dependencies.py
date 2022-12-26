@@ -101,8 +101,6 @@ class WebsocketEntryPoint:
                     )
 
                 elif use_case == "subscribe_frequency":
-                    print("subscribe_frequency")
-
                     frequency = data["data"]["frequency"]
                     if frequency not in self.websocket_frequency:
                         self.websocket_frequency[frequency] = []
@@ -114,18 +112,15 @@ class WebsocketEntryPoint:
                     message = data["data"]["message"]
                     sender = data["data"]["sender"]
                     sender_alias = data["data"]["sender_alias"]
-                    print("emit_frequency")
+
                     if frequency not in self.websocket_frequency:
                         self.websocket_frequency[frequency] = [websocket]
-                    print("emit_frequency1")
 
                     if websocket not in self.websocket_frequency[frequency]:
                         self.websocket_frequency[frequency].append(websocket)
-                    print("emit_frequency2")
 
                     if frequency not in self.chat_messages:
                         self.chat_messages[frequency] = []
-                    print("emit_frequency3")
 
                     msg = {
                         "sender": sender,
@@ -134,14 +129,9 @@ class WebsocketEntryPoint:
                         "frequency": frequency,
                         "timestamp": timestamp
                     }
-                    print("emit_frequency4")
 
                     self.chat_messages[frequency].append(msg)
-                    print("emit_frequency5")
-                    print(f"{len(self.websocket_frequency[frequency])} ws connections")
                     await self.websocket_manager.broadcast_from_list_except(json.dumps(msg), self.websocket_frequency[frequency], websocket)
-                    print("emit_frequency6")
-
 
                 elif use_case == "receive_full_chat":
                     frequency = data["data"]["frequency"]
@@ -153,7 +143,11 @@ class WebsocketEntryPoint:
                     if frequency in self.chat_messages:
                         msgs["data"] = self.chat_messages[frequency]
 
+                    if frequency not in self.websocket_frequency:
+                        self.websocket_frequency[frequency] = [websocket]
 
+                    if websocket not in self.websocket_frequency[frequency]:
+                        self.websocket_frequency[frequency].append(websocket)
 
                     await self.websocket_manager.send_personal_message(json.dumps(msgs), websocket)
 
