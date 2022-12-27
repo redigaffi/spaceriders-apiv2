@@ -764,9 +764,9 @@ class BeaniCurrencyMarketTradeRepositoryAdapter(CurrencyMarketTradeRepositoryPor
 class BeaniUserRepositoryAdapter(UserRepositoryPort):
     async def user_leaderboard(self, page: int, per_page: int) -> list[User] | None:
         return await UserDocument.find()\
-            .sort(-UserDocument.level,-UserDocument.experience)\
             .skip(page*per_page)\
             .limit(per_page)\
+            .sort(-UserDocument.experience,-UserDocument.level)\
             .to_list()
 
     async def update(self, user: UserDocument) -> User:
@@ -800,10 +800,10 @@ class BeaniUserRepositoryAdapter(UserRepositoryPort):
 class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
 
     async def planet_leaderboard(self, page: int, per_page: int) -> list[Planet] | None:
-        return await PlanetDocument.find()\
+        return await PlanetDocument.find(PlanetDocument.claimed == True)\
             .skip(page*per_page)\
             .limit(per_page) \
-            .sort(-PlanetDocument.experience, -PlanetDocument.level).to_list()
+            .sort(-PlanetDocument.experience, -PlanetDocument.level, +PlanetDocument.created_at).to_list()
 
     async def all_claimed_planets_count(self) -> int:
         planets = await PlanetDocument.find(PlanetDocument.claimed == True).count()
