@@ -88,8 +88,8 @@ async def main():
         smart_contract_recover_by_planet_cronjob, controller
     )
     #schedule.every(1200).seconds.do(smart_contract_recover_by_user_cronjob, controller)
-    schedule.every(16).hours.do(asteroid, controller)
-    schedule.every(12).hours.do(space_pirate, controller)
+    schedule.every(50).hours.do(asteroid, controller)
+    schedule.every(20).hours.do(space_pirate, controller)
 
     while True:
         await schedule.run_pending()
