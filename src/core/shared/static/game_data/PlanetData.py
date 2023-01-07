@@ -44,7 +44,7 @@ class PlanetData:
                     CK.METAL: 875,
                     CK.PETROL: 177,
                     CK.CRYSTAL: 429,
-                    CK.ENERGY: 500,
+                    CK.ENERGY: 5000,
                 },
             },
 
@@ -61,7 +61,7 @@ class PlanetData:
                     CK.METAL: 750,
                     CK.PETROL: 177,
                     CK.CRYSTAL: 500,
-                    CK.ENERGY: 500,
+                    CK.ENERGY: 5000,
                 },
             },
 
@@ -78,7 +78,7 @@ class PlanetData:
                     CK.METAL: 750,
                     CK.PETROL: 309,
                     CK.CRYSTAL: 286,
-                    CK.ENERGY: 500,
+                    CK.ENERGY: 5000,
                 },
             },
 
@@ -95,7 +95,7 @@ class PlanetData:
                     CK.METAL: 875,
                     CK.PETROL: 265,
                     CK.CRYSTAL: 286,
-                    CK.ENERGY: 500,
+                    CK.ENERGY: 5000,
                 },
             },
 
@@ -112,7 +112,7 @@ class PlanetData:
                     CK.METAL: 500,
                     CK.PETROL: 265,
                     CK.CRYSTAL: 500,
-                    CK.ENERGY: 500,
+                    CK.ENERGY: 5000,
                 },
             },
             
@@ -129,7 +129,7 @@ class PlanetData:
                     CK.METAL: 500,
                     CK.PETROL: 309,
                     CK.CRYSTAL: 429,
-                    CK.ENERGY: 500,
+                    CK.ENERGY: 5000,
                 },
             },
         },
@@ -147,7 +147,7 @@ class PlanetData:
                     CK.METAL: 919,
                     CK.PETROL: 186,
                     CK.CRYSTAL: 450,
-                    CK.ENERGY: 750,
+                    CK.ENERGY: 7500,
                 },
             },
             OCEAN: {
@@ -163,7 +163,7 @@ class PlanetData:
                     CK.METAL: 788,
                     CK.PETROL: 186,
                     CK.CRYSTAL: 525,
-                    CK.ENERGY: 750,
+                    CK.ENERGY: 7500,
                 },
             },
             LAVA: {
@@ -179,7 +179,7 @@ class PlanetData:
                     CK.METAL: 788,
                     CK.PETROL: 325,
                     CK.CRYSTAL: 300,
-                    CK.ENERGY: 750,
+                    CK.ENERGY: 7500,
                 },
             },
             ICE: {
@@ -195,7 +195,7 @@ class PlanetData:
                     CK.METAL: 919,
                     CK.PETROL: 278,
                     CK.CRYSTAL: 300,
-                    CK.ENERGY: 750,
+                    CK.ENERGY: 7500,
                 },
             },
             DESERT: {
@@ -211,7 +211,7 @@ class PlanetData:
                     CK.METAL: 525,
                     CK.PETROL: 278,
                     CK.CRYSTAL: 525,
-                    CK.ENERGY: 750,
+                    CK.ENERGY: 7500,
                 },
             },
             GAS: {
@@ -227,7 +227,7 @@ class PlanetData:
                     CK.METAL: 525,
                     CK.PETROL: 325,
                     CK.CRYSTAL: 450,
-                    CK.ENERGY: 750,
+                    CK.ENERGY: 7500,
                 },
             },
         },
@@ -245,7 +245,7 @@ class PlanetData:
                     CK.METAL: 1006,
                     CK.PETROL: 203,
                     CK.CRYSTAL: 493,
-                    CK.ENERGY: 1000,
+                    CK.ENERGY: 10000,
                 },
             },
             OCEAN: {
@@ -261,7 +261,7 @@ class PlanetData:
                     CK.METAL: 863,
                     CK.PETROL: 203,
                     CK.CRYSTAL: 575,
-                    CK.ENERGY: 1000,
+                    CK.ENERGY: 10000,
                 },
             },
             LAVA: {
@@ -277,7 +277,7 @@ class PlanetData:
                     CK.METAL: 863,
                     CK.PETROL: 356,
                     CK.CRYSTAL: 329,
-                    CK.ENERGY: 1000,
+                    CK.ENERGY: 10000,
                 },
             },
             ICE: {
@@ -293,7 +293,7 @@ class PlanetData:
                     CK.METAL: 1006,
                     CK.PETROL: 305,
                     CK.CRYSTAL: 329,
-                    CK.ENERGY: 1000,
+                    CK.ENERGY: 10000,
                 },
             },
             DESERT: {
@@ -309,7 +309,7 @@ class PlanetData:
                     CK.METAL: 575,
                     CK.PETROL: 305,
                     CK.CRYSTAL: 575,
-                    CK.ENERGY: 1000,
+                    CK.ENERGY: 10000,
                 },
             },
             GAS: {
@@ -325,7 +325,7 @@ class PlanetData:
                     CK.METAL: 575,
                     CK.PETROL: 356,
                     CK.CRYSTAL: 493,
-                    CK.ENERGY: 1000,
+                    CK.ENERGY: 10000,
                 },
             },
 
@@ -344,7 +344,7 @@ class PlanetData:
                     CK.METAL: 1138,
                     CK.PETROL: 230,
                     CK.CRYSTAL: 557,
-                    CK.ENERGY: 1250,
+                    CK.ENERGY: 12500,
                 },
             },
             OCEAN: {
@@ -360,7 +360,7 @@ class PlanetData:
                     CK.METAL: 975,
                     CK.PETROL: 230,
                     CK.CRYSTAL: 650,
-                    CK.ENERGY: 1250,
+                    CK.ENERGY: 12500,
                 },
             },
             LAVA: {
@@ -376,7 +376,7 @@ class PlanetData:
                     CK.METAL: 975,
                     CK.PETROL: 402,
                     CK.CRYSTAL: 371,
-                    CK.ENERGY: 1250,
+                    CK.ENERGY: 12500,
                 },
             },
             ICE: {
@@ -392,7 +392,7 @@ class PlanetData:
                     CK.METAL: 1138,
                     CK.PETROL: 345,
                     CK.CRYSTAL: 371,
-                    CK.ENERGY: 1250,
+                    CK.ENERGY: 12500,
                 },
             },
             DESERT: {
@@ -408,7 +408,7 @@ class PlanetData:
                     CK.METAL: 650,
                     CK.PETROL: 345,
                     CK.CRYSTAL: 650,
-                    CK.ENERGY: 1250,
+                    CK.ENERGY: 12500,
                 },
             },
             GAS: {
@@ -424,7 +424,7 @@ class PlanetData:
                     CK.METAL: 650,
                     CK.PETROL: 402,
                     CK.CRYSTAL: 557,
-                    CK.ENERGY: 1250,
+                    CK.ENERGY: 12500,
                 },
             },
         },
@@ -442,7 +442,7 @@ class PlanetData:
                     CK.METAL: 1313,
                     CK.PETROL: 265,
                     CK.CRYSTAL: 643,
-                    CK.ENERGY: 1500,
+                    CK.ENERGY: 15000,
                 },
             },
             OCEAN: {
@@ -458,7 +458,7 @@ class PlanetData:
                     CK.METAL: 1125,
                     CK.PETROL: 265,
                     CK.CRYSTAL: 750,
-                    CK.ENERGY: 1500,
+                    CK.ENERGY: 15000,
                 },
             },
             LAVA: {
@@ -474,7 +474,7 @@ class PlanetData:
                     CK.METAL: 1125,
                     CK.PETROL: 464,
                     CK.CRYSTAL: 429,
-                    CK.ENERGY: 1500,
+                    CK.ENERGY: 15000,
                 },
             },
             ICE: {
@@ -490,7 +490,7 @@ class PlanetData:
                     CK.METAL: 1313,
                     CK.PETROL: 398,
                     CK.CRYSTAL: 429,
-                    CK.ENERGY: 1500,
+                    CK.ENERGY: 15000,
                 },
             },
             DESERT: {
@@ -506,7 +506,7 @@ class PlanetData:
                     CK.METAL: 750,
                     CK.PETROL: 398,
                     CK.CRYSTAL: 750,
-                    CK.ENERGY: 1500,
+                    CK.ENERGY: 15000,
                 },
             },
             GAS: {
@@ -522,7 +522,7 @@ class PlanetData:
                     CK.METAL: 750,
                     CK.PETROL: 464,
                     CK.CRYSTAL: 643,
-                    CK.ENERGY: 1500,
+                    CK.ENERGY: 15000,
                 },
             },
         }
