@@ -183,21 +183,21 @@ class MintPlanet:
         if not request.name:
             raise PlanetNameMissingException()
 
-        nft_token_id = await self.contract_service.spaceriders_nft_call(
-            "byPlanetIdData", request.planet_id
-        )
-        requested_planets_data: list = await self.contract_service.spaceriders_nft_call(
-            "byTokenIdIdData", nft_token_id
-        )
+        #nft_token_id = await self.contract_service.spaceriders_nft_call(
+        #    "byPlanetIdData", request.planet_id
+        #)
+        #requested_planets_data: list = await self.contract_service.spaceriders_nft_call(
+        #    "byTokenIdIdData", nft_token_id
+        #)
 
-        exists = bool(requested_planets_data[2])
-        owner = str(requested_planets_data[4])
+        #exists = bool(requested_planets_data[2])
+        #owner = str(requested_planets_data[4])
 
-        if not exists:
-            raise PlanetIdNotFoundSmartContractException()
-
-        if owner.lower() != user.lower():
-            raise NotMyPlanetException()
+        # if not exists:
+        #     raise PlanetIdNotFoundSmartContractException()
+        #
+        # if owner.lower() != user.lower():
+        #     raise NotMyPlanetException()
 
         claimable = int(dt.datetime.now(dt.timezone.utc).timestamp() + 60)
 
