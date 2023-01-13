@@ -142,7 +142,7 @@ class Email(BaseModel):
     body: str = None
     sender: str = None
     read: bool = False
-    planet: str
+    planet: str = None
     topic: str = None
 
 

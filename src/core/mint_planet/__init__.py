@@ -99,11 +99,6 @@ class MintPlanet:
 
         token_amount_cost_wei = int(token_amount_cost * 10**18)
 
-        planet: Planet = await self.planet_repository.get(request.planet_id)
-
-        if planet is not None:
-            raise PlanetIdAlreadyExistsException()
-
         signed_msg = await self.contract_service.sign_message(
             ["string", "address", "uint256"],
             [request.planet_id, user, token_amount_cost_wei],
