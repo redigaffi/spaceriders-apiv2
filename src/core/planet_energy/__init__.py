@@ -49,7 +49,7 @@ class PlanetEnergy:
         )
 
         amount = request.amount - (request.amount * 0.1)  # fee
-        energy_amount = amount / 10
+        energy_amount = amount * 200
 
         if planet.resources.bkm <= amount:
             raise NotEnoughBKM
