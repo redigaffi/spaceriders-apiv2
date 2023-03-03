@@ -558,3 +558,12 @@ class Volume24Info(BaseModel):
     min_24: float = None
     pair1_volume: float = None
     pair2_volume: float = None
+
+
+class Voucher(BaseModel):
+    voucher_id: str
+    amount_metal: float = 0
+    amount_crystal: float = 0
+    amount_petrol: float = 0
+    amount_energy: float = 0
+    redeemed: bool

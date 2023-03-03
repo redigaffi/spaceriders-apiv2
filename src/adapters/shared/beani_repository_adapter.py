@@ -13,7 +13,7 @@ from adapters.shared.beanie_models_adapter import (
     EmailDocument,
     EnergyDepositDocument,
     PlanetDocument,
-    UserDocument,
+    UserDocument, VoucherDocument,
 )
 from core.shared.models import (
     BKMTransaction,
@@ -27,7 +27,7 @@ from core.shared.models import (
     PriceCandleDataGroupedByTimeInterval,
     User,
     UserNotFoundException,
-    Volume24Info,
+    Volume24Info, Voucher,
 )
 from core.shared.ports import (
     BKMDepositRepositoryPort,
@@ -36,7 +36,7 @@ from core.shared.ports import (
     EmailRepositoryPort,
     EnergyDepositRepositoryPort,
     PlanetRepositoryPort,
-    UserRepositoryPort,
+    UserRepositoryPort, VoucherRepositoryPort,
 )
 
 
@@ -946,3 +946,15 @@ class BeaniPlanetRepositoryAdapter(PlanetRepositoryPort):
         await user.save(link_rule=WriteRules.WRITE)
 
         return new_planet
+
+
+class BeaniVoucherRepositoryAdapter(VoucherRepositoryPort):
+    async def update(self, voucher: VoucherDocument) -> Voucher:
+        await voucher.save_changes()
+        return await self.find_voucher(voucher.voucher_id)
+
+    async def find_voucher(self, voucher_code: str) -> Voucher | None:
+        voucher = await VoucherDocument.find_one(
+            VoucherDocument.voucher_id == voucher_code
+        )
+        return voucher

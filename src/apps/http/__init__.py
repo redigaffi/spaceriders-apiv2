@@ -20,7 +20,7 @@ from adapters.shared.beanie_models_adapter import (
     EmailDocument,
     EnergyDepositDocument,
     PlanetDocument,
-    UserDocument,
+    UserDocument, VoucherDocument,
 )
 import apps.http.dependencies as dependencies
 from apps.http.dependencies import get_middleware
@@ -178,6 +178,7 @@ async def app_init():
             EmailDocument,
             CurrencyMarketOrderDocument,
             CurrencyMarketTradeDocument,
+            VoucherDocument
         ],
     )
 
