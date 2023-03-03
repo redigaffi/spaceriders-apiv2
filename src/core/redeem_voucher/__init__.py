@@ -7,7 +7,7 @@ from core.shared.ports import ResponsePort, VoucherRepositoryPort, PlanetReposit
 
 
 class RedeemVoucherRequest(BaseModel):
-    voucher_id: str
+    redeem_code: str
 
 
 class VoucherNotFoundException(AppBaseException):
@@ -30,7 +30,7 @@ class RedeemVoucher:
 
     async def redeem_voucher(self, user_id: str, request: RedeemVoucherRequest):
 
-        voucher = await self.voucher_repository.find_voucher(request.voucher_id)
+        voucher = await self.voucher_repository.find_voucher(request.redeem_code)
 
         if not voucher:
             raise VoucherNotFoundException()
