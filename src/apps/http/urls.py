@@ -12,6 +12,7 @@ from core.mint_planet import FetchPlanetCostDataResponse, FetchPlanetCostRespons
 from core.nft_metadata import OpenseaMetadataNftResponse
 from core.planet_bkm import BKMWithdrawResponse
 from core.planet_staking import CreateStakingResponse, TierInfoResponse
+from core.redeem_voucher import RedeemVoucherResponse
 from core.shared.models import (
     BKMTransaction,
     BuildableItem,
@@ -220,6 +221,12 @@ async def register_fastapi_routes(http_controller: HttpController) -> list:
             path=r"/leaderboard/users",
             endpoint=http_controller.leaderboard_get_by_users,
             methods=["get"],
+        ),
+        dict(
+            path=r"/redeem",
+            response_model=RedeemVoucherResponse,
+            endpoint=http_controller.redeem_voucher,
+            methods=["post"],
         ),
         dict(path=r"/health", endpoint=http_controller.health, methods=["get"]),
         dict(path=r"/feed", endpoint=http_controller.medium_feed, methods=["get"]),

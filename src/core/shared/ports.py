@@ -12,7 +12,7 @@ from core.shared.models import (
     Planet,
     PriceCandleDataGroupedByTimeInterval,
     User,
-    Volume24Info,
+    Volume24Info, Voucher,
 )
 
 
@@ -333,3 +333,13 @@ class TokenPricePort(ABC):
 
 class MediumContentParserPort(ABC):
     pass
+
+
+class VoucherRepositoryPort(ABC):
+    @abstractmethod
+    async def update(self, voucher: Voucher) -> Voucher:
+        pass
+
+    @abstractmethod
+    async def find_voucher(self, voucher_code: str) -> Voucher:
+        pass

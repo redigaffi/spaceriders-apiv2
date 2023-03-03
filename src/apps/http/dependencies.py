@@ -12,7 +12,7 @@ from adapters.shared.beani_repository_adapter import (
     BeaniUserRepositoryAdapter,
     BKMDepositRepositoryAdapter,
     EmailRepositoryAdapter,
-    EnergyDepositRepositoryAdapter,
+    EnergyDepositRepositoryAdapter, BeaniVoucherRepositoryAdapter,
 )
 from adapters.shared.cache_adapter import MemCacheCacheServiceAdapter
 from adapters.shared.evm_adapter import EvmChainServiceAdapter, TokenPriceAdapter
@@ -36,6 +36,7 @@ from core.planet_energy import PlanetEnergy
 from core.experience_points import ExperiencePoints
 from core.planet_resources import PlanetResources
 from core.planet_staking import Staking
+from core.redeem_voucher import RedeemVoucher
 from core.shared.ports import (
     CacheServicePort,
     ChainServicePort,
@@ -291,6 +292,12 @@ async def get_leaderboard_use_case(
         config("PLANET_IMAGES_BUCKET_PATH"),
         http_response_port,
     )
+
+async def get_redeem_voucher_use_case(
+    planet_repository_port: PlanetRepositoryPort,
+    redeem_voucher_port: BeaniVoucherRepositoryAdapter
+):
+    return RedeemVoucher(redeem_voucher_port, planet_repository_port, http_response_port)
 # Controllers
 
 
@@ -327,6 +334,7 @@ async def http_controller():
     email_repository = EmailRepositoryAdapter()
     currency_market_order_repository = BeaniCurrencyMarketOrderRepositoryAdapter()
     currency_market_trade_repository = BeaniCurrencyMarketTradeRepositoryAdapter()
+    redeem_voucher_repository = BeaniVoucherRepositoryAdapter()
 
     cache = await cache_dependency()
     contract_service = await contract_dependency(cache, config("RPCS_URL"))
@@ -390,6 +398,8 @@ async def http_controller():
     account_use_case = await get_account_use_case(user_repository)
 
     leaderboard_user_case = await get_leaderboard_use_case(planet_repository, user_repository)
+
+    redeem_voucher_use_case = await get_redeem_voucher_use_case(planet_repository, redeem_voucher_repository)
     return HttpController(
         a,
         b,
@@ -405,5 +415,6 @@ async def http_controller():
         medium_scrapper_use_case,
         favourite_planet_use_case,
         account_use_case,
-        leaderboard_user_case
+        leaderboard_user_case,
+        redeem_voucher_use_case
     )

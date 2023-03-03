@@ -17,7 +17,7 @@ from core.shared.models import (
     Reserves,
     Resources,
     User,
-    UserNotFoundException, BuildingQueueItem, BuildingQueue,
+    UserNotFoundException, BuildingQueueItem, BuildingQueue, Voucher,
 )
 
 
@@ -166,5 +166,19 @@ class CurrencyMarketTradeDocument(Document, CurrencyMarketTrade):
 
     class Settings:
         name = "currency_market_trade"
+        use_revision = True
+        use_state_management = True
+
+
+class VoucherDocument(Document, Voucher):
+    voucher_id: str
+    amount_metal: float = 0
+    amount_crystal: float = 0
+    amount_petrol: float = 0
+    amount_energy: float = 0
+    redeemed: bool = False
+
+    class Settings:
+        name = "vouchers"
         use_revision = True
         use_state_management = True

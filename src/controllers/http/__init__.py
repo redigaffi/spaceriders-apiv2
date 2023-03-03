@@ -31,6 +31,7 @@ from core.planet_staking import (
     Staking,
     UnStakeRequest,
 )
+from core.redeem_voucher import RedeemVoucher, RedeemVoucherRequest
 from core.shared.models import Planet
 from core.medium_scraper import MediumScraper
 
@@ -55,6 +56,7 @@ class HttpController:
     favourite_planet: FavouritePlanet
     account: Account
     leader_board: LeaderBoard
+    redeem_voucher_use_case: RedeemVoucher
 
     async def jwt(self, req: AuthenticationDetailsRequest):
         return await self.authenticate_use_case(req)
@@ -231,6 +233,10 @@ class HttpController:
         self, page: int = 0, per_page: int = 10, user=Depends(jwt_bearer)
     ):
         re = await self.leader_board.get_by_users(page, per_page)
+        return jsonable_encoder(re)
+
+    async def redeem_voucher(self, req: RedeemVoucherRequest, user=Depends(jwt_bearer)):
+        re = await self.redeem_voucher_use_case.redeem_voucher(user, req)
         return jsonable_encoder(re)
 
     async def health(self):
