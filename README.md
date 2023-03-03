@@ -10,7 +10,7 @@
 
 Before you start with this installation, you need to have running [spaceriders-smartcontracts](https://github.com/redigaffi/spaceriders-smartcontracts) project.
 
-Clone the project's repository.
+Clone the project's repository. 
 
 ```bash
 git clone git@github.com:redigaffi/spaceriders-apiv2.git
